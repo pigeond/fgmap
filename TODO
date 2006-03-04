@@ -1,0 +1,6 @@
+
+- Fix trail lines, they don't line up with all different plane icons...
+- Weird bug with fg_server= and server change
+- Why am I putting the server list to be inside the map?
+- Scale icons according to zoom level
+

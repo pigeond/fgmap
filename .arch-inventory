@@ -1,0 +1,4 @@
+precious ^(.*-devel.*)$
+precious ^(.*\.cpp)$
+precious ^(doc)$
+

@@ -1,0 +1,147 @@
+
+.fgmap_menu_title
+{
+    background-color: #000;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+.fgmap_menu_title_highlight
+{
+    background-color: #000;
+    color: #99f;
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+b.mh b { background-color: #000; }
+
+.fgmap_menu
+{
+    background-color: #000;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+.fgmap_title_label { font-weight: bold; }
+.fgmap_title_value { font-weight: bold; }
+.fgmap_v_separator { font-weight: bold; }
+
+.fgmap_field_label { font-weight: bold; }
+.fgmap_field_value { font-weight: bold; }
+
+/* Nice round menu effect */
+b.mh b { display: block; height: 1px; overflow: hidden; }
+b.m0 { margin: 0 0px; }
+b.m1 { margin: 0 6px; }
+b.m2 { margin: 0 4px; }
+b.m3 { margin: 0 3px; }
+b.m4 { margin: 0 2px; }
+b.m5 { margin: 0 1px; }
+
+
+a           { color: #99f; }
+a:link      { color: #99f; }
+a:visited   { color: #99f; }
+a:active    { color: #ddf; }
+a:hover     { color: #ddf; }
+
+
+#fgmap_menu_tabs span
+{
+    padding-left: 8px;
+    padding-top: 0px;
+    padding-right: 8px;
+    padding-bottom: 0px;
+    width: 0px;
+
+    border-left: 1px solid #777;
+    border-top: 1px solid #fff;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #fff;
+
+    background-color: #777;
+    color: #000;
+
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+#fgmap_menu_tabs .hover
+{
+    border-left: 1px solid #777;
+    border-top: 1px solid #fff;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #fff;
+
+    background-color: #555;
+    color: #fff;
+}
+
+#fgmap_menu_tabs .current
+{
+    padding-bottom: 3px;
+
+    border-left: 1px solid #fff;
+    border-top: none;
+    border-right: 1px solid #555;
+    border-bottom: 1px solid #fff;
+    
+    background-color: #000;
+    color: #fff;
+    font-weight: bold;
+}
+
+#fgmap_menu_tabs .tail
+{
+    border-left: none;
+    border-top: 1px solid #fff;
+    border-right: none;
+    border-bottom: none;
+
+    background-color: #000;
+}
+
+.fgmap_menu input,text,select,textarea
+{
+    font-family: sans-serif;
+    font-size: 11px;
+    font-weight: normal;
+}
+
+
+/* pilots tab */
+.fgmap_pilot_callsign { color: #fff; font-weight: bold; }
+.fgmap_pilot_callsign_highlight { color: #99f; font-weight: bold; }
+
+.fgmap_pilot_tab_msg { color: #fff; }
+
+.fgmap_pilot_tab_callsign { color: #fff; }
+.fgmap_pilot_tab_server { color: #fff; }
+.fgmap_pilot_tab_lng { color: #f55; }
+.fgmap_pilot_tab_lat { color: #fdb; }
+.fgmap_pilot_tab_model { color: #fff; }
+.fgmap_pilot_tab_alt { color: #fff; }
+.fgmap_pilot_tab_hdg { color: #fff; }
+
+
+/* map info box */
+.fgmap_pilot_info
+{
+    font-size: 10px;
+    font-family: monospace;
+    color: #fff;
+    background-color: #000;
+    padding: 5px;
+    width: auto;
+    white-space: nowrap;
+}
+
+.fgmap_pilot_info_callsign { color: white; font-weight: bold; }
+.fgmap_pilot_info_model { color: white; }
+.fgmap_pilot_info_alt { color: cyan; }
+.fgmap_pilot_info_hdg { color: gold; }
+.fgmap_pilot_info_spd { color: lime; }
+
