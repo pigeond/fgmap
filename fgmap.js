@@ -1147,8 +1147,15 @@ FGMap.prototype.init = function(force) {
  */
 FGMap.prototype.server_add = function(name, host, port) {
 
-    if(this.fg_servers[name] != null)
-        return false;
+    var server;
+
+    if(((server = this.fg_servers[name]) != null) &&
+        (server.host != null) &&
+        (server.host > 0))
+    {
+        this.fg_server_current = server;
+        return true;
+    }
 
     if(name == null)
         return false;
@@ -1179,24 +1186,24 @@ FGMap.prototype.server_add = function(name, host, port) {
  */
 FGMap.prototype.server_set = function(name) {
 
-    var fg_server;
+    var server;
 
-    if((fg_server = this.fg_servers[name]) == null) {
+    if((server = this.fg_servers[name]) == null) {
         return false;
     }
 
     if((this.fg_server_current != null) &&
-        (this.fg_server_current.name == fg_server.name) &&
-        (this.fg_server_current.port == fg_server.port)) {
+        (this.fg_server_current.name == server.name) &&
+        (this.fg_server_current.port == server.port)) {
 
         return false;
     }
 
-    if(fg_server.host == null || fg_server.port == 0) {
+    if(server.host == null || server.port == 0) {
         return false;
     }
 
-    this.fg_server_current = fg_server;
+    this.fg_server_current = server;
     this.pilots_clear();
 
     // TODO: Should we?
@@ -1205,6 +1212,8 @@ FGMap.prototype.server_set = function(name) {
     if(this.update) {
         this.map_update();
     }
+
+    this.linktomap_update();
 
     this.event_callback_call(FGMAP_EVENT_SERVER_CHANGED, name);
 };
@@ -1276,7 +1285,6 @@ FGMap.prototype.query_string_parse = function() {
 
             var spp = pair[1].split(",");
             this.server_add(spp[0], spp[1], spp[2]);
-
 
         } else if(pair[0] == "follow") {
 
@@ -1668,6 +1676,13 @@ FGMap.prototype.linktomap_update = function() {
     // FGMap settings
     for(var i = 0; i < this.follows.length; i++) {
         href += "&follow=" + this.follows[i];
+    }
+
+    // Current server
+    if(this.fg_server_current != null) {
+        href += "&fg_server=" + this.fg_server_current.name + "," +
+            this.fg_server_current.host + "," +
+            this.fg_server_current.port;
     }
 
     this.linktomap = href;
