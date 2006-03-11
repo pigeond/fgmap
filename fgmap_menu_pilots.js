@@ -59,6 +59,13 @@ FGMapMenuPilots.prototype.setup = function() {
 
     this.fgmap.event_callback_add(FGMAP_EVENT_PILOT_PAN,
         this.pilot_pan_cb.bind_event(this), null);
+
+    this.fgmap.event_callback_add(FGMAP_EVENT_PILOT_FOLLOW_ADD,
+        this.pilot_follow_cb.bind_event(this), null);
+    this.fgmap.event_callback_add(FGMAP_EVENT_PILOT_FOLLOW_REMOVE,
+        this.pilot_follow_cb.bind_event(this), null);
+    this.fgmap.event_callback_add(FGMAP_EVENT_PILOT_FOLLOWS_CLEAR,
+        this.pilot_follow_cb.bind_event(this), null);
 };
 
 
@@ -224,5 +231,8 @@ FGMapMenuPilots.prototype.pilot_pan_cb = function(event, cb_data, callsign) {
 }
 
 
+FGMapMenuPilots.prototype.pilot_follow_cb = function(event, cb_data, callsign) {
+    this.update();
+}
 
 

@@ -12,8 +12,10 @@ function FGMapMenuServer(fgmapmenu) {
 FGMapMenuServer.prototype.setup = function() {
 
     var elem = element_create(null, "div");
+    elem.style.textAlign = "center";
     elem.style.width = "100%";
     elem.style.height = "100%";
+    elem.style.paddingTop = "8px";
 
     var ul = element_create(elem, "ul");
     ul.style.width = "90%";
@@ -24,14 +26,13 @@ FGMapMenuServer.prototype.setup = function() {
     var li;
     
     li = element_create(ul, "li");
-    li.style.width = "48%";
-    li.style.cssFloat = "left";
-    li.style.styleFloat = "left";
     li.style.verticalAlign = "middle";
     li.style.whiteSpace = "nowrap";
-    //li.style.paddingLeft = "4px";
     li.style.paddingTop = "6px";
     li.style.paddingBottom = "6px";
+    li.className = "fgmap_field_label";
+
+    element_text_append(li, "Server: ");
 
     var select = this.select = element_create(li, "select");
     select.className = "fgmap_menu";

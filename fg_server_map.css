@@ -29,8 +29,10 @@ b.mh b { background-color: #000; }
 .fgmap_title_value { font-weight: bold; }
 .fgmap_v_separator { font-weight: bold; }
 
+/*
 .fgmap_field_label { font-weight: bold; }
 .fgmap_field_value { font-weight: bold; }
+*/
 
 /* Nice round menu effect */
 b.mh b { display: block; height: 1px; overflow: hidden; }

@@ -15,23 +15,24 @@
  * FGMap events
  */
 
+var event_cnt = 1;
 /**
  * When a pilot joins the server.
  * @tparam String callsign          the callsign of the plot
  */
-var FGMAP_EVENT_PILOT_JOIN = 1;
+var FGMAP_EVENT_PILOT_JOIN = event_cnt++;
 
 /**
  * When a pilot parts the server.
  * @tparam String callsign          the callsign of the plot
  */
-var FGMAP_EVENT_PILOT_PART = 2;
+var FGMAP_EVENT_PILOT_PART = event_cnt++;
 
 
 /**
  * When an update of the map has finished.
  */
-var FGMAP_EVENT_PILOTS_POS_UPDATE = 3;
+var FGMAP_EVENT_PILOTS_POS_UPDATE = event_cnt++;
 
 
 /**
@@ -40,34 +41,55 @@ var FGMAP_EVENT_PILOTS_POS_UPDATE = 3;
  * @tparam String host              the host of the server added
  * @tparam Integer port             the port of the server added
  */
-var FGMAP_EVENT_SERVER_ADDED = 4;
+var FGMAP_EVENT_SERVER_ADDED = event_cnt++;
 
-var FGMAP_EVENT_SERVER_REMOVED = 5;
+var FGMAP_EVENT_SERVER_REMOVED = event_cnt++;
 
 
 /**
  * When the server is changed.
  * @tparam String name              the name of the server changed to
  */
-var FGMAP_EVENT_SERVER_CHANGED = 6;
+var FGMAP_EVENT_SERVER_CHANGED = event_cnt++;
 
 /**
  * When the map is being resized
  */
-var FGMAP_EVENT_MAP_RESIZE = 7;
+var FGMAP_EVENT_MAP_RESIZE = event_cnt++;
 
 
 /**
  * When the map view has changed. Example: zoom in/out, pan, scroll, etc.
  */
-var FGMAP_EVENT_MAP_VIEW_CHANGED = 8;
+var FGMAP_EVENT_MAP_VIEW_CHANGED = event_cnt++;
 
 
 /**
  * When a pilot is panned/zoomed to.
- * @tparam String callsign          the callsign of the plot
+ * @tparam String callsign          the callsign of the pilot
  */
-var FGMAP_EVENT_PILOT_PAN = 9;
+var FGMAP_EVENT_PILOT_PAN = event_cnt++;
+
+
+/**
+ * When a pilot is added to the follow list.
+ * @tparam String callsign          the callsign of the pilot
+ */
+var FGMAP_EVENT_PILOT_FOLLOW_ADD = event_cnt++;
+
+
+/**
+ * When a pilot is removed from the follow list.
+ * @tparam String callsign          the callsign of the pilot
+ */
+var FGMAP_EVENT_PILOT_FOLLOW_REMOVE = event_cnt++;
+
+
+/**
+ * When the follow list has been cleared
+ */
+var FGMAP_EVENT_PILOT_FOLLOWS_CLEAR = event_cnt++;
+
 
 
 /** FGMapPilotInfoType @see FGMap.info_type_set */
@@ -947,10 +969,10 @@ FGPilot.prototype.remove = function() {
 
     dprint(this.fgmap, this.callsign + ": being removed");
 
+    this.fgmap.pilot_follow_remove(this.callsign);
+
     this.info.remove();
     this.marker.remove();
-
-    this.fgmap.pilot_follow_remove(this.callsign);
 
     this.trail_visible_set(false);
     // TODO: do I need to delete each element...
@@ -1032,6 +1054,7 @@ function FGMap(id)
     this.menu_visible = true;
     this.model_icon = false;
     this.debug = false;
+    this.pantoall = false;
 
     /* gmap initial settings */
     this.gmap = null;
@@ -1210,7 +1233,7 @@ FGMap.prototype.server_set = function(name) {
     //this.pilot_follows_clear();
 
     if(this.update) {
-        this.map_update();
+        this.map_update(true);
     }
 
     this.linktomap_update();
@@ -1310,15 +1333,19 @@ FGMap.prototype.query_string_parse = function() {
 };
 
 
-FGMap.prototype.map_update = function() {
+FGMap.prototype.map_update = function(force) {
 
     if(this.fg_server_current == null)
         return false;
 
     // TODO: At the moment, this mean we'll wait forever (or whatever the
     // default timeout is for a request
-    if(this.updating) {
+    if(this.updating && !force) {
         return false;
+    }
+
+    if(this.xml_request != null) {
+        this.xml_request.abort();
     }
 
     this.updating = true;
@@ -1381,6 +1408,10 @@ FGMap.prototype.xml_request_cb = function() {
                 has_new_pilots = true;
                 this.event_callback_call(FGMAP_EVENT_PILOT_JOIN, callsign);
 
+                if(this.pantoall) {
+                    this.pilot_follow_add(callsign);
+                }
+
             } else {
 
                 p = this.pilots[callsign];
@@ -1399,9 +1430,9 @@ FGMap.prototype.xml_request_cb = function() {
             if(onlines[callsign] == null) {
                 dprint(this, "deleted " + callsign);
                 this.pilots_cnt -= 1;
-                this.event_callback_call(FGMAP_EVENT_PILOT_PART, callsign);
                 this.pilots[callsign].remove();
                 delete(this.pilots[callsign]);
+                this.event_callback_call(FGMAP_EVENT_PILOT_PART, callsign);
             }
         }
 
@@ -1511,6 +1542,8 @@ FGMap.prototype.pilot_follow_add = function(callsign) {
         this.pilots[callsign].info_visible_set(true);
     }
 
+    this.event_callback_call(FGMAP_EVENT_PILOT_FOLLOW_ADD, callsign);
+
     this.linktomap_update();
 
     return true;
@@ -1536,6 +1569,7 @@ FGMap.prototype.pilot_follow_remove = function(callsign) {
             this.pilots[callsign].info_visible_set(false);
         }
         this.linktomap_update();
+        this.event_callback_call(FGMAP_EVENT_PILOT_FOLLOW_REMOVE, callsign);
         return true;
     } else {
         return false;
@@ -1548,6 +1582,7 @@ FGMap.prototype.pilot_follow_remove = function(callsign) {
  */
 FGMap.prototype.pilot_follows_clear = function() {
     this.follows = new Array();
+    this.event_callback_call(FGMAP_EVENT_PILOT_FOLLOWS_CLEAR);
 };
 
 
@@ -1579,7 +1614,9 @@ FGMap.prototype.follows_update = function() {
     }
 
     //var follow_padding = 0.0008;
-    var follow_padding = 0.005;
+    //var follow_padding = 0.005;
+    //var follow_padding = 0.08;
+    var follow_padding = 0.04;
 
     // Add some padding
     follow_bounds.minX -= follow_padding;
@@ -1653,6 +1690,29 @@ FGMap.prototype.info_type_set = function(type) {
         }
     }
 
+};
+
+
+/**
+ * Enable/Disable the Zoom/Pan to all pilots mode.
+ *
+ * @tparam Boolean pantoall     pan to all or not
+ */
+FGMap.prototype.pantoall_set = function(pantoall) {
+
+    if(this.pantoall == pantoall) {
+        return;
+    }
+
+    this.pantoall = pantoall;
+
+    if(pantoall) {
+        for(var callsign in this.pilots) {
+            this.pilot_follow_add(callsign);
+        }
+    } else {
+        this.pilot_follows_clear();
+    }
 };
 
 

@@ -506,6 +506,7 @@ Settings tab\
         </ul>\
     <li>You can turn on or off the trails of pilots with the \"Pilot trails\" checkbox.</li>\
     <li>You can turn on or off photographic icon for pilots with the \"Model icon\" checkbox. Currently this only works for c172p, 737 and the ufo.</li>\
+    <li>You can turn on or off the \"Zoom/Pan to all pilots\" mode with the corresponding checkbox. When this mode is enabled, all pilots will be \"followed\" automatically at all time. That also means any new pilots joining will be followed automatically too.</li>\
     <li>You can turn on debug mode of the map with the \"Debug\" checkbox. When it is turned on a debug tab will be added, showing debugging messages of the map.</li>\
 </ul>\
 \

@@ -35,6 +35,7 @@ FGMapMenuSettings.prototype.setup = function() {
 
     // Pilot label
     element_text_append(li, "Pilot label");
+    li.className = "fgmap_field_label";
     element_create(li, "br");
 
     element_text_append(li, "\u00a0\u00a0\u00a0");
@@ -70,6 +71,7 @@ FGMapMenuSettings.prototype.setup = function() {
 
     // Pilot trail
     li = element_clone(li, false);
+    li.className = "fgmap_field_label";
     element_attach(li, ul);
     this.trail_checkbox = checkbox = element_create(li, "input", "checkbox");
     checkbox.className = "fgmap_menu";
@@ -86,6 +88,7 @@ FGMapMenuSettings.prototype.setup = function() {
 
     // Model icon
     li = element_clone(li, false);
+    li.className = "fgmap_field_label";
     element_attach(li, ul);
     this.model_icon_checkbox = checkbox =
         element_create(li, "input", "checkbox");
@@ -105,6 +108,7 @@ FGMapMenuSettings.prototype.setup = function() {
 
     // Debug
     li = element_clone(li, false);
+    li.className = "fgmap_field_label";
     element_attach(li, ul);
     this.debug_checkbox = checkbox = element_create(li, "input", "checkbox");
     checkbox.className = "fgmap_menu";
@@ -118,6 +122,25 @@ FGMapMenuSettings.prototype.setup = function() {
     element_text_append(li, "\u00a0");
     element_text_append(li, "Debug");
     attach_event(checkbox, "click", this.debug_checkbox_cb.bind_event(this));
+
+
+    // Zoom all
+    li = element_clone(li, false);
+    li.className = "fgmap_field_label";
+    element_attach(li, ul);
+    this.debug_checkbox = checkbox = element_create(li, "input", "checkbox");
+    checkbox.className = "fgmap_menu";
+    if(this.fgmap.pantoall) {
+        checkbox.checked = true;
+        if(USER_AGENT.is_ie) {
+            checkbox.mychecked = true;
+        }
+        this.debug_show(true);
+    }
+    element_text_append(li, "\u00a0");
+    element_text_append(li, "Zoom/Pan to all pilots");
+    attach_event(checkbox, "click", this.pantoall_checkbox_cb.bind_event(this));
+
 
     this.fgmapmenu.tab_add("settings", "settings", elem, this);
 };
@@ -162,6 +185,12 @@ FGMapMenuSettings.prototype.debug_show = function(bool) {
 FGMapMenuSettings.prototype.debug_checkbox_cb = function(e) {
     var target = target_get(e || window.event);
     this.debug_show(target.checked);
+};
+
+
+FGMapMenuSettings.prototype.pantoall_checkbox_cb = function(e) {
+    var target = target_get(e || window.event);
+    this.fgmap.pantoall_set(target.checked);
 };
 
 
