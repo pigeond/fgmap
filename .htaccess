@@ -1,2 +1,4 @@
-Options +ExecCGI
+Options +ExecCGI +Includes
+AddHandler server-parsed .html
+DirectoryIndex fg_server_map.html
 

@@ -1616,7 +1616,8 @@ FGMap.prototype.follows_update = function() {
     //var follow_padding = 0.0008;
     //var follow_padding = 0.005;
     //var follow_padding = 0.08;
-    var follow_padding = 0.04;
+    //var follow_padding = 0.04;
+    var follow_padding = 0.001;
 
     // Add some padding
     follow_bounds.minX -= follow_padding;
