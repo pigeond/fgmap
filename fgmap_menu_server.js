@@ -101,7 +101,14 @@ FGMapMenuServer.prototype.update = function() {
     for(var name in this.fgmap.fg_servers) {
         var fg_server = this.fgmap.fg_servers[name];
         var option = element_create(this.select, "option");
-        option.text = name;
+
+        if(fg_server.longname == null) {
+            option.text = fg_server.name;
+        } else {
+            option.text = fg_server.longname;
+        }
+
+        option.server_name = fg_server.name;
 
         if(fg_server.host == null || fg_server.port == 0) {
             option.value = "";
@@ -122,7 +129,8 @@ FGMapMenuServer.prototype.update = function() {
 
 FGMapMenuServer.prototype.server_select_changed_cb = function(e) {
     var selected = this.select.options[this.select.selectedIndex];
-    this.fgmap.server_set(selected.text);
+    //this.fgmap.server_set(selected.text);
+    this.fgmap.server_set(selected.server_name);
 };
 
 
@@ -139,7 +147,8 @@ FGMapMenuServer.prototype.update_checkbox_cb = function(e) {
 
 
 FGMapMenuServer.prototype.server_added_cb = function(event,
-                                                    cb_data, name, host, port) {
+                                                    cb_data,
+                                                    name, longname, host, port) {
     this.update();
 };
 

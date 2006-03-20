@@ -38,6 +38,7 @@ var FGMAP_EVENT_PILOTS_POS_UPDATE = event_cnt++;
 /**
  * When server is added to the map.
  * @tparam String name              the name of the server added
+ * @tparam String longname          the longname of the server added
  * @tparam String host              the host of the server added
  * @tparam Integer port             the port of the server added
  */
@@ -1006,8 +1007,9 @@ FGPilot.prototype.marker_mouse_event_cb = function(e) {
 
 /* fg_server ******************************************************************/
 
-function fg_server(name, host, port) {
+function fg_server(name, longname, host, port) {
     this.name = name;
+    this.longname = longname;
     this.host = host;
     this.port = port;
 }
@@ -1161,14 +1163,16 @@ FGMap.prototype.init = function(force) {
 /**
  * Add a server to servers list.
  * 
- * @tparam String name      the name to be appeared for this server, must be
+ * @tparam String name      a short name to be appeared for this server, must be
  *                          unique
+ * @tparam String longname  a long name, possibly with description of this
+ *                          server
  * @tparam String host      the host of the server to connect to (ip or host
  *                          name). null for a placeholder item.
  * @tparam Integer port     the port to connect to (FG server admin port)
  * @treturn Boolean         true on success, false on failure
  */
-FGMap.prototype.server_add = function(name, host, port) {
+FGMap.prototype.server_add = function(name, longname, host, port) {
 
     var server;
 
@@ -1183,9 +1187,10 @@ FGMap.prototype.server_add = function(name, host, port) {
     if(name == null)
         return false;
 
-    this.fg_servers[name] = new fg_server(name, host, port);
+    this.fg_servers[name] = new fg_server(name, longname, host, port);
 
-    this.event_callback_call(FGMAP_EVENT_SERVER_ADDED, name, host, port);
+    this.event_callback_call(FGMAP_EVENT_SERVER_ADDED,
+        name, longname, host, port);
 
     if(this.fg_server_current == null) {
         this.server_set(name);
@@ -1307,7 +1312,7 @@ FGMap.prototype.query_string_parse = function() {
         if(pair[0] == "fg_server") {
 
             var spp = pair[1].split(",");
-            this.server_add(spp[0], spp[1], spp[2]);
+            this.server_add(spp[0], spp[0], spp[1], spp[2]);
 
         } else if(pair[0] == "follow") {
 
