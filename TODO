@@ -4,4 +4,5 @@
 - Why am I putting the server list to be inside the map?
 - Scale icons according to zoom level
 - Auto zoom/pan padding mechanism doesn't work well in all cases...
-
+- Optimization: pilot count should only be updated if there's an actual change.
+  

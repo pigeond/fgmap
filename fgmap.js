@@ -1618,11 +1618,17 @@ FGMap.prototype.follows_update = function() {
 
     }
 
-    //var follow_padding = 0.0008;
-    //var follow_padding = 0.005;
-    //var follow_padding = 0.08;
-    //var follow_padding = 0.04;
-    var follow_padding = 0.001;
+    var follow_padding;
+    
+    if(this.follows.length <= 1) {
+        follow_padding = 0;
+    } else {
+        //follow_padding = 0.0008;
+        //follow_padding = 0.005;
+        //follow_padding = 0.08;
+        follow_padding = 0.06;
+        //follow_padding = 0.04;
+    }
 
     // Add some padding
     follow_bounds.minX -= follow_padding;
