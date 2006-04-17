@@ -5,4 +5,5 @@
 - Scale icons according to zoom level
 - Auto zoom/pan padding mechanism doesn't work well in all cases...
 - Optimization: pilot count should only be updated if there's an actual change.
+- Expose more GMap stuff (disable panning/zoom, etc)
   

@@ -98,6 +98,14 @@ FGMapMenuServer.prototype.update = function() {
     // Clear the list
     this.select.length = 0;
 
+    var current_host = null;
+    var current_port = null;
+
+    if(this.fgmap.fg_server_current) {
+        current_host = this.fgmap.fg_server_current.host;
+        current_port = this.fgmap.fg_server_current.port;
+    }
+
     for(var name in this.fgmap.fg_servers) {
         var fg_server = this.fgmap.fg_servers[name];
         var option = element_create(this.select, "option");
@@ -116,8 +124,9 @@ FGMapMenuServer.prototype.update = function() {
 
             option.value = fg_server.host + ":" + fg_server.port;
 
-            if((this.fgmap.fg_server_current.host == fg_server.host) &&
-                (this.fgmap.fg_server_current.port == fg_server.port)) {
+            if((current_host != null) &&
+                (current_host == fg_server.host) &&
+                (current_port == fg_server.port)) {
                 option.selected = true;
             }
 

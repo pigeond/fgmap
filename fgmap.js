@@ -94,6 +94,8 @@ var FGMAP_EVENT_PILOT_FOLLOWS_CLEAR = event_cnt++;
 
 
 /** FGMapPilotInfoType @see FGMap.info_type_set */
+var FGMAP_PILOT_INFO_OFF = 0;
+/** FGMapPilotInfoType @see FGMap.info_type_set */
 var FGMAP_PILOT_INFO_ALWAYS = 1;
 /** FGMapPilotInfoType @see FGMap.info_type_set */
 var FGMAP_PILOT_INFO_FOLLOWS = 2;
@@ -124,7 +126,7 @@ var FGMAP_CRAFT_ICON_SMALLJET = "smalljet/smalljet";
 var FGMAP_CRAFT_MODELS_SMALLJET = [ "Citation-II", "Bravo", "fokker100", "tu154B" ];
 
 var FGMAP_CRAFT_ICON_HEAVYJET = "heavyjet/heavyjet";
-var FGMAP_CRAFT_MODELS_HEAVYJET = [ "boeing733", "boeing747-400-jw", "a320-fb", "A380", "AN-225-model", "B-52F-model", "Concorde-ba", "FINNAIRmd11", "MD11", "KLMmd11" ];
+var FGMAP_CRAFT_MODELS_HEAVYJET = [ "boeing733", "boeing747-400-jw", "a320-fb", "A380", "AN-225-model", "B-52F-model", "Concorde-ba", "FINNAIRmd11", "MD11", "KLMmd11", "737-300" ];
 
 
 
@@ -309,7 +311,34 @@ GMap.prototype.centerAndZoomOnBounds = function(bounds) {
     } else {
         this.recenterOrPanToLatLng(center);
     }
-} 
+}
+
+
+/* Inspired by http://www.phpied.com/javascript-include/ */
+function include_js(file) {
+
+    var head;
+    
+    head = document.getElementsByTagName('head').item(0);
+
+    if(head == null) {
+        return false;
+    }
+
+    var js = document.createElement('script');
+    js.setAttribute('language', 'javascript');
+    js.setAttribute('type', 'text/javascript');
+    js.setAttribute('src', file);
+    head.appendChild(js);
+
+    return true;
+}
+
+include_js("fgmap_menu.js");
+include_js("fgmap_menu_pilots.js");
+include_js("fgmap_menu_server.js");
+include_js("fgmap_menu_settings.js");
+include_js("fgmap_menu_debug.js");
 
 
 
@@ -985,7 +1014,8 @@ FGPilot.prototype.remove = function() {
 
 FGPilot.prototype.marker_mouse_event_cb = function(e) {
 
-    if(this.fgmap.info_type == FGMAP_PILOT_INFO_ALWAYS)
+    if(this.fgmap.info_type == FGMAP_PILOT_INFO_OFF ||
+        this.fgmap.info_type == FGMAP_PILOT_INFO_ALWAYS)
         return;
 
     if(this.fgmap.info_type == FGMAP_PILOT_INFO_FOLLOWS &&
@@ -1122,9 +1152,11 @@ FGMap.prototype.init = function(force) {
 
     this.query_string_parse();
 
-    //this.gmap.addControl(new GSmallMapControl());
-    this.gmap.addControl(new GLargeMapControl());
-    this.gmap.addControl(new GMapTypeControl());
+    if(!this.nomapcontrol) {
+        //this.gmap.addControl(new GSmallMapControl());
+        this.gmap.addControl(new GLargeMapControl());
+        this.gmap.addControl(new GMapTypeControl());
+    }
 
 
     GEvent.addListener(this.gmap, "moveend",
@@ -1157,6 +1189,19 @@ FGMap.prototype.init = function(force) {
 
     //this.pilot_test();
 
+    this.menu_setup();
+};
+
+
+FGMap.prototype.menu_setup = function() {
+
+    if(!this.nomenu) {
+        this.fgmap_menu = new FGMapMenu(this);
+
+        if(!this.menuminimized) {
+            this.fgmap_menu.menu_visible_set(true);
+        }
+    }
 };
 
 
@@ -1332,6 +1377,32 @@ FGMap.prototype.query_string_parse = function() {
             this.gmap_type = (pair[1] == "m" ? G_MAP_TYPE :
                                 (pair[1] == "s" ? G_SATELLITE_TYPE :
                                     G_HYBRID_TYPE));
+
+        } else if(pair[0] == "nomapcontrol") {
+
+            this.nomapcontrol = true;
+
+        } else if(pair[0] == "nomenu") {
+
+            this.nomenu = true;
+
+        } else if(pair[0] == "menuminimized") {
+
+            this.menuminimized = true;
+
+        } else if(pair[0] == "pilot_label") {
+
+            /* TODO: Update linktomap with this too */
+            if(pair[1] == "off") {
+                this.info_type = FGMAP_PILOT_INFO_OFF;
+            } else if(pair[1] == "always") {
+                this.info_type = FGMAP_PILOT_INFO_ALWAYS;
+            } else if(pair[1] == "follows") {
+                this.info_type = FGMAP_PILOT_INFO_FOLLOWS;
+            } else if(pair[1] == "mouseover") {
+                this.info_type = FGMAP_PILOT_INFO_MOUSEOVER;
+            }
+
         }
     }
 
@@ -1666,6 +1737,7 @@ FGMap.prototype.trail_visible_set = function(visible) {
  *
  * Type could be:
  * <ul>
+ * <li>#FGMAP_PILOT_INFO_OFF: info box is always off
  * <li>#FGMAP_PILOT_INFO_ALWAYS: info box is always shown
  * <li>#FGMAP_PILOT_INFO_FOLLOWS: info box is visible for pilots in the follow
  * list
@@ -1685,10 +1757,13 @@ FGMap.prototype.info_type_set = function(type) {
     this.info_type = type;
 
     if(type == FGMAP_PILOT_INFO_ALWAYS) {
+
         for(var callsign in this.pilots) {
             this.pilots[callsign].info_visible_set(true);
         }
+
     } else if(type == FGMAP_PILOT_INFO_FOLLOWS) {
+
         for(var callsign in this.pilots) {
             if(this.follows.indexOf(callsign) == -1) {
                 this.pilots[callsign].info_visible_set(false);
@@ -1696,10 +1771,14 @@ FGMap.prototype.info_type_set = function(type) {
                 this.pilots[callsign].info_visible_set(true);
             }
         }
-    } else if(type == FGMAP_PILOT_INFO_MOUSEOVER) {
+
+    } else if(type == FGMAP_PILOT_INFO_OFF ||
+        type == FGMAP_PILOT_INFO_MOUSEOVER) {
+
         for(var callsign in this.pilots) {
             this.pilots[callsign].info_visible_set(false);
         }
+
     }
 
 };

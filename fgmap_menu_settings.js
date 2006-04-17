@@ -48,6 +48,13 @@ FGMapMenuSettings.prototype.setup = function() {
 
     var option;
     option = element_create(select, "option");
+    option.text = "off";
+    option.value = FGMAP_PILOT_INFO_OFF;
+    if(this.fgmap.info_type == FGMAP_PILOT_INFO_OFF) {
+        option.selected = true;
+    }
+
+    option = element_create(select, "option");
     option.text = "always";
     option.value = FGMAP_PILOT_INFO_ALWAYS;
     if(this.fgmap.info_type == FGMAP_PILOT_INFO_ALWAYS) {

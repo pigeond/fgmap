@@ -59,7 +59,7 @@ FGMapMenu.prototype.init = function() {
     span.style.cursor = "pointer";
     span.style.padding = "0px";
     span.style.margin = "0px";
-    span.title = "Click here to bring up menu";
+    span.title = "Click here to bring up the menu";
 
     attach_event(span, "click", this.menu_visible_toggle.bind_event(this));
 
@@ -411,10 +411,10 @@ FGMapMenu.prototype.menu_visible_set = function(visible) {
 
     if(visible) {
         element_show(this.menu_body);
-        this.menu_title_span.title = "Click here to hide menu";
+        this.menu_title_span.title = "Click here to minimize the menu";
     } else {
         element_hide(this.menu_body);
-        this.menu_title_span.title = "Click here to bring up menu";
+        this.menu_title_span.title = "Click here to bring up the menu";
     }
 
 };
@@ -498,8 +498,9 @@ Settings tab\
 </p>\
 \
 <ul style=\"margin: 0px 0px 0px 0px; padding: 0px 0px 0px 8px;\">\
-    <li>You can choose how the pilot label will be shown on the map. Currently there are 3 modes:<br>\
+    <li><a name=\"pilot_label\"></a>You can choose how the pilot label will be shown on the map. Currently there are 3 modes:<br>\
         <ul style=\"margin: 0px 0px 0px 0px; padding: 0px 0px 0px 16px;\">\
+            <li style=\"line-height: 150%;\"><code>off</code> - labels are always off.</li>\
             <li style=\"line-height: 150%;\"><code>always</code> - labels will be shown for all pilots at any time.</li>\
             <li style=\"line-height: 150%;\"><code>follow always</code> - labels will only be shown for pilots which are selected for \"follow\" in the pilot tab.</li>\
             <li style=\"line-height: 150%;\"><code>mouse over only</code> - labels will only be shown when you move your mouse over the icon of a pilot.</li>\
@@ -540,6 +541,19 @@ Currently valid keys and values are:<br>\
     <li style=\"line-height: 150%;\">\
     <code>follow</code> - Follow the pilot at startup given its callsign. Multiple follow is allowed.<br>\
     example: <code>follow=pigeon&follow=ampere</code>\
+    </li>\
+    <li style=\"line-height: 150%;\">\
+    <code>pilot_label</code> - Set the startup pilot label mode. Valid values are <code>off</code>, <code>always</code>, <code>follows</code>, and <code>mouseover</code>. See the help of the settings tab more info.<br>\
+    example: <code>pilot_label=off</code>\
+    </li>\
+    <li style=\"line-height: 150%;\">\
+    <code>nomapcontrol</code> - Hide Google Map zoom and map mode controls.<br>\
+    </li>\
+    <li style=\"line-height: 150%;\">\
+    <code>nomenu</code> - Hide the menu, completely.<br>\
+    </li>\
+    <li style=\"line-height: 150%;\">\
+    <code>menuminimized</code> - Have the menu minimized on startup.<br>\
     </li>\
 </ul>\
 <br><br><br>\

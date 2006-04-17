@@ -22,11 +22,6 @@
     </script>
 
     <script src="fgmap.js"></script>
-    <script src="fgmap_menu.js"></script>
-    <script src="fgmap_menu_pilots.js"></script>
-    <script src="fgmap_menu_server.js"></script>
-    <script src="fgmap_menu_settings.js"></script>
-    <script src="fgmap_menu_debug.js"></script>
 
     <style type="text/css">
 
@@ -54,7 +49,7 @@
         {
             var fgmap = new FGMap("fgmap");
 
-            fgmap.server_add("-- For FG stable --", null, null, 0);
+            fgmap.server_add("-- For FG 0.9.10 --", null, null, 0);
 
             fgmap.server_add("mpserver01:5000",
                 "mpserver01.flightgear.org:5000 (Germany)",
@@ -83,9 +78,6 @@
             fgmap.server_add("mpserver03:5002",
                 "mpserver03.flightgear.org:5002 (East Coast US)",
                 "mpserver03.flightgear.org", 5003);
-
-            var fgmap_menu = new FGMapMenu(fgmap);
-            fgmap_menu.menu_visible_set(true);
 
             //fgmap.debug_set(true);
         }
