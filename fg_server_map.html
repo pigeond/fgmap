@@ -5,12 +5,12 @@
     <title>FlightGear server online map</title>
 
 <!--#if expr="\"${HTTP_HOST}\" = \"localhost\"" -->
-    <!-- <script src="http://maps.google.com/maps?file=api&v=1&key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBQsnjKtmoBcGM7Hr46AB7vQ9RgJehStikuzXFq1JhXNmGuz2srLpjo-WQ" type="text/javascript"></script> -->
-    <script src="http://maps.google.com/maps?file=api&v=1&key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBSSDzLYxvyashWcRaKE0aRFfeXqiBT-k8HQ3MAYQqUw2bKJcU1Dwcb-kA" type="text/javascript"></script>
+    <!-- <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBQsnjKtmoBcGM7Hr46AB7vQ9RgJehStikuzXFq1JhXNmGuz2srLpjo-WQ" type="text/javascript"></script> -->
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBSSDzLYxvyashWcRaKE0aRFfeXqiBT-k8HQ3MAYQqUw2bKJcU1Dwcb-kA" type="text/javascript"></script>
 <!--#elif expr="\"${HTTP_HOST}\" = \"mpmap02.flightgear.org\"" -->
-    <script src="http://maps.google.com/maps?file=api&v=1&key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBRG77dGRhGm-4jBcEKVK_TcS9THYxQ6SxiPE4mzyPWv_KfNfV1m51X4bw" type="text/javascript"></script>
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBRG77dGRhGm-4jBcEKVK_TcS9THYxQ6SxiPE4mzyPWv_KfNfV1m51X4bw" type="text/javascript"></script>
 <!--#else -->
-    <script src="http://maps.google.com/maps?file=api&v=1&key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBTuVNkUjJsSLgxO_mO4bdtL0EB06xS8NVUrVk2drnESv2I3ZmTI2shkGA" type="text/javascript"></script>
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBTuVNkUjJsSLgxO_mO4bdtL0EB06xS8NVUrVk2drnESv2I3ZmTI2shkGA" type="text/javascript"></script>
 <!--#endif -->
 
     <script>
@@ -55,10 +55,12 @@
                 "mpserver01.flightgear.org:5000 (Germany)",
                 "mpserver01.flightgear.org", 5001);
 
+            // 22.266133,114.246467
             fgmap.server_add("mpserver02:5000",
                 "mpserver02.flightgear.org:5000 (Hong Kong)",
                 "mpserver02.flightgear.org", 5001);
 
+            // 37.2285 -80.4239
             fgmap.server_add("mpserver03:5000",
                 "mpserver03.flightgear.org:5000 (East Coast US)",
                 "mpserver03.flightgear.org", 5001);
@@ -88,7 +90,7 @@
 
   </head>
 
-  <body onLoad="fgmap_load();">
+  <body onLoad="fgmap_load();" onUnload="GUnload();">
     <div id="fgmap" style="width: 100%; height: 100%;"></div>
   </body>
 </html>

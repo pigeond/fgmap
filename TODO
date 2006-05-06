@@ -3,7 +3,8 @@
 - Weird bug with fg_server= and server change
 - Why am I putting the server list to be inside the map?
 - Scale icons according to zoom level
-- Auto zoom/pan padding mechanism doesn't work well in all cases...
 - Optimization: pilot count should only be updated if there's an actual change.
 - Expose more GMap stuff (disable panning/zoom, etc)
   
+- Seems to be fixed along with GMap v2: Auto zoom/pan padding mechanism doesn't work well in all cases...
+

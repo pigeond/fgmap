@@ -527,8 +527,8 @@ Currently valid keys and values are:<br>\
         example: <code>fg_server=os-devel,postrobot.de,5003</code>\
     </li>\
     <li style=\"line-height: 150%;\">\
-    <code>ll</code> - Longitude and latitude (in that order) at startup.<br>\
-    example: <code>ll=-122.357237,37.613545</code>\
+    <code>ll</code> - Latitude and Longitude (in that order) at startup.<br>\
+    example: <code>ll=37.613545,-122.357237</code>\
     </li>\
     <li style=\"line-height: 150%;\">\
     <code>z</code> - map zoom level, range 0 - 17, being 0 is the highest zoom level.<br>\

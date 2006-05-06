@@ -93,9 +93,8 @@ FGMapMenuPilots.prototype.update = function() {
     for(var callsign in this.fgmap.pilots) {
 
         var p = this.fgmap.pilots[callsign];
-        var marker = p.marker;
-        var lng = marker.point.x;
-        var lat = marker.point.y;
+        var lat = p.latlng.lat();
+        var lng = p.latlng.lng();
 
         var li = element_clone(base_li, false);
         element_attach(li, ul);
@@ -146,14 +145,14 @@ FGMapMenuPilots.prototype.update = function() {
         element_text_append(li, "(");
 
         span = element_create(li, "span");
-        span.className = "fgmap_pilot_tab_lng";
-        span.innerHTML = lng.toFixed(4);
+        span.className = "fgmap_pilot_tab_lat";
+        span.innerHTML = lat.toFixed(4);
 
         element_text_append(li, " , ");
 
         span = element_create(li, "span");
-        span.className = "fgmap_pilot_tab_lat";
-        span.innerHTML = lat.toFixed(4);
+        span.className = "fgmap_pilot_tab_lng";
+        span.innerHTML = lng.toFixed(4);
 
         element_text_append(li, ")");
 

@@ -129,6 +129,9 @@ var FGMAP_CRAFT_ICON_HEAVYJET = "heavyjet/heavyjet";
 var FGMAP_CRAFT_MODELS_HEAVYJET = [ "boeing733", "boeing747-400-jw", "a320-fb", "A380", "AN-225-model", "B-52F-model", "Concorde-ba", "FINNAIRmd11", "MD11", "KLMmd11", "737-300" ];
 
 
+var FGMAP_CRAFT_ICON_GLIDER = "glider/glider";
+var FGMAP_CRAFT_MODELS_GLIDER = [ "hgldr-cs-model", "paraglider_model", "colditz-model" ];
+
 
 // TODO
 var pi_size = new GSize(40, 40);
@@ -290,30 +293,6 @@ function attach_event(elem, event_str, bind_func) {
 }
 
 
-/*
- * GMap additional function from Chris Smoak
- * @see http://groups.google.com/group/Google-Maps-API/tree/browse_frm/thread/4cedb228f3a86ea0/e48fa56dbd04c6f4?rnum=1&hl=en&_done=%2Fgroup%2FGoogle-Maps-API%2Fbrowse_frm%2Fthread%2F4cedb228f3a86ea0%2F%3F#doc_5643aa572b0e01ff
- */
-GMap.prototype.centerAndZoomOnBounds = function(bounds) {
-
-    var span = new GSize(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY);
-
-    var center = new GPoint(bounds.minX + span.width / 2.,
-                            bounds.minY + span.height / 2.);
-
-    var newZoom = this.spec.getLowestZoomLevel(center, span, this.viewSize);
-
-    // My own change here
-    //if (this.getZoomLevel() != newZoom) {
-
-    if (this.getZoomLevel() < newZoom) {
-        this.centerAndZoom(center, newZoom);
-    } else {
-        this.recenterOrPanToLatLng(center);
-    }
-}
-
-
 /* Inspired by http://www.phpied.com/javascript-include/ */
 function include_js(file) {
 
@@ -456,74 +435,82 @@ function element_clone(elem, deep) {
 
 
 
-/* gmap_element ***************************************************************/
-/* Helper functions for creating/manipulating element within GMap */
+/* GMapElement ***************************************************************/
+/* Helper class for creating/manipulating overlay within GMap */
 
+function GMapElement(latlng, align, child, gmap_pane) {
+    this.latlng = latlng;
+    this.align = align;
+    this.gmap_pane = gmap_pane || G_MAP_MARKER_PANE;
+    this.child = child;
+}
+GMapElement.prototype = new GOverlay();
 
-function gmap_element(gmap, lnglat, align, child) {
+GMapElement.prototype.copy = function() {
+    return new GMapElement(this.latlng, this.align, this.child, this.gmap_pane);
+};
+
+GMapElement.prototype.initialize = function(gmap) {
 
     this.gmap = gmap;
-    this.point = lnglat;
-    this.align = align;
-
-    this.elem = element_create(gmap.div, "div");
+    this.elem = element_create(gmap.getPane(this.gmap_pane), "div");
     this.elem.style.position = "absolute";
-    this.elem.style.zIndex = 10; // FIXME
+    this.elem.style.zIndex = GOverlay.getZIndex(this.latlng.lat());
 
-    GEvent.bind(gmap, "zoom", this, function() { this.update(); });
-    GEvent.bind(gmap, "moveend", this, function() { this.update(); });
-
-    this.update(lnglat, align);
-
-    this.child_set(child);
-}
+    this.update(this.latlng, this.align);
+    this.child_set(this.child);
+};
 
 
-gmap_element.prototype.child_set = function(child) {
+GMapElement.prototype.child_set = function(child) {
     if(child) {
         this.child = child;
         this.elem.appendChild(child);
     }
 };
 
-gmap_element.prototype.update = function(lnglat, align) {
 
-    if(lnglat)
-        this.point = lnglat;
+GMapElement.prototype.update = function(latlng, align) {
+
+    if(latlng)
+        this.latlng = latlng;
 
     if(align)
         this.align = align;
 
-    var bc = this.gmap.spec.getBitmapCoordinate(this.point.y, this.point.x,
-                                            this.gmap.getZoomLevel());
-    var dc = this.gmap.getDivCoordinate(bc.x, bc.y);
-
+    var dc = this.gmap.fromLatLngToDivPixel(this.latlng);
     this.elem.style.left = str_to_pos(dc.x + this.align.x);
     this.elem.style.top = str_to_pos(dc.y + this.align.y);
 };
 
 
-gmap_element.prototype.show = function() {
+GMapElement.prototype.redraw = function(force) {
+    this.update(this.latlng, this.align);
+};
+
+
+/*
+GMapElement.prototype.show = function() {
     element_show(this.elem);
 };
 
 
-gmap_element.prototype.hide = function() {
+GMapElement.prototype.hide = function() {
     element_hide(this.elem);
 };
+*/
 
 
-gmap_element.prototype.remove = function() {
+GMapElement.prototype.remove = function() {
     element_remove(this.child);
     this.child = null;
     element_remove(this.elem);
     this.eleme = null;
-    delete(this.point);
-    this.point = null;
+    delete(this.latlng);
+    this.latlng = null;
     delete(this.align);
     this.align = null;
 };
-
 
 
 /* Pilot class ***************************************************************/
@@ -545,7 +532,7 @@ gmap_element.prototype.remove = function() {
  * @tparam String server_ip     The server ip or host name which this pilot
  *                              connected to.
  */
-function FGPilot(fgmap, callsign, lng, lat, alt, model, server_ip) {
+function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip) {
 
     this.fgmap = fgmap;
     this.callsign = callsign;
@@ -557,7 +544,7 @@ function FGPilot(fgmap, callsign, lng, lat, alt, model, server_ip) {
     if(isNaN(lat))
         lat = 0;
 
-    this.point = new GPoint(lng, lat);
+    this.latlng = new GLatLng(lat, lng);
 
     this.hdg = "N/A";
     this.last_disp_hdg = -1;
@@ -576,8 +563,8 @@ function FGPilot(fgmap, callsign, lng, lat, alt, model, server_ip) {
     /* Arrays of GPolyline */
     this.polylines = new Array();
 
-    /* Arrays of GPoint for the polyline */
-    this.trails = [ this.point ];
+    /* Arrays of GLatLng for the polyline */
+    this.trails = [ this.latlng ];
 
 
     var elem, span;
@@ -588,9 +575,11 @@ function FGPilot(fgmap, callsign, lng, lat, alt, model, server_ip) {
     elem.style.zIndex = FGMAP_PILOT_INFO_ZINDEX;
     //element_opacity_set(elem, 0.65);
 
-    this.info = new gmap_element(fgmap.gmap, this.point,
-                                    new GPoint(20, 15),
-                                    this.info_elem);
+    this.info = new GMapElement(this.latlng,
+                                new GPoint(20, 15),
+                                this.info_elem);
+    fgmap.gmap.addOverlay(this.info);
+
     // TODO
     element_opacity_set(this.info.elem, 0.65);
 
@@ -670,14 +659,22 @@ function FGPilot(fgmap, callsign, lng, lat, alt, model, server_ip) {
         this.marker_mouse_event_cb.bind_event(this));
 
 
-    this.marker = new gmap_element(fgmap.gmap, this.point,
+    /*
+    this.marker = new gmap_element(fgmap.gmap, this.latlng,
                                     new GPoint(-(pi_anchor.x), -(pi_anchor.y)),
                                     this.icon_elem);
+    */
+    this.marker = new GMapElement(this.latlng,
+                                    new GPoint(-(pi_anchor.x), -(pi_anchor.y)),
+                                    this.icon_elem);
+    fgmap.gmap.addOverlay(this.marker);
 
 
     this.marker_update(true);
 
 }
+
+FGPilot.prototype = new GOverlay();
 
 
 /**
@@ -687,20 +684,20 @@ function FGPilot(fgmap, callsign, lng, lat, alt, model, server_ip) {
  * update the position of the pilot's icon. It will also calculate and update
  * the heading and ground speed of this pilot.
  *
- * @tparam Float lng            the new longitude of this pilot.
  * @tparam Float lat            the new latitude of this pilot.
+ * @tparam Float lng            the new longitude of this pilot.
  * @tparam Float alt            the new altitude of this pilot.
  */
-FGPilot.prototype.position_update = function(lng, lat, alt) {
+FGPilot.prototype.position_update = function(lat, lng, alt) {
 
-    if(isNaN(lng))
-        lng = 0;
     if(isNaN(lat))
         lat = 0;
+    if(isNaN(lng))
+        lng = 0;
 
     this.alt = alt;
 
-    if((this.point.x == lng) && (this.point.y == lat) &&
+    if((this.latlng.lng() == lng) && (this.latlng.lat() == lat) &&
         (this.alt == this.last_alt)) {
 
         dprint(this.fgmap, this.callsign + ": hasn't moved...");
@@ -709,18 +706,17 @@ FGPilot.prototype.position_update = function(lng, lat, alt) {
         return;
     }
 
-    var last_x = this.point.x;
-    var last_y = this.point.y;
+    var last_x = this.latlng.lng();
+    var last_y = this.latlng.lat();
 
-    this.point.x = lng;
-    this.point.y = lat;
+    this.latlng = new GLatLng(lat, lng);
 
     /* Updating the array of points */
     if(this.trails && this.trails.length == this.fgmap.gmap_trail_limit) {
         //delete(this.trails.shift());
         this.trails.shift();
     }
-    this.trails.push(new GPoint(lng, lat));
+    this.trails.push(new GLatLng(lat, lng));
 
     if(this.fgmap.trail_visible) {
         this.trail_visible_set(true);
@@ -838,7 +834,7 @@ FGPilot.prototype.position_update = function(lng, lat, alt) {
 
     this.alt_elem.innerHTML = this.alt.toFixed(0);
 
-    this.info.update(this.point);
+    this.info.update(this.latlng);
 
     this.marker_update();
 
@@ -870,7 +866,7 @@ FGPilot.prototype.marker_update = function(force) {
     if(this.last_disp_hdg == deg && !force) {
 
         dprint(this.fgmap, this.callsign + ": heading was the same");
-        this.marker.update(this.point, null);
+        this.marker.update(this.latlng, null);
 
     } else {
 
@@ -901,6 +897,8 @@ FGPilot.prototype.marker_update = function(force) {
                 img += FGMAP_CRAFT_ICON_SMALLJET;
             } else if(FGMAP_CRAFT_MODELS_HEAVYJET.indexOf(this.model) != -1) {
                 img += FGMAP_CRAFT_ICON_HEAVYJET;
+            } else if(FGMAP_CRAFT_MODELS_GLIDER.indexOf(this.model) != -1) {
+                img += FGMAP_CRAFT_ICON_GLIDER;
             } else {
                 // TODO
                 img += FGMAP_CRAFT_ICON_GENERIC;
@@ -911,7 +909,7 @@ FGPilot.prototype.marker_update = function(force) {
         img += deg + FGMAP_CRAFT_ICON_SUFFIX;
 
         this.icon_elem.src = img;
-        this.marker.update(this.point);
+        this.marker.update(this.latlng);
         img_ie_fix(this.icon_elem);
     }
 };
@@ -976,7 +974,13 @@ FGPilot.prototype.trail_visible_set = function(visible) {
                 this.polylines[n] = pl;
             } else {
                 //dprint(this.fgmap, "updating polyline " + n);
-                this.polylines[n].opacity = opacity;
+
+                //this.polylines[n].opacity = opacity;
+                // XXX TODO FIXME
+                if(this.polylines[n].B) {
+                    this.polylines[n].B = opacity;
+                }
+
                 this.polylines[n].redraw(true);
             }
         }
@@ -1001,8 +1005,8 @@ FGPilot.prototype.remove = function() {
 
     this.fgmap.pilot_follow_remove(this.callsign);
 
-    this.info.remove();
-    this.marker.remove();
+    this.fgmap.gmap.removeOverlay(this.info);
+    this.fgmap.gmap.removeOverlay(this.marker);
 
     this.trail_visible_set(false);
     // TODO: do I need to delete each element...
@@ -1090,7 +1094,7 @@ function FGMap(id)
 
     /* gmap initial settings */
     this.gmap = null;
-    this.gmap_zoom = 4;
+    this.gmap_zoom = 13;
 
     this.gmap_trail_weight = 2;
     this.gmap_trail_color = "#ff0000";
@@ -1140,9 +1144,7 @@ FGMap.prototype.init = function(force) {
 
     }
 
-    this.gmap = new GMap(this.div);
-    this.gmap_start_point = new GPoint(-122.357237, 37.613545); // KSFO
-    this.gmap_type = G_SATELLITE_TYPE;
+    this.gmap = new GMap2(this.div);
 
     if(!this.gmap) {
         this.div.innerHTML =
@@ -1150,25 +1152,43 @@ FGMap.prototype.init = function(force) {
         return false;
     }
 
+    this.gmap_start_point = new GLatLng(37.613545, -122.357237); // KSFO
+    this.gmap_type = G_SATELLITE_MAP;
+
+    this.gmap.setCenter(this.gmap_start_point, this.gmap_zoom);
+    this.gmap.setMapType(this.gmap_type);
+
     this.query_string_parse();
 
     if(!this.nomapcontrol) {
         //this.gmap.addControl(new GSmallMapControl());
         this.gmap.addControl(new GLargeMapControl());
         this.gmap.addControl(new GMapTypeControl());
+        this.gmap.addControl(new GScaleControl());
+
+        this.gmap_overview = new GOverviewMapControl();
+        this.gmap.addControl(this.gmap_overview);
+
+        setTimeout(this.maptypechanged_cb.bind_event(this), 1);
     }
 
+    this.gmap.setCenter(this.gmap_start_point);
+    this.gmap.setZoom(this.gmap_zoom);
+    this.gmap.setMapType(this.gmap_type);
+
+
+    GEvent.addListener(this.gmap, "maptypechanged",
+        this.maptypechanged_cb.bind_event(this));
 
     GEvent.addListener(this.gmap, "moveend",
         this.linktomap_update.bind_event(this));
+    /*
     GEvent.addListener(this.gmap, "zoom",
         this.linktomap_update.bind_event(this));
+    */
     GEvent.addListener(this.gmap, "maptypechanged",
         this.linktomap_update.bind_event(this));
 
-
-    this.gmap.setMapType(this.gmap_type);
-    this.gmap.centerAndZoom(this.gmap_start_point, this.gmap_zoom);
 
 
     // TODO: Put this somewhere else better?
@@ -1190,6 +1210,16 @@ FGMap.prototype.init = function(force) {
     //this.pilot_test();
 
     this.menu_setup();
+};
+
+
+FGMap.prototype.maptypechanged_cb = function() {
+
+    this.gmap_type = this.gmap.getCurrentMapType();
+
+    if(this.gmap_overview != null) {
+        this.gmap_overview.getOverviewMap().setMapType(this.gmap_type);
+    }
 };
 
 
@@ -1320,14 +1350,14 @@ FGMap.prototype.pilot_test = function() {
 
     for(var n = 0; n < 11; n++) {
         var p = new FGPilot(this, "testpilot" + (n + 1),
-                this.gmap_start_point.x + Math.random(),
-                this.gmap_start_point.y + Math.random(),
+                this.gmap_start_point.lat() + (n * 0.01),
+                this.gmap_start_point.lng() + (n * 0.01),
                 (n + 1) * 100, "test", "test");
         this.pilots["testpilot" + (n + 1)] = p;
         //p.info_visible_set(true);
     }
 
-    this.pilots_tab_update();
+    //this.pilots_tab_update();
 };
 
 
@@ -1366,17 +1396,18 @@ FGMap.prototype.query_string_parse = function() {
         } else if(pair[0] == "ll") {
 
             var ll = pair[1].split(",");
-            this.gmap_start_point = new GPoint(ll[0], ll[1]);
+            this.gmap_start_point =
+                new GLatLng(parseFloat(ll[0]), parseFloat(ll[1]));
 
         } else if(pair[0] == "z") {
 
-            this.gmap_zoom = pair[1];
+            this.gmap_zoom = parseInt(pair[1]);
 
         } else if(pair[0] == "t") {
 
-            this.gmap_type = (pair[1] == "m" ? G_MAP_TYPE :
-                                (pair[1] == "s" ? G_SATELLITE_TYPE :
-                                    G_HYBRID_TYPE));
+            this.gmap_type = (pair[1] == "m" ? G_NORMAL_MAP :
+                                (pair[1] == "s" ? G_SATELLITE_MAP :
+                                    G_HYBRID_MAP));
 
         } else if(pair[0] == "nomapcontrol") {
 
@@ -1477,7 +1508,7 @@ FGMap.prototype.xml_request_cb = function() {
             if(this.pilots[callsign] == null) {
 
                 p = new FGPilot(this, callsign,
-                            lng, lat, alt, model, server_ip);
+                            lat, lng, alt, model, server_ip);
                 this.pilots[callsign] = p;
                 dprint(this, "added " + callsign + " " + lng + " " + lat);
                 this.pilots_cnt += 1;
@@ -1491,7 +1522,7 @@ FGMap.prototype.xml_request_cb = function() {
             } else {
 
                 p = this.pilots[callsign];
-                p.position_update(lng, lat, alt);
+                p.position_update(lat, lng, alt);
 
                 dprint(this, "updated " + callsign + " " + lng + " " + lat);
             }
@@ -1547,7 +1578,7 @@ FGMap.prototype.pilot_pan = function(callsign) {
 
         dprint(this, "panning to pilot " + callsign);
         //map.centerAtLatLng(this.pilots[callsign].point);
-        this.gmap.recenterOrPanToLatLng(this.pilots[callsign].marker.point);
+        this.gmap.panTo(this.pilots[callsign].marker.latlng);
 
         this.event_callback_call(FGMAP_EVENT_PILOT_PAN, callsign);
     }
@@ -1664,7 +1695,11 @@ FGMap.prototype.pilot_follows_clear = function() {
 
 FGMap.prototype.follows_update = function() {
 
-    var follow_bounds = new GBounds(181, 91, -181, -91);
+    if(this.follows.length == 0) {
+        return;
+    }
+
+    var follow_bounds = new GLatLngBounds();
 
     for(var i = 0; i < this.follows.length; i++) {
 
@@ -1673,48 +1708,29 @@ FGMap.prototype.follows_update = function() {
         if(!pilot)
             continue;
 
-        var point = pilot.point;
-
-        if(follow_bounds.minX > point.x)
-            follow_bounds.minX = point.x;
-
-        if(follow_bounds.minY > point.y)
-            follow_bounds.minY = point.y;
-
-        if(follow_bounds.maxX < point.x)
-            follow_bounds.maxX = point.x;
-
-        if(follow_bounds.maxY < point.y)
-            follow_bounds.maxY = point.y;
-
+        follow_bounds.extend(pilot.latlng);
     }
 
-    var follow_padding;
-    
-    if(this.follows.length <= 1) {
-        follow_padding = 0;
-    } else {
-        //follow_padding = 0.0008;
-        //follow_padding = 0.005;
-        //follow_padding = 0.08;
-        follow_padding = 0.06;
-        //follow_padding = 0.04;
-    }
+    var map_bounds = this.gmap.getBounds();
 
-    // Add some padding
-    follow_bounds.minX -= follow_padding;
-    follow_bounds.minY -= follow_padding;
-    follow_bounds.maxX += follow_padding;
-    follow_bounds.maxY += follow_padding;
+    if(map_bounds.containsBounds(follow_bounds) == false) {
 
-    var bounds = this.gmap.getBoundsLatLng();
+        /* Change the zoom only if we need to */
+        var map_zoom = this.gmap.getZoom();
+        var follow_zoom = this.gmap.getBoundsZoomLevel(follow_bounds);
 
-    if((follow_bounds.minX < bounds.minX) ||
-        (follow_bounds.minY < bounds.minY) ||
-        (follow_bounds.maxX > bounds.maxX) ||
-        (follow_bounds.maxY > bounds.maxY)) {
-    
-        this.gmap.centerAndZoomOnBounds(follow_bounds);
+        if(map_zoom > follow_zoom) {
+            map_zoom = follow_zoom;
+        }
+
+        var clat = (follow_bounds.getNorthEast().lat() +
+                    follow_bounds.getSouthWest().lat()) /2;
+
+        var clng = (follow_bounds.getNorthEast().lng() +
+                    follow_bounds.getSouthWest().lng()) /2;
+
+        this.gmap.setCenter(new GLatLng(clat, clng), map_zoom);
+
     }
 };
 
@@ -1812,17 +1828,17 @@ FGMap.prototype.linktomap_update = function() {
     if(!this.gmap)
         return;
 
-    var zoomlevel = this.gmap.getZoomLevel();
+    var zoomlevel = this.gmap.getZoom();
     var maptype = this.gmap.getCurrentMapType();
-    var center = this.gmap.getCenterLatLng();
+    var center = this.gmap.getCenter();
 
     var href = "";
 
     // GMap settings
-    href += "?ll=" + center.x + "," + center.y;
+    href += "?ll=" + center.lat() + "," + center.lng();
     href += "&z=" + zoomlevel;
-    href += "&t=" + (maptype == G_MAP_TYPE ? "m" :
-                        (maptype == G_SATELLITE_TYPE ? "s" : "h"));
+    href += "&t=" + (maptype == G_NORMAL_MAP ? "m" :
+                        (maptype == G_SATELLITE_MAP ? "s" : "h"));
     
     // FGMap settings
     for(var i = 0; i < this.follows.length; i++) {
@@ -1909,7 +1925,10 @@ FGMap.prototype.event_callback_call = function(event /*, ... */) {
 /* FGMap internal callback functions */
 
 FGMap.prototype.resize_cb = function() {
-    this.gmap.onResize();
+
+    if(this.gmap) {
+        this.gmap.checkResize();
+    }
     this.event_callback_call(FGMAP_EVENT_MAP_RESIZE);
 };
 
