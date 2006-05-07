@@ -1,0 +1,67 @@
+#!/usr/bin/perl -w
+
+# Convert fix.dat into SQL statements, see fg.sql for database definition
+
+use strict;
+
+my($sql) = "";
+my($debug) = undef;
+
+$debug = 1;
+
+sub dprintf
+{
+    my($str) = @_;
+
+    if($debug)
+    {
+        printf(STDERR $str);
+    }
+}
+
+while(<STDIN>)
+{
+    my($line) = $_;
+
+    if($line =~ /^$/)
+    {
+        next;
+    }
+
+    chomp($line);
+    $line =~ s/^\s+//g;
+    
+    my($code);
+
+    ($code) = ($line =~ m/^(\d+)/);
+
+    if(!defined($code))
+    {
+        next;
+    }
+
+    if($code > 99)
+    {
+        # header, ignore
+    }
+    elsif($code != 99)
+    {
+        my($lat, $lng, $name) = split(/[ \t]+/, $line, 3);
+
+        $name =~ s/'/\\'/g;
+
+        $sql .= <<SQL;
+INSERT INTO fg_fix
+    (lat, lng, name)
+    VALUES
+    ($lat, $lng, '$name');
+SQL
+    }
+    else
+    {
+        # end
+    }
+}
+
+print($sql);
+

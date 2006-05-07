@@ -192,6 +192,10 @@ FGMapMenu.prototype.default_menu_add = function() {
         new FGMapMenuPilots(this);
     }
 
+    if(typeof(FGMapMenuNav) == "function") {
+        new FGMapMenuNav(this);
+    }
+
     if(typeof(FGMapMenuServer) == "function") {
         new FGMapMenuServer(this);
     }

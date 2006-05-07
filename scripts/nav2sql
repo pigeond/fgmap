@@ -1,0 +1,69 @@
+#!/usr/bin/perl -w
+
+# Convert nav.dat into SQL statements, see fg.sql for database definition
+
+use strict;
+
+my($sql) = "";
+my($debug) = undef;
+
+#$debug = 1;
+
+sub dprintf
+{
+    my($str) = @_;
+
+    if($debug)
+    {
+        printf(STDERR $str);
+    }
+}
+
+while(<STDIN>)
+{
+    my($line) = $_;
+
+    if($line =~ /^$/)
+    {
+        next;
+    }
+
+    chomp($line);
+    
+    dprintf("[$line]\n");
+
+    my($code);
+
+    ($code) = ($line =~ m/^(\d+) /);
+
+    if(!defined($code))
+    {
+        next;
+    }
+
+    if($code > 99)
+    {
+        # header, ignore
+    }
+    elsif($code != 99)
+    {
+        my($type, $lat, $lng, $elevation, $freq, $range, $multi, $ident, $name) =
+            split(/[ \t]+/, $line, 9);
+
+        $name =~ s/'/\\'/g;
+
+        $sql .= <<SQL;
+INSERT INTO fg_nav
+    (nav_type, lat, lng, elevation, freq, range, multi, ident, name)
+    VALUES
+    ($type, $lat, $lng, $elevation, $freq, $range, $multi, '$ident', '$name');
+SQL
+    }
+    else
+    {
+        # end
+    }
+}
+
+print($sql);
+

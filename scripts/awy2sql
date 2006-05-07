@@ -1,0 +1,67 @@
+#!/usr/bin/perl -w
+
+# Convert awy.dat into SQL statements, see fg.sql for database definition
+
+use strict;
+
+my($sql) = "";
+my($debug) = undef;
+
+$debug = 1;
+
+sub dprintf
+{
+    my($str) = @_;
+
+    if($debug)
+    {
+        printf(STDERR $str);
+    }
+}
+
+while(<STDIN>)
+{
+    my($line) = $_;
+
+    if($line =~ /^$/)
+    {
+        next;
+    }
+
+    chomp($line);
+    $line =~ s/^\s+//g;
+    
+    my($code);
+
+    ($code) = ($line =~ m/^([^\s]+)/);
+
+    if(!defined($code))
+    {
+        next;
+    }
+
+    if($code =~ /(\d+)/)
+    {
+        # end
+    }
+    elsif($code =~ /\S\S+/)
+    {
+        my($name_start, $lat_start, $lng_start,
+            $name_end, $lat_end, $lng_end,
+            $route, $base, $top, $seg_name) = split(/[ \t]+/, $line, 10);
+
+        $name_start =~ s/'/\\'/g;
+        $name_end =~ s/'/\\'/g;
+        $seg_name =~ s/'/\\'/g;
+
+        $sql .= <<SQL;
+INSERT INTO fg_awy
+    (name_start, lat_start, lng_start, name_end, lat_end, lng_end, enroute, base, top, seg_name)
+    VALUES
+    ('$name_start', $lat_start, $lng_start, '$name_end', $lat_end, $lng_end, $route, $base, $top, '$seg_name');
+SQL
+    }
+}
+
+print($sql);
+

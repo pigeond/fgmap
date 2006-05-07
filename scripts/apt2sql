@@ -1,0 +1,145 @@
+#!/usr/bin/perl -w
+
+# Convert apt.dat into SQL statements, see fg.sql for database definition
+
+use strict;
+
+my($sql) = "";
+my($debug) = undef;
+
+my($apt_code) = "";
+my($apt_id) = 0;
+
+#$debug = 1;
+
+sub dprintf
+{
+    my($str) = @_;
+
+    if($debug)
+    {
+        printf(STDERR $str);
+    }
+}
+
+while(<STDIN>)
+{
+    my($line) = $_;
+
+    dprintf("$line\n");
+
+    if($line =~ /^$/)
+    {
+        next;
+    }
+
+    chomp($line);
+
+    if($line =~ m/^1\s+.*?$/ or $line =~ m/^17\s+.*?$/)
+    {
+        # airport/heliport
+
+        my($heliport) = ($line =~ m/^17/ ? "true" : "false");
+
+        my($apt_ele, $apt_name);
+
+        $apt_code = "";
+
+        ($apt_ele, $apt_code, $apt_name) =
+            ($line =~ m/^\d+\s+(-?\d+)\s+\d\s+\d\s+(.*?)\s+(.*?)$/);
+
+        $apt_name =~ s/'/\\'/g;
+
+        if($apt_code)
+        {
+            $apt_id += 1;
+
+            dprintf("Found airport [${apt_code}]\n");
+
+            $sql .= <<SQL;
+
+INSERT INTO fg_apt (apt_id, apt_code, apt_name, elevation, heliport)
+    VALUES (${apt_id}, '${apt_code}', '${apt_name}', ${apt_ele}, ${heliport});
+SQL
+        }
+    }
+    elsif($line =~ m/^10\s+.*?$/)
+    {
+        # runway/taxiway
+
+        if(${apt_code} eq "")
+        {
+            die("Found runway/taxiway without airport id!\n");
+        }
+
+        my($type);
+        my($lat, $lng, $num, $heading, $len, $width) =
+            ($line =~ m/^10\s+(.*?)\s+(.*?)\s+(.*?)\s+(.*?)\s+(\d+)\s+.*?\s+.*?\s+(\d+)\s+.*?$/);
+        
+        if($num eq 'xxx')
+        {
+            $num = "null";
+            $type = "t";
+        }
+        else
+        {
+            $num =~ s/x//g;
+            $num = "'".$num."'";
+            $type = "r";
+        }
+
+        $sql .= <<SQL;
+INSERT INTO fg_apt_way (apt_id, type, num, lat, lng, heading, length, width)
+    VALUES (${apt_id}, '${type}', ${num}, ${lat}, ${lng}, ${heading}, ${len}, ${width});
+SQL
+    }
+    elsif($line =~ m/^14\s+.*?/)
+    {
+        # tower view location
+    }
+    elsif($line =~ m/^15\s+.*?/)
+    {
+        # ramp startup position
+    }
+    elsif($line =~ m/^16\s+.*?/)
+    {
+        # seaplane base
+    }
+    elsif($line =~ m/^18\s+.*?/)
+    {
+        # beacons
+    }
+    elsif($line =~ m/^19\s+.*?/)
+    {
+        # windsocks
+    }
+    elsif($line =~ m/^(5\d)\s+(\d+)\s+(.*?)$/)
+    {
+        # atc
+        my($type, $freq, $name) = ($1, $2, $3);
+
+        $sql .= <<SQL;
+INSERT INTO fg_atc (apt_id, atc_type, freq, name)
+    VALUES (${apt_id}, ${type}, ${freq}, '${name}');
+SQL
+    }
+    elsif($line =~ /^I$/ or $line =~ /^A$/)
+    {
+        # format header
+    }
+    elsif($line =~ /^\d+\s+Version\s+.*/)
+    {
+        # version
+    }
+    elsif($line =~ /^99$/)
+    {
+        # last line
+    }
+    else
+    {
+        print(STDERR "Warning: [$line] not handled\n");
+    }
+}
+
+print($sql);
+

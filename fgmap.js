@@ -318,7 +318,7 @@ include_js("fgmap_menu_pilots.js");
 include_js("fgmap_menu_server.js");
 include_js("fgmap_menu_settings.js");
 include_js("fgmap_menu_debug.js");
-
+include_js("fgmap_menu_nav.js");
 
 
 // Browser stuff
@@ -763,6 +763,7 @@ FGPilot.prototype.position_update = function(lat, lng, alt) {
 
     // Calculate speed
     if(this.trails.length > 0) {
+
         var d;
 
         with(Math) {
@@ -1480,14 +1481,14 @@ FGMap.prototype.xml_request_cb = function() {
 
     if(this.xml_request.readyState == 4) {
 
-        var xmlDoc = this.xml_request.responseXML;
+        var xmldoc = this.xml_request.responseXML;
 
-        if(xmlDoc == null || xmlDoc.documentElement == null) {
+        if(xmldoc == null || xmldoc.documentElement == null) {
             this.updating = false;
             return;
         }
 
-        var markers = xmlDoc.documentElement.getElementsByTagName("marker");
+        var markers = xmldoc.documentElement.getElementsByTagName("marker");
         var onlines = new Object();
         var follows_need_update = false;
         var has_new_pilots = false;
@@ -1933,6 +1934,66 @@ FGMap.prototype.resize_cb = function() {
 };
 
 
+
+
+
+
+/* Airport and Nav stuff */
+
+function FGAirport(fgmap, code, name, elevation, heli) {
+    this.fgmap = fgmap;
+    this.code = code;
+    this.name = name;
+    this.elevation = elevation;
+    this.heli = heli || false;
+    this.nums = [];
+    this.lines = [];
+    this.labels = [];
+}
+
+
+FGAirport.prototype.runway_add = function(num,
+                                            lat, lng, heading, length, width) {
+
+    var r = 365239.5;
+    this.nums.push(num);
+
+    var rad = deg_to_rad(parseFloat(heading));
+    var a = Math.cos(rad) * length / 2.0;
+    var o = Math.sin(rad) * length / 2.0;
+
+    var dlat = a / r;
+    var dlng = o / Math.cos(dlat) / r;
+
+    var p1 = new GLatLng(lat + dlat, lng + dlng);
+    var p2 = new GLatLng(lat - dlat, lng - dlng);
+    var line = new GPolyline([ p1, p2 ], "#0000ff", 1, 1.0);
+
+    this.lines.push(line);
+
+};
+
+
+FGAirport.prototype.visible_set = function(visible) {
+
+    if(visible) {
+        for(var i = 0; i < this.lines.length; i++) {
+            this.fgmap.gmap.addOverlay(this.lines[i]);
+        }
+    } else {
+        for(var i = 0; i < this.lines.length; i++) {
+            this.fgmap.gmap.removeOverlay(this.lines[i]);
+        }
+    }
+};
+
+
+FGAirport.prototype.remove = function() {
+    for(var i = 0; i < this.lines.length; i++) {
+        this.fgmap.gmap.removeOverlay(this.lines[i]);
+    }
+    delete(this.lines);
+};
 
 
 
