@@ -75,6 +75,7 @@ if(!$sstr)
     exit(0);
 }
 
+$sstr =~ s/%([a-fA-F0-9][a-f-A-F0-9])/pack("C", hex($1))/ge;
 
 if($apt)
 {
@@ -84,9 +85,10 @@ if($apt)
     $sql .= "SELECT * FROM ${APT_TABLE} WHERE ";
 
     $sstr =~ s/[\%\*\.\?\_]//g;
-    $sql .= "upper(apt_code) like '\%".uc(${sstr})."\%' or apt_name like '\%${sstr}\%'";
+    $sql .= "upper(apt_code) like '\%".uc(${sstr})."\%' or upper(apt_name) like '\%".uc(${sstr})."\%'";
     $sql .= " ORDER BY apt_code LIMIT ${APT_LIMIT};";
 
+    #print(STDERR "$sql\n");
     my($sth) = $dbi->process($sql);
 
     if($sth->rows > 0)
