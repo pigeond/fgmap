@@ -130,7 +130,7 @@ var FGMAP_CRAFT_MODELS_HEAVYJET = [ "boeing733", "boeing747-400-jw", "a320-fb", 
 
 
 var FGMAP_CRAFT_ICON_GLIDER = "glider/glider";
-var FGMAP_CRAFT_MODELS_GLIDER = [ "hgldr-cs-model", "paraglider_model", "colditz-model" ];
+var FGMAP_CRAFT_MODELS_GLIDER = [ "hgldr-cs-model", "paraglider_model", "colditz-model", "sgs233" ];
 
 
 // TODO
