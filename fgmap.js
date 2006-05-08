@@ -1955,6 +1955,12 @@ function FGAirport(fgmap, code, name, elevation, heli) {
 FGAirport.prototype.runway_add = function(num,
                                             lat, lng, heading, length, width) {
 
+    // Some default
+    var runway_color = "#0000ff";
+    var runway_width = 3;
+    var runway_info_align = new GPoint(4, 4);
+
+
     var r = 365239.5;
     this.nums.push(num);
 
@@ -1962,12 +1968,15 @@ FGAirport.prototype.runway_add = function(num,
     var a = Math.cos(rad) * length / 2.0;
     var o = Math.sin(rad) * length / 2.0;
 
-    var dlat = a / r;
-    var dlng = o / Math.cos(dlat) / r;
+    var dlat;
+    var dlng;
+
+    dlat = a / r;
+    dlng = o / Math.cos(deg_to_rad(lat + dlat)) / r;
 
     var p1 = new GLatLng(lat + dlat, lng + dlng);
     var p2 = new GLatLng(lat - dlat, lng - dlng);
-    var line = new GPolyline([ p1, p2 ], "#0000ff", 1, 1.0);
+    var line = new GPolyline([ p1, p2 ], runway_color, runway_width, 1.0);
 
     this.lines.push(line);
 
