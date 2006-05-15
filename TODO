@@ -1,4 +1,7 @@
 
+- Implement unload to cleanup
+- Don't add visibility: visible; by default
+- Get rid of all extra and useless div in div
 - Fix trail lines, they don't line up with all different plane icons...
 - Weird bug with fg_server= and server change
 - Why am I putting the server list to be inside the map?
