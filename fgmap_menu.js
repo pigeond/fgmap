@@ -388,7 +388,22 @@ FGMapMenu.prototype.tab_set = function(id) {
     element_show(this.menus[id].tab_content);
     this.menus[id].tab_span.className = "current";
 
+    if(this.menus[this.menu_current].data &&
+        typeof(this.menus[this.menu_current].data.onblur) == "function") {
+
+        var func = this.menus[this.menu_current].data.onblur.bind_event(
+                    this.menus[this.menu_current].data);
+        func();
+    }
+
     this.menu_current = id;
+
+    if(this.menus[this.menu_current].data &&
+        typeof(this.menus[this.menu_current].data.onfocus) == "function") {
+
+        var func = this.menus[id].data.onfocus.bind_event(this.menus[id].data);
+        func();
+    }
 
     return true;
 };
