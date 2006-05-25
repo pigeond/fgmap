@@ -117,7 +117,7 @@ var FGMAP_CRAFT_ICON_HELI = "heli/heli"
 var FGMAP_CRAFT_MODELS_HELI = [ "bo105" ];
 
 var FGMAP_CRAFT_ICON_SINGLEPROP = "singleprop/singleprop";
-var FGMAP_CRAFT_MODELS_SINGLEPROP = [ "ov10", "c150", "c172p", "c172-dpm", "c182-dpm", "c310-dpm", "c310u3a", "dhc2floats", "pa28-161", "pc7", "j3cub" ];
+var FGMAP_CRAFT_MODELS_SINGLEPROP = [ "c150", "c172p", "c172-dpm", "c182-dpm", "c310-dpm", "c310u3a", "dhc2floats", "pa28-161", "pc7", "j3cub" ];
 
 var FGMAP_CRAFT_ICON_TWINPROP = "twinprop/twinprop";
 var FGMAP_CRAFT_MODELS_TWINPROP = [ "Boeing314Clipper", "Lockheed1049_twa", "TU-114-model", "b1900d-anim", "b29-model", "beech99-model", "dc3-dpm", "fokker50" ];
@@ -131,6 +131,15 @@ var FGMAP_CRAFT_MODELS_HEAVYJET = [ "boeing733", "boeing747-400-jw", "a320-fb", 
 
 var FGMAP_CRAFT_ICON_GLIDER = "glider/glider";
 var FGMAP_CRAFT_MODELS_GLIDER = [ "hgldr-cs-model", "paraglider_model", "colditz-model", "sgs233" ];
+
+
+/* Specific aircraft icons */
+var FGMAP_CRAFT_ICON_OV10 = "ov10/ov10";
+var FGMAP_CRAFT_MODELS_OV10 = [ "OV10", "OV10_USAFE" ];
+
+var FGMAP_CRAFT_ICON_KC135 = "kc135/kc135";
+var FGMAP_CRAFT_MODELS_KC135 = [ "KC135" ];
+
 
 
 /* Navaid types */
@@ -951,10 +960,10 @@ FGPilot.prototype.marker_update = function(force) {
         // TODO
 
         if(this.fgmap.model_icon &&
-            (this.fgmap.aircraft_model_icons.indexOf(this.model) != -1)) {
+            (this.fgmap.aircraft_model_icons[this.model] != null)) {
 
             // specific model icon
-            img += this.model + "/" + this.model;
+            img += this.fgmap.aircraft_model_icons[this.model];
 
         } else {
 
@@ -970,6 +979,13 @@ FGPilot.prototype.marker_update = function(force) {
                 img += FGMAP_CRAFT_ICON_HEAVYJET;
             } else if(FGMAP_CRAFT_MODELS_GLIDER.indexOf(this.model) != -1) {
                 img += FGMAP_CRAFT_ICON_GLIDER;
+
+
+            } else if(FGMAP_CRAFT_MODELS_OV10.indexOf(this.model) != -1) {
+                img += FGMAP_CRAFT_ICON_OV10;
+            } else if(FGMAP_CRAFT_MODELS_KC135.indexOf(this.model) != -1) {
+                img += FGMAP_CRAFT_ICON_KC135;
+
             } else {
                 // TODO
                 img += FGMAP_CRAFT_ICON_GENERIC;
@@ -1263,17 +1279,11 @@ FGMap.prototype.init = function(force) {
 
 
     // TODO: Put this somewhere else better?
-    this.aircraft_model_icons = [
-        "c172p",
-        "boeing733",
-        "ufo",
-        /* TODO
-        "b1900d-anim",
-        "seahawk-3d-model",
-        "hunter-model",
-        "Bravo"
-        */
-        ];
+    this.aircraft_model_icons = new Object();
+    this.aircraft_model_icons["c172p"] = "c172p/c172p";
+    this.aircraft_model_icons["boeing733"] = "boeing733/boeing733";
+    this.aircraft_model_icons["ufo"] = "ufo/ufo";
+    this.aircraft_model_icons["KC135"] = "kc135/kc135-model";
 
 
     this.linktomap_update();
