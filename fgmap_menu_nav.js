@@ -15,6 +15,7 @@ function FGMapMenuNav(fgmapmenu) {
     this.fgmap = fgmapmenu.fgmap;
     this.result_cnt = 0;
     this.setup();
+    this.bounds = null;
 }
 
 FGMapMenuNav.prototype.setup = function() {
@@ -239,38 +240,48 @@ FGMapMenuNav.prototype.cbutton_enabled_set = function(enabled) {
 
 FGMapMenuNav.prototype.nav_form_submit_cb = function(e) {
 
-    if(this.nav_lookup.value != "") {
-
-        var url = "fg_nav_xml.cgi?sstr=" + this.nav_lookup.value;
-
-        if(this.aptcode_chbx.checked == true)
-            url += "&apt_code";
-        if(this.aptname_chbx.checked == true)
-            url += "&apt_name";
-        if(this.vor_chbx.checked == true)
-            url += "&vor";
-        if(this.ndb_chbx.checked == true)
-            url += "&ndb";
-        if(this.fix_chbx.checked == true)
-            url += "&fix";
-        if(this.awy_chbx.checked == true)
-            url += "&awy";
-
-        if(this.xml_request) {
-            this.xml_request.abort();
-        }
-
-        this.xml_request = GXmlHttp.create();
-        this.xml_request.open("GET", url, true);
-        this.xml_request.onreadystatechange =
-            this.nav_form_xml_request_cb.bind_event(this);
-        this.xml_request.send(null);
-        
-        this.result_box_result_clear();
-        this.result_box_msg_set("Please wait...");
-        this.sbutton_enabled_set(false);
-        this.cbutton_enabled_set(false);
+    if(this.nav_lookup.value == "" || this.bounds == null) {
+        return false;
     }
+
+    var url = "fg_nav_xml.cgi?";
+    
+    if(this.bounds) {
+        var ne = this.bounds.getNorthEast();
+        var sw = this.bounds.getSouthWest();
+        url += "ne=" + ne.lat() + "," + ne.lng() +
+                "&sw=" + sw.lat() + "," + sw.lng();
+    } else {
+        url += "sstr=" + this.nav_lookup.value;
+    }
+
+    if(this.aptcode_chbx.checked == true)
+        url += "&apt_code";
+    if(this.aptname_chbx.checked == true)
+        url += "&apt_name";
+    if(this.vor_chbx.checked == true)
+        url += "&vor";
+    if(this.ndb_chbx.checked == true)
+        url += "&ndb";
+    if(this.fix_chbx.checked == true)
+        url += "&fix";
+    if(this.awy_chbx.checked == true)
+        url += "&awy";
+    
+    if(this.xml_request) {
+        this.xml_request.abort();
+    }
+
+    this.xml_request = GXmlHttp.create();
+    this.xml_request.open("GET", url, true);
+    this.xml_request.onreadystatechange =
+        this.nav_form_xml_request_cb.bind_event(this);
+    this.xml_request.send(null);
+    
+    this.result_box_result_clear();
+    this.result_box_msg_set("Please wait...");
+    this.sbutton_enabled_set(false);
+    this.cbutton_enabled_set(false);
 
     return false;
 };
@@ -394,11 +405,24 @@ FGMapMenuNav.prototype.nav_vor_parse = function(xmldoc) {
 
 FGMapMenuNav.prototype.nav_fix_parse = function(xmldoc) {
 
+    var fixes = xmldoc.documentElement.getElementsByTagName("fix");
+    var fix;
+
+    for(i = 0; i < fixes.length; i++) {
+        lat = fixes[i].getAttribute('lat');
+        lng = fixes[i].getAttribute('lng');
+        name = fixes[i].getAttribute('name');
+
+        id = 'fix:' + name + ':' + lat + ':' + lng;
+        fix = new FGNavFix(this.fgmap, id, name, lat, lng);
+        this.result_box_result_add(fix);
+    }
+
 };
 
 
 FGMapMenuNav.prototype.nav_awy_parse = function(xmldoc) {
-
+    /* TODO */
 };
 
 
@@ -448,6 +472,10 @@ FGMapMenuNav.prototype.nav_form_xml_request_cb = function() {
 
 
 FGMapMenuNav.prototype.nav_cbutton_onclick_cb = function() {
+
+    this.bounds = this.fgmap.gmap.getBounds();
+    this.nav_form_submit_cb();
+    this.bounds = null;
 
 };
 

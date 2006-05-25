@@ -2541,8 +2541,20 @@ function FGNavNdb(fgmap, id, code, name, lat, lng, freq) {
     FGNavMarker.apply(this,
         [ fgmap, id, FGMAP_NAVAID_NDB, code, name, lat, lng, elem ]);
 }
-
 FGNavNdb.prototype = new FGNavMarker();
+
+
+function FGNavFix(fgmap, id, name, lat, lng) {
+
+    var elem = element_create(null, "div");
+    element_text_append(elem, name);
+    element_opacity_set(elem, 0.65);
+
+    FGNavMarker.apply(this,
+        [ fgmap, id, FGMAP_NAVAID_FIX, name, name, lat, lng, elem ]);
+}
+FGNavFix.prototype = new FGNavMarker();
+
 
 /* vim: set sw=4 sts=4:*/
 

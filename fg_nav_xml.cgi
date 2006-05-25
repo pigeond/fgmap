@@ -1,5 +1,6 @@
 #!/usr/bin/perl -Tw
 #
+#
 # Author: Pigeon <pigeon at pigeond dot net>
 #
 # Under debian, you need libdbix-easy-perl,
@@ -14,6 +15,8 @@ my($APT_TABLE) = "fg_apt";
 my($APTWAY_TABLE) = "fg_apt_way";
 my($ATC_TABLE) = "fg_atc";
 my($NAV_TABLE) = "fg_nav";
+my($FIX_TABLE) = "fg_fix";
+my($AWY_TABLE) = "fg_awy";
 
 my($SQL_LIMIT) = 50;
 
@@ -128,7 +131,7 @@ sub freqstr
     return sprintf("%.2f", $freq / 100);
 }
 
-my($xml);
+my($xml) = "";
 
 
 if(!$ENV{'QUERY_STRING'})
@@ -136,10 +139,15 @@ if(!$ENV{'QUERY_STRING'})
     exit(0);
 }
 
+
 # search string
 my($sstr);
+
 # search options
-my($apt_code, $apt_name, $vor, $ndb, $fix, $awy, $taxiway);
+my($apt_code, $apt_name, $vor, $ndb, $fix, $awy, $taxiway, $bounds);
+
+# bounds
+my($ne, $sw, $ne_lat, $ne_lng, $sw_lat, $sw_lng);
 
 my($p);
 my(@a) = split(/\&/, $ENV{'QUERY_STRING'});
@@ -181,6 +189,16 @@ foreach $p (@a)
         # We want taxiway too
         $taxiway = 1;
     }
+    elsif($key eq 'ne')
+    {
+        $ne = $value;
+        ($ne_lat, $ne_lng) = split(/,/, $ne);
+    }
+    elsif($key eq 'sw')
+    {
+        $sw = $value;
+        ($sw_lat, $sw_lng) = split(/,/, $sw);
+    }
 }
 
 my($dbi);
@@ -188,6 +206,23 @@ my($sth);
 
 #$dbi = new DBIx::Easy qw(mysql flightgear fgmap);
 $dbi = new DBIx::Easy qw(Pg flightgear fgmap);
+
+if(!$sstr and !($ne and $sw))
+{
+    exit(0);
+}
+
+if($sstr)
+{
+    $sstr =~ s/%([a-fA-F0-9][a-f-A-F0-9])/pack("C", hex($1))/ge;
+    $sstr =~ s/[\%\*\.\?\_]//g;
+
+    if(length($sstr) < 2)
+    {
+        exit(0);
+    }
+}
+
 
 if(!$dbi)
 {
@@ -199,21 +234,19 @@ if(!$dbi)
 my($result_cnt) = 0;
 my($sql);
 
-if(!$sstr)
+
+if($ne and $sw)
 {
-    exit(0);
+    if($apt_code or $apt_name)
+    {
+        # Searching for airport according to its runway
+        $sql = "SELECT * FROM ${APTWAY_TABLE} WHERE ";
+    }
+
 }
 
-$sstr =~ s/%([a-fA-F0-9][a-f-A-F0-9])/pack("C", hex($1))/ge;
-$sstr =~ s/[\%\*\.\?\_]//g;
 
-if(length($sstr) < 2)
-{
-    exit(0);
-}
-
-
-if($apt_code or $apt_name)
+if($sstr and ($apt_code or $apt_name))
 {
     # airport
     $xml .= "\t<apt>\n";
@@ -352,10 +385,9 @@ XML
     $xml .= "\t</apt>\n\n";
 }
 
-if($vor or $ndb)
+
+if($sstr and ($vor or $ndb))
 {
-    $xml .= "\t<nav>\n";
-    
     $sql = "SELECT * FROM ${NAV_TABLE}";
     $sql .= " WHERE (UPPER(ident) LIKE '\%".uc(${sstr})."\%' OR ";
     $sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%') AND (";
@@ -411,23 +443,79 @@ if($vor or $ndb)
             }
 
             $xml .= <<XML;
-\t\t<${nav_tag} nav_type="${nav_type}" lat="${lat}" lng="${lng}" elevation="${elevation}" freq="${freq}" range="${range}" multi="${multi}" ident="${ident}" name="${name}" />"
+\t<${nav_tag} nav_type="${nav_type}" lat="${lat}" lng="${lng}" elevation="${elevation}" freq="${freq}" range="${range}" multi="${multi}" ident="${ident}" name="${name}" />"
 XML
         }
         $result_cnt += $sth->rows;
     }
 
-    $xml .= "\t</nav>\n\n";
 }
 
-if($fix)
+
+if($sstr and $fix)
 {
-    $sql = "";
+    $sql = "SELECT * FROM ${FIX_TABLE}";
+    $sql .= " WHERE UPPER(name) LIKE '\%".uc(${sstr})."\%'";
+    $sql .= ";";
+
+    $sth = $dbi->process($sql);
+
+    if($sth->rows > 0)
+    {
+        my($i);
+        for($i = 0; $i < (&min(${SQL_LIMIT} - ${result_cnt}, $sth->rows)); $i++)
+        {
+            my($row_href) = $sth->fetchrow_hashref;
+            my(%row_hash) = %$row_href;
+
+            my($lat) = $row_hash{'lat'};
+            my($lng) = $row_hash{'lng'};
+            my($name) = &htmlencode($row_hash{'name'});
+
+            $xml .= <<XML;
+\t<fix lat="${lat}" lng="${lng}" name="${name}" />"
+XML
+        }
+        $result_cnt += $sth->rows;
+    }
 }
 
-if($awy)
+
+if($sstr and $awy)
 {
-    $sql = "";
+    $sql = "SELECT * FROM ${AWY_TABLE}";
+    $sql .= " WHERE UPPER(seg_name) LIKE '\%".uc(${sstr})."\%'";
+    $sql .= ";";
+
+    $sth = $dbi->process($sql);
+
+    if($sth->rows > 0)
+    {
+        my($i);
+        for($i = 0; $i < (&min(${SQL_LIMIT} - ${result_cnt}, $sth->rows)); $i++)
+        {
+            my($row_href) = $sth->fetchrow_hashref;
+            my(%row_hash) = %$row_href;
+
+            my($name_start) = $row_hash{'name_start'};
+            my($lat_start) = $row_hash{'lat_start'};
+            my($lng_start) = $row_hash{'lng_start'};
+
+            my($name_end) = $row_hash{'name_end'};
+            my($lat_end) = $row_hash{'lat_end'};
+            my($lng_end) = $row_hash{'lng_end'};
+
+            my($enroute) = $row_hash{'enroute'};
+            my($base) = $row_hash{'base'};
+            my($top) = $row_hash{'top'};
+            my($seg_name) = $row_hash{'seg_name'};
+
+            $xml .= <<XML;
+\t<awy name_start="${name_start}" lat="${lat_start}" lng="${lng_start}" name_end="${name_end}" lat="${lat_end}" lng="${lng_end}" enroute="${enroute}" base="${base}" top="${top}" seg_name="${seg_name}" />"
+XML
+        }
+        $result_cnt += $sth->rows;
+    }
 }
 
 
