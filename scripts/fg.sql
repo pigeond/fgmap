@@ -21,6 +21,7 @@ create table fg_apt_way
     num         varchar(3),
     lat         float,
     lng         float,
+    abslng      float,
     heading     float,
     length      integer,
     width       integer
@@ -90,6 +91,7 @@ create table fg_nav
     nav_type    integer references fg_nav_type(nav_type),
     lat         float,
     lng         float,
+    abslng      float,
     elevation   integer,
     freq        integer,
     range       integer,
@@ -107,6 +109,7 @@ create table fg_fix
 (
     lat         float,
     lng         float,
+    abslng      float,
     name        varchar(5),
 
     primary key (lat, lng, name)
