@@ -245,6 +245,11 @@ FGMapMenuNav.prototype.nav_form_submit_cb = function(e) {
         return false;
     }
 
+    if(this.xml_request) {
+        //this.xml_request.abort();
+        return false;
+    }
+
     var url = "fg_nav_xml.cgi?";
     
     if(this.bounds) {
@@ -270,10 +275,6 @@ FGMapMenuNav.prototype.nav_form_submit_cb = function(e) {
     if(this.awy_chbx.checked == true)
         url += "&awy";
     
-    if(this.xml_request) {
-        this.xml_request.abort();
-    }
-
     this.xml_request = GXmlHttp.create();
     this.xml_request.open("GET", url, true);
     this.xml_request.onreadystatechange =
@@ -474,12 +475,15 @@ FGMapMenuNav.prototype.nav_form_xml_request_cb = function() {
         this.sbutton_enabled_set(true);
         this.cbutton_enabled_set(true);
         this.bounds = null;
+        this.xml_request = null;
 
     } else if(this.xml_request.readyState > 4) {
         this.result_box_msg_set("Error occured, please try again");
         this.sbutton_enabled_set(true);
         this.cbutton_enabled_set(true);
         this.bounds = null;
+        this.xml_request = null;
+
     }
 };
 
