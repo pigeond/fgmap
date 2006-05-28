@@ -18,13 +18,21 @@ my($NAV_TABLE) = "fg_nav";
 my($FIX_TABLE) = "fg_fix";
 my($AWY_TABLE) = "fg_awy";
 
-my($SQL_LIMIT) = 50;
+my($SQL_LIMIT) = 100;
 
 
 print("Pragma: no-cache\r\n");
 print("Cache-Control: no-cache\r\n");
 print("Expires: Sat, 17 Sep 1977 00:00:00 GMT\r\n");
 print("Content-Type: text/xml\r\n\r\n");
+
+
+sub err_print
+{
+    my($err) = @_;
+    print("<navaids err=\"${err}\" />\n");
+    exit(0);
+}
 
 
 sub min
@@ -83,7 +91,7 @@ sub rwy_nav
         $nav_tag = "ilsdme" if($nav_type eq '12');
 
         $rwy_nav .= <<XML;
-\t\t\t\t<${nav_tag} name="${nav_name}" lat="${nav_lat}" lng="${nav_lng}" elevation="${nav_elevation}" freq="${nav_freq}" range="${nav_range}" multi="${nav_multi}" ident="${nav_ident}" />
+\t\t\t\t<${nav_tag} name="${nav_name}" type="${nav_type}" lat="${nav_lat}" lng="${nav_lng}" elevation="${nav_elevation}" freq="${nav_freq}" range="${nav_range}" multi="${nav_multi}" ident="${nav_ident}" />
 XML
     }
 
@@ -193,11 +201,19 @@ foreach $p (@a)
     {
         $ne = $value;
         ($ne_lat, $ne_lng) = split(/,/, $ne);
+        if($ne_lng < 0)
+        {
+            $ne_lng += 360;
+        }
     }
     elsif($key eq 'sw')
     {
         $sw = $value;
         ($sw_lat, $sw_lng) = split(/,/, $sw);
+        if($sw_lng < 0)
+        {
+            $sw_lng += 360;
+        }
     }
 }
 
@@ -209,7 +225,7 @@ $dbi = new DBIx::Easy qw(Pg flightgear fgmap);
 
 if(!$sstr and !($ne and $sw))
 {
-    exit(0);
+    &err_print("Invalid search");
 }
 
 if($sstr)
@@ -219,7 +235,22 @@ if($sstr)
 
     if(length($sstr) < 2)
     {
-        exit(0);
+        &err_print("Search string too short, minimum length 3.");
+    }
+}
+
+if($ne and $sw)
+{
+    # Check if the bounds is way too big, we want to limit this
+
+    # this is gmap z=10
+    my($lat_max) = 0.5199925335038184;
+    my($lng_max) = 1.1714172363281472;
+
+    if((($ne_lat - $sw_lat) > $lat_max) or
+            (($ne_lng - $sw_lng) > $lng_max))
+    {
+        &err_print("Bounds too high");
     }
 }
 
@@ -227,7 +258,7 @@ if($sstr)
 if(!$dbi)
 {
     # TODO
-    exit(0);
+    &err_print("Database connector error");
 }
 
 
@@ -235,39 +266,46 @@ my($result_cnt) = 0;
 my($sql);
 
 
-if($ne and $sw)
-{
-    if($apt_code or $apt_name)
-    {
-        # Searching for airport according to its runway
-        $sql = "SELECT * FROM ${APTWAY_TABLE} WHERE ";
-    }
 
-}
-
-
-if($sstr and ($apt_code or $apt_name))
+if($apt_code or $apt_name)
 {
     # airport
     $xml .= "\t<apt>\n";
 
-    $sql = "SELECT * FROM ${APT_TABLE} WHERE ";
-
-    if($apt_code)
+    if($sstr)
     {
-        $sql .= "UPPER(apt_code) LIKE '\%".uc(${sstr})."\%'";
-    }
+        $sql = "SELECT * FROM ${APT_TABLE} WHERE ";
 
-    if($apt_name)
-    {
         if($apt_code)
         {
-            $sql .= " OR ";
+            $sql .= "UPPER(apt_code) LIKE '\%".uc(${sstr})."\%'";
         }
-        $sql .= "UPPER(apt_name) LIKE '\%".uc(${sstr})."\%'";
+
+        if($apt_name)
+        {
+            if($apt_code)
+            {
+                $sql .= " OR ";
+            }
+            $sql .= "UPPER(apt_name) LIKE '\%".uc(${sstr})."\%'";
+        }
+
+        $sql .= " ORDER BY apt_code;";
+    }
+    elsif($ne and $sw)
+    {
+        # Searching for airport according to its runway
+        $sql = "SELECT DISTINCT ON (${APT_TABLE}.apt_id) * FROM ${APT_TABLE} ";
+        $sql .= "JOIN ${APTWAY_TABLE} ON ";
+        $sql .= "${APT_TABLE}.apt_id = ${APTWAY_TABLE}.apt_id";
+        $sql .= " WHERE ${APTWAY_TABLE}.type = 'r'";
+        $sql .= " AND (lat < ${ne_lat}";
+        $sql .= " AND lat > ${sw_lat}";
+        $sql .= " AND abslng < ${ne_lng}";
+        $sql .= " AND abslng > ${sw_lng})";
+        $sql .= " ORDER BY ${APT_TABLE}.apt_id, apt_code;";
     }
 
-    $sql .= " ORDER BY apt_code;";
 
     #print(STDERR "$sql\n");
     $sth = $dbi->process($sql);
@@ -386,11 +424,24 @@ XML
 }
 
 
-if($sstr and ($vor or $ndb))
+if($vor or $ndb)
 {
-    $sql = "SELECT * FROM ${NAV_TABLE}";
-    $sql .= " WHERE (UPPER(ident) LIKE '\%".uc(${sstr})."\%' OR ";
-    $sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%') AND (";
+    $sql = "SELECT * FROM ${NAV_TABLE} WHERE ";
+
+    if($sstr)
+    {
+        $sql .= "(UPPER(ident) LIKE '\%".uc(${sstr})."\%' OR ";
+        $sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%')";
+    }
+    elsif($ne and $sw)
+    {
+        $sql .= "(lat < ${ne_lat}";
+        $sql .= " AND lat > ${sw_lat}";
+        $sql .= " AND abslng < ${ne_lng}";
+        $sql .= " AND abslng > ${sw_lng})";
+    }
+
+    $sql .= " AND (";
 
     if($vor)
     {
@@ -452,10 +503,22 @@ XML
 }
 
 
-if($sstr and $fix)
+if($fix)
 {
-    $sql = "SELECT * FROM ${FIX_TABLE}";
-    $sql .= " WHERE UPPER(name) LIKE '\%".uc(${sstr})."\%'";
+    $sql = "SELECT * FROM ${FIX_TABLE} WHERE ";
+
+    if($sstr)
+    {
+        $sql .= " WHERE UPPER(name) LIKE '\%".uc(${sstr})."\%'";
+    }
+    elsif($ne and $sw)
+    {
+        $sql .= "(lat < ${ne_lat}";
+        $sql .= " AND lat > ${sw_lat}";
+        $sql .= " AND abslng < ${ne_lng}";
+        $sql .= " AND abslng > ${sw_lng})";
+    }
+
     $sql .= ";";
 
     $sth = $dbi->process($sql);

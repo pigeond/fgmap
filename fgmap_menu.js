@@ -103,21 +103,23 @@ FGMapMenu.prototype.init = function() {
     anchor.title = "Link to this map";
 
     var elem = element_create(anchor, "img");
-    elem.src = "images/link.png";
+    elem.src = "images/link.gif";
+    elem.style.width = "16px";
+    elem.style.height = "16px";
     elem.title = "Link to this map";
     elem.alt = "Link to this map";
     elem.style.border = "0px";
-    img_ie_fix(elem);
+    //img_ie_fix(elem);
 
     attach_event(elem, "mouseover", function(e) {
         var target = target_get(e || window.event);
-        target.src = "images/link_active.png";
-        img_ie_fix(target);
+        target.src = "images/link_active.gif";
+        //img_ie_fix(target);
     });
     attach_event(elem, "mouseout", function(e) {
         var target = target_get(e || window.event);
-        target.src = "images/link.png";
-        img_ie_fix(target);
+        target.src = "images/link.gif";
+        //img_ie_fix(target);
     });
 
 
@@ -490,7 +492,7 @@ General help\
 \
 <ul style=\"margin: 0px 0px 0px 0px; padding: 0px 0px 0px 8px;\">\
     <li>You can minimize this menu dock by clicking on the title (where the \"FGMap - server name - pilots: n\" is). Click on it again to bring up this menu again.</li>\
-    <li>The <img src=\"images/link.png\" alt=\"\" title=\"\" border=0 align=\"middle\"> icon at the top right hand corner of the menu box gives you a permanent link to current view of the map, which includes the current zoom level, map type, and pilots that map is following.</li>\
+    <li>The <img src=\"images/link.gif\" alt=\"\" title=\"\" border=0 align=\"middle\"> icon at the top right hand corner of the menu box gives you a permanent link to current view of the map, which includes the current zoom level, map type, and pilots that map is following.</li>\
 </ul>\
 \
 <p style=\"text-align: center; font-weight: bold;\">\

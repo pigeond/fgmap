@@ -188,17 +188,17 @@ a:hover     { color: #ddf; }
     border: 1px dotted white;
 }
 
-.fgmap_airport_info_name { color: white; font-weight: bold; }
-.fgmap_airport_info_code { color: white; font-weight: bold; }
+.fgmap_airport_info_name { color: red; font-weight: bold; }
+.fgmap_airport_info_code { color: red; font-weight: bold; }
 .fgmap_airport_info_atc_atis { color: cyan; }
 .fgmap_airport_info_atc_tower { color: lime; }
 
+.fgmap_nav_apt_info { color: red; }
+.fgmap_nav_vor_info { color: cyan; }
+.fgmap_nav_ndb_info { color: magenta; }
+.fgmap_nav_fix_info { color: yellow; }
+.fgmap_nav_awy_info { color: green; }
+
 .fgmap_nav_result_normal { background-color: transparent; }
 .fgmap_nav_result_hover { background-color: #777; color: #000; }
-
-.fgmap_nav_result_apt { color: red; }
-.fgmap_nav_result_vor { color: cyan; }
-.fgmap_nav_result_ndb { color: magenta; }
-.fgmap_nav_result_fix { color: yellow; }
-.fgmap_nav_result_awy { color: green; }
 

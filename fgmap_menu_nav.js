@@ -3,12 +3,8 @@
  */
 
 
-var FGMAP_NAV_RESULT_CLASSES = new Object();
-FGMAP_NAV_RESULT_CLASSES[FGMAP_NAVAID_APT] = 'fgmap_nav_result_apt';
-FGMAP_NAV_RESULT_CLASSES[FGMAP_NAVAID_VOR] = 'fgmap_nav_result_vor';
-FGMAP_NAV_RESULT_CLASSES[FGMAP_NAVAID_NDB] = 'fgmap_nav_result_ndb';
-FGMAP_NAV_RESULT_CLASSES[FGMAP_NAVAID_FIX] = 'fgmap_nav_result_fix';
-FGMAP_NAV_RESULT_CLASSES[FGMAP_NAVAID_AWY] = 'fgmap_nav_result_awy';
+var FGMAP_NAV_INVIEW_ZOOM_MAX = 10;
+
 
 function FGMapMenuNav(fgmapmenu) {
     this.fgmapmenu = fgmapmenu;
@@ -207,6 +203,11 @@ FGMapMenuNav.prototype.setup = function() {
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "awy");
 
+    GEvent.addListener(this.fgmap.gmap, "zoomend",
+        this.gmap_zoomend_cb.bind_event(this));
+
+    this.gmap_zoomend_cb(-1, this.fgmap.gmap.getZoom());
+
     this.fgmapmenu.tab_add("nav", "nav", elem, this);
 
 };
@@ -240,13 +241,14 @@ FGMapMenuNav.prototype.cbutton_enabled_set = function(enabled) {
 
 FGMapMenuNav.prototype.nav_form_submit_cb = function(e) {
 
-    if(this.nav_lookup.value == "" || this.bounds == null) {
+    if(this.nav_lookup.value == "" && this.bounds == null) {
         return false;
     }
 
     var url = "fg_nav_xml.cgi?";
     
     if(this.bounds) {
+        /* This override search string */
         var ne = this.bounds.getNorthEast();
         var sw = this.bounds.getSouthWest();
         url += "ne=" + ne.lat() + "," + ne.lng() +
@@ -353,6 +355,7 @@ FGMapMenuNav.prototype.nav_apt_parse = function(xmldoc) {
         }
 
         this.result_box_result_add(apt);
+
     }
 
 };
@@ -433,15 +436,23 @@ FGMapMenuNav.prototype.nav_form_xml_request_cb = function() {
 
     if(this.xml_request.readyState == 4) {
 
-        var result_cnt = 0;
-
         var xmldoc = this.xml_request.responseXML;
 
         if(xmldoc == null || xmldoc.documentElement == null) {
             return;
         }
 
-        result_cnt = xmldoc.documentElement.getAttribute("cnt");
+        var err = xmldoc.documentElement.getAttribute("err");
+
+        if(err)
+        {
+            this.result_box_msg_set(err);
+            this.sbutton_enabled_set(true);
+            this.cbutton_enabled_set(true);
+            return;
+        }
+
+        var result_cnt = xmldoc.documentElement.getAttribute("cnt");
 
         if(result_cnt == 0) {
             this.result_box_msg_set("No result found");
@@ -462,21 +473,20 @@ FGMapMenuNav.prototype.nav_form_xml_request_cb = function() {
 
         this.sbutton_enabled_set(true);
         this.cbutton_enabled_set(true);
+        this.bounds = null;
 
     } else if(this.xml_request.readyState > 4) {
         this.result_box_msg_set("Error occured, please try again");
         this.sbutton_enabled_set(true);
         this.cbutton_enabled_set(true);
+        this.bounds = null;
     }
 };
 
 
 FGMapMenuNav.prototype.nav_cbutton_onclick_cb = function() {
-
     this.bounds = this.fgmap.gmap.getBounds();
     this.nav_form_submit_cb();
-    this.bounds = null;
-
 };
 
 
@@ -547,7 +557,7 @@ FGMapMenuNav.prototype.result_box_result_add = function(nav) {
     attach_event(tr, "mouseout",
         this.result_mouseout_cb.bind_event(this, tr, nav));
 
-    var classname = FGMAP_NAV_RESULT_CLASSES[nav.type];
+    var classname = FGMAP_NAV_INFO_CLASSES[nav.type];
 
     td = element_create(tr, "td");
     td.innerHTML = FGMAP_NAVAID_NAMES[nav.type];
@@ -562,6 +572,13 @@ FGMapMenuNav.prototype.result_box_result_add = function(nav) {
     td.className = classname;
 
     this.result_cnt += 1;
+
+    if(this.bounds) {
+        /* In view lookup, show it straight away */
+        if(this.fgmap.nav_add(nav) == true) {
+            this.fgmap.nav_visible_set(nav.id, true);
+        }
+    }
 
     return true;
 };
@@ -584,5 +601,10 @@ FGMapMenuNav.prototype.result_click_cb = function(e, tr, nav) {
             this.fgmap.nav_visible_set(nav.id, true);
         }
     }
+};
+
+
+FGMapMenuNav.prototype.gmap_zoomend_cb = function(oldLevel, newLevel) {
+    this.cbutton.disabled = !(newLevel > FGMAP_NAV_INVIEW_ZOOM_MAX);
 };
 
