@@ -469,8 +469,12 @@ function element_remove(elem) {
 }
 
 
-function element_text_create(text) {
-    return document.createTextNode(text);
+function element_text_create(parent, text) {
+    var text = document.createTextNode(text);
+    if(parent) {
+        parent.appendChild(text);
+    }
+    return text;
 }
 
 
@@ -2559,11 +2563,11 @@ FGNavMarker.prototype.setup = function() {
 
     /* Info elem */
     if(this.info_elem != null) {
-        this.info_elem.className = FGMAP_NAV_INFO_CLASSES[this.type];
-        align = new GPoint(w, h / -2);
+        //this.info_elem.className = FGMAP_NAV_INFO_CLASSES[this.type];
+        this.info_elem.className = "fgmap_nav_info";
+        align = new GPoint(w * 3 / 4, h / -2);
         this.info = new GMapElement(this.latlng, align,
-                                    this.info_elem, G_MAP_MARKER_SHADOW_PANE,
-                                    "fgmap_nav_info");
+                                    this.info_elem, G_MAP_MARKER_SHADOW_PANE);
     }
 
     return true;
@@ -2608,10 +2612,13 @@ FGNavMarker.prototype.remove = function() {
 function FGNavVor(fgmap, id, code, name, lat, lng, freq) {
 
     var elem = element_create(null, "div");
-    element_text_append(elem, code + " - " + name);
-    element_create(elem, "br");
-    element_text_append(elem, freq);
     element_opacity_set(elem, 0.65);
+
+    var span = element_create(elem, "span");
+    span.className = "fgmap_nav_vor_info";
+    element_text_append(span, code + " - " + name);
+    element_create(span, "br");
+    element_text_append(span, freq);
 
     FGNavMarker.apply(this,
         [ fgmap, id, FGMAP_NAVAID_VOR, code, name, lat, lng, elem ]);
@@ -2623,10 +2630,13 @@ FGNavVor.prototype = new FGNavMarker();
 function FGNavNdb(fgmap, id, code, name, lat, lng, freq) {
 
     var elem = element_create(null, "div");
-    element_text_append(elem, code + " - " + name);
-    element_create(elem, "br");
-    element_text_append(elem, freq);
     element_opacity_set(elem, 0.65);
+
+    var span = element_create(elem, "span");
+    span.className = "fgmap_nav_ndb_info";
+    element_text_append(span, code + " - " + name);
+    element_create(span, "br");
+    element_text_append(span, freq);
 
     FGNavMarker.apply(this,
         [ fgmap, id, FGMAP_NAVAID_NDB, code, name, lat, lng, elem ]);
@@ -2637,8 +2647,11 @@ FGNavNdb.prototype = new FGNavMarker();
 function FGNavFix(fgmap, id, name, lat, lng) {
 
     var elem = element_create(null, "div");
-    element_text_append(elem, name);
     element_opacity_set(elem, 0.65);
+
+    var span = element_create(elem, "span");
+    span.className = "fgmap_nav_fix_info";
+    element_text_append(span, name);
 
     FGNavMarker.apply(this,
         [ fgmap, id, FGMAP_NAVAID_FIX, name, name, lat, lng, elem ]);
