@@ -509,7 +509,7 @@ if($fix)
 
     if($sstr)
     {
-        $sql .= " WHERE UPPER(name) LIKE '\%".uc(${sstr})."\%'";
+        $sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%'";
     }
     elsif($ne and $sw)
     {
