@@ -205,7 +205,7 @@ var FGMAP_ILS_TYPE_MM = 8;
 var FGMAP_ILS_TYPE_IM = 9;
 
 
-var FGMAP_PILOT_OPACITY = 0.65;
+var FGMAP_PILOT_OPACITY = 0.75;
 var FGMAP_NAV_OPACITY = 0.80;
 
 
@@ -704,6 +704,9 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip) {
     elem.className = "fgmap_pilot_info";
     elem.style.zIndex = FGMAP_PILOT_INFO_ZINDEX;
 
+    attach_event(elem, "mouseover",
+        this.info_mouseover_cb.bind_event(this));
+
     this.info = new GMapElement(this.latlng,
                                 new GPoint(20, 15),
                                 this.info_elem);
@@ -1148,6 +1151,12 @@ FGPilot.prototype.remove = function() {
 
 FGPilot.prototype.marker_mouse_event_cb = function(e) {
 
+    if(!e) e = window.event;
+
+    if(e.type == "mouseover") {
+        this.raise();
+    }
+
     if(this.fgmap.info_type == FGMAP_PILOT_INFO_OFF ||
         this.fgmap.info_type == FGMAP_PILOT_INFO_ALWAYS)
         return;
@@ -1155,8 +1164,6 @@ FGPilot.prototype.marker_mouse_event_cb = function(e) {
     if(this.fgmap.info_type == FGMAP_PILOT_INFO_FOLLOWS &&
         this.fgmap.follows.indexOf(this.callsign) != -1)
         return;
-
-    if(!e) e = window.event;
 
     if(e.type == "mouseover") {
         element_show(this.info_elem);
@@ -1167,6 +1174,15 @@ FGPilot.prototype.marker_mouse_event_cb = function(e) {
 }
 
 
+FGPilot.prototype.info_mouseover_cb = function(e) {
+    this.raise();
+};
+
+
+FGPilot.prototype.raise = function() {
+    this.marker.raise();
+    this.info.raise();
+};
 
 
 /* fg_server ******************************************************************/
