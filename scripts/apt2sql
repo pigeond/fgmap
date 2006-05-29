@@ -88,9 +88,15 @@ SQL
             $type = "r";
         }
 
+        my($abslng) = $lng;
+        if($abslng < 0)
+        {
+            $abslng += 360;
+        }
+
         $sql .= <<SQL;
-INSERT INTO fg_apt_way (apt_id, type, num, lat, lng, heading, length, width)
-    VALUES (${apt_id}, '${type}', ${num}, ${lat}, ${lng}, ${heading}, ${len}, ${width});
+INSERT INTO fg_apt_way (apt_id, type, num, lat, lng, abslng, heading, length, width)
+    VALUES (${apt_id}, '${type}', ${num}, ${lat}, ${lng}, ${abslng}, ${heading}, ${len}, ${width});
 SQL
     }
     elsif($line =~ m/^14\s+.*?/)

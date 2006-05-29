@@ -47,16 +47,22 @@ while(<STDIN>)
     }
     elsif($code != 99)
     {
-        my($type, $lat, $lng, $elevation, $freq, $range, $multi, $ident, $name) =
-            split(/[ \t]+/, $line, 9);
+        my($type, $lat, $lng, $elevation, $freq, $range, $multi, $ident, $name)
+            = split(/[ \t]+/, $line, 9);
 
         $name =~ s/'/\\'/g;
 
+        my($abslng) = $lng;
+        if($abslng < 0)
+        {
+            $abslng += 360;
+        }
+
         $sql .= <<SQL;
 INSERT INTO fg_nav
-    (nav_type, lat, lng, elevation, freq, range, multi, ident, name)
+    (nav_type, lat, lng, abslng, elevation, freq, range, multi, ident, name)
     VALUES
-    ($type, $lat, $lng, $elevation, $freq, $range, $multi, '$ident', '$name');
+    ($type, $lat, $lng, $abslng, $elevation, $freq, $range, $multi, '$ident', '$name');
 SQL
     }
     else

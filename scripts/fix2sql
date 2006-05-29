@@ -48,13 +48,19 @@ while(<STDIN>)
     {
         my($lat, $lng, $name) = split(/[ \t]+/, $line, 3);
 
+        my($abslng) = $lng;
+        if($abslng < 0)
+        {
+            $abslng += 360;
+        }
+
         $name =~ s/'/\\'/g;
 
         $sql .= <<SQL;
 INSERT INTO fg_fix
-    (lat, lng, name)
+    (lat, lng, abslng, name)
     VALUES
-    ($lat, $lng, '$name');
+    ($lat, $lng, $abslng, '$name');
 SQL
     }
     else
