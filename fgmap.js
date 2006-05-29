@@ -169,11 +169,11 @@ FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_NDB] = '64x64';
 FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_FIX] = '16x12';
 
 var FGMAP_NAV_INFO_CLASSES = new Object();
-FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_APT] = 'fgmap_nav_apt_info';
-FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_VOR] = 'fgmap_nav_vor_info';
-FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_NDB] = 'fgmap_nav_ndb_info';
-FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_FIX] = 'fgmap_nav_fix_info';
-FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_AWY] = 'fgmap_nav_awy_info';
+FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_APT] = 'fgmap_nav_apt';
+FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_VOR] = 'fgmap_nav_vor';
+FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_NDB] = 'fgmap_nav_ndb';
+FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_FIX] = 'fgmap_nav_fix';
+FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_AWY] = 'fgmap_nav_awy';
 
 
 /* ATC enums */
@@ -195,6 +195,18 @@ FGMAP_ATC_TYPES[FGMAP_ATC_TYPE_TWR] = 'Tower';
 FGMAP_ATC_TYPES[FGMAP_ATC_TYPE_APP] = 'Approach';
 FGMAP_ATC_TYPES[FGMAP_ATC_TYPE_DEP] = 'Departure';
 
+
+/* ILS type */
+var FGMAP_ILS_TYPE_ILS = 4;
+var FGMAP_ILS_TYPE_LLZ = 5;
+var FGMAP_ILS_TYPE_GS = 6;
+var FGMAP_ILS_TYPE_OM = 7;
+var FGMAP_ILS_TYPE_MM = 8;
+var FGMAP_ILS_TYPE_IM = 9;
+
+
+var FGMAP_PILOT_OPACITY = 0.65;
+var FGMAP_NAV_OPACITY = 0.80;
 
 
 // TODO
@@ -460,6 +472,15 @@ function element_attach_after(elem, ref_elem, parent) {
 }
 
 
+function element_raise(elem) {
+    var parent = elem.parentNode;
+    if(parent) {
+        parent.removeChild(elem);
+        parent.appendChild(elem);
+    }
+}
+
+
 function element_remove(elem) {
     if(elem.parentNode) {
         elem.parentNode.removeChild(elem);
@@ -549,7 +570,11 @@ GMapElement.prototype.initialize = function(gmap) {
     this.elem = element_create(gmap.getPane(this.gmap_pane), "div");
     this.elem.style.position = "absolute";
     this.elem.className = this.classname;
-    this.elem.style.zIndex = GOverlay.getZIndex(this.latlng.lat());
+
+    // TODO: Not setting zindex according to GMap here allows raise() to work,
+    // but check me
+    //this.elem.style.zIndex = GOverlay.getZIndex(this.latlng.lat());
+    this.elem.style.zIndex = 32767;
 
     this.update(this.latlng, this.align);
     this.child_set(this.child);
@@ -598,6 +623,11 @@ GMapElement.prototype.hide = function() {
 GMapElement.prototype.opacity_set = function(opacity) {
     //element_opacity_set(this.child, opacity);
     element_opacity_set(this.elem, opacity);
+};
+
+
+GMapElement.prototype.raise = function() {
+    element_raise(this.elem);
 };
 
 
@@ -678,7 +708,7 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip) {
                                 new GPoint(20, 15),
                                 this.info_elem);
     fgmap.gmap.addOverlay(this.info);
-    this.info.opacity_set(0.65);
+    this.info.opacity_set(FGMAP_PILOT_OPACITY);
 
 
     // callsign
@@ -2275,7 +2305,7 @@ FGAirport.prototype.runway_setup = function() {
 
     // Some default
     var runway_color = "#0000ff";
-    var runway_opacity = 0.65;
+    var runway_opacity = FGMAP_NAV_OPACITY;
     var runway_width = 3;
     var runway_info_offset = 250;
     var runway_info_align = new GPoint(-12, 0);
@@ -2325,21 +2355,55 @@ FGAirport.prototype.runway_setup = function() {
         var label = new GMapElement(new GLatLng(lat - dlat, lng - dlng),
                                         runway_info_align, elem,
                                         G_MAP_MARKER_SHADOW_PANE);
+        attach_event(elem, "mouseover",
+            this.runway_mouseover_cb.bind_event(this, label));
         this.rwy_labels.push(label);
 
 
+        if(this.ilss && this.ilss[num] != null) {
+
 /*
-        if(this.ilss[num] != null) {
-
-            var pin = element_create(elem, "img");
-
+            // TODO
             // ILS/GS/OM/MM/IM for each runway
             for(var k in this.ilss[num]) {
                 var ils = this.ilss[num][k];
             }
-        }
 */
+            element_text_append(elem, "\u00a0");
 
+            var ils = this.ilss[num];
+
+            var img = ils.ils_toggle_img =
+                element_create(elem, "img");
+            img.style.width = "12px";
+            img.style.height = "6px";
+            //img_ie_fix(img);
+            img.style.verticalAlign = "middle";
+            img.title = "Toggle ILS details";
+            attach_event(img, "click",
+                this.ils_toggle_img_click_cb.bind_event(this,
+                ils));
+
+            element_create(elem, "br");
+
+            // TODO
+            var i;
+            if((i = ils[FGMAP_ILS_TYPE_ILS]) == null) { 
+                i = ils[FGMAP_ILS_TYPE_LLZ];
+            }
+
+            var div = ils.ils_table = element_create(elem, "div");
+            element_opacity_set(div, FGMAP_NAV_OPACITY);
+            div.style.display = "block";
+
+            var span = element_create(div, "span");
+            span.className = "fgmap_nav_ils";
+            element_text_append(span, i.name + " - " + i.ident);
+            element_create(span, "br");
+            element_text_append(span, i.freq);
+
+            this.ils_visible_set(ils, false);
+        }
 
     }
 
@@ -2420,11 +2484,34 @@ FGAirport.prototype.airport_setup = function() {
             this.label = new GMapElement(this.bounds.getNorthEast(),
                                             airport_info_align, elem,
                                             G_MAP_MARKER_SHADOW_PANE);
+            attach_event(elem, "mouseover",
+                this.airport_mouseover_cb.bind_event(this));
         }
     }
 
     return true;
 };
+
+
+FGAirport.prototype.airport_mouseover_cb = function(e) {
+    if(this.rwy_labels) {
+        for(var i = 0; i < this.rwy_labels.length; i++) {
+            this.rwy_labels[i].raise();
+        }
+    }
+    if(this.label) {
+        this.label.raise();
+    }
+};
+
+
+FGAirport.prototype.runway_mouseover_cb = function(e, label) {
+    this.airport_mouseover_cb();
+    if(label) {
+        label.raise();
+    }
+};
+
 
 
 FGAirport.prototype.atc_visible_set = function(visible) {
@@ -2444,6 +2531,27 @@ FGAirport.prototype.atc_toggle_img_click_cb = function(e) {
     this.atc_visible_set(this.atc_table.style.display != "block");
 };
 
+
+FGAirport.prototype.ils_visible_set = function(ils, visible) {
+    if(ils.ils_table) {
+        if(visible) {
+            ils.ils_toggle_img.src = "images/arrow_up.gif";
+            element_show(ils.ils_table);
+        } else {
+            ils.ils_toggle_img.src = "images/arrow_down.gif";
+            element_hide(ils.ils_table);
+        }
+    }
+};
+
+
+FGAirport.prototype.ils_toggle_img_click_cb = function(e, ils) {
+    if(!ils)
+        return;
+    this.ils_visible_set(ils, ils.ils_table.style.display != "block");
+};
+
+
 FGAirport.prototype.visible_set = function(visible) {
 
     if(this.visible == visible) {
@@ -2451,8 +2559,8 @@ FGAirport.prototype.visible_set = function(visible) {
     }
 
     if(visible) {
-        var runway_opacity = 0.65;
-        var airport_info_opacity = 0.65;
+        var runway_opacity = FGMAP_NAV_OPACITY;
+        var airport_info_opacity = FGMAP_NAV_OPACITY;
 
         if(this.rwy_lines) {
             for(var i = 0; i < this.rwy_lines.length; i++) {
@@ -2545,9 +2653,8 @@ FGNavMarker.prototype.setup = function() {
     var w, h;
 
     /* Image marker */
-    var elem = element_create(null, "img");
-    elem.src = FGMAP_NAVAID_ICONS[this.type];
-    img_ie_fix(elem);
+    var img = element_create(null, "img");
+    img.src = FGMAP_NAVAID_ICONS[this.type];
 
     if((dimen = FGMAP_NAVAID_ICONS_DIMEN[this.type]) == null) {
         w = 64;
@@ -2557,20 +2664,34 @@ FGNavMarker.prototype.setup = function() {
         w = parseInt(arr[1]);
         h = parseInt(arr[2]);
     }
+    img.style.width = w + "px";
+    img.style.height = h + "px";
+    img_ie_fix(img);
+    
     align = new GPoint(w / -2, h / -2);
     this.img = new GMapElement(this.latlng, align,
-                                elem, G_MAP_MARKER_SHADOW_PANE);
+                                img, G_MAP_MARKER_SHADOW_PANE);
+    attach_event(img, "mouseover", this.info_mouseover_cb.bind_event(this));
 
     /* Info elem */
     if(this.info_elem != null) {
-        //this.info_elem.className = FGMAP_NAV_INFO_CLASSES[this.type];
         this.info_elem.className = "fgmap_nav_info";
         align = new GPoint(w * 3 / 4, h / -2);
         this.info = new GMapElement(this.latlng, align,
                                     this.info_elem, G_MAP_MARKER_SHADOW_PANE);
+
+        attach_event(this.info_elem, "mouseover",
+            this.info_mouseover_cb.bind_event(this));
     }
 
+
     return true;
+};
+
+
+FGNavMarker.prototype.info_mouseover_cb = function(e) {
+    this.info.raise();
+    this.img.raise();
 };
 
 
@@ -2581,8 +2702,10 @@ FGNavMarker.prototype.visible_set = function(visible) {
 
     if(visible) {
         this.fgmap.gmap.addOverlay(this.img);
-        if(this.info)
+        if(this.info) {
             this.fgmap.gmap.addOverlay(this.info);
+            this.info.opacity_set(FGMAP_NAV_OPACITY);
+        }
     } else {
         this.fgmap.gmap.removeOverlay(this.img);
         if(this.info)
@@ -2612,10 +2735,9 @@ FGNavMarker.prototype.remove = function() {
 function FGNavVor(fgmap, id, code, name, lat, lng, freq) {
 
     var elem = element_create(null, "div");
-    element_opacity_set(elem, 0.65);
 
     var span = element_create(elem, "span");
-    span.className = "fgmap_nav_vor_info";
+    span.className = "fgmap_nav_vor";
     element_text_append(span, code + " - " + name);
     element_create(span, "br");
     element_text_append(span, freq);
@@ -2630,10 +2752,9 @@ FGNavVor.prototype = new FGNavMarker();
 function FGNavNdb(fgmap, id, code, name, lat, lng, freq) {
 
     var elem = element_create(null, "div");
-    element_opacity_set(elem, 0.65);
 
     var span = element_create(elem, "span");
-    span.className = "fgmap_nav_ndb_info";
+    span.className = "fgmap_nav_ndb";
     element_text_append(span, code + " - " + name);
     element_create(span, "br");
     element_text_append(span, freq);
@@ -2647,10 +2768,9 @@ FGNavNdb.prototype = new FGNavMarker();
 function FGNavFix(fgmap, id, name, lat, lng) {
 
     var elem = element_create(null, "div");
-    element_opacity_set(elem, 0.65);
 
     var span = element_create(elem, "span");
-    span.className = "fgmap_nav_fix_info";
+    span.className = "fgmap_nav_fix";
     element_text_append(span, name);
 
     FGNavMarker.apply(this,
