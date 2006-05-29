@@ -139,7 +139,16 @@ FGMapMenuServer.prototype.update = function() {
 
 
 FGMapMenuServer.prototype.server_select_changed_cb = function(e) {
-    var selected = this.select.options[this.select.selectedIndex];
+
+    var sindex = this.select.selectedIndex;
+
+    if(sindex == -1) {
+        return;
+    }
+
+    this.server_select_changed = true;
+
+    var selected = this.select.options[sindex];
     //this.fgmap.server_set(selected.text);
     this.fgmap.server_set(selected.server_name);
 };
@@ -164,6 +173,10 @@ FGMapMenuServer.prototype.server_added_cb = function(event,
 };
 
 FGMapMenuServer.prototype.server_changed_cb = function(event, name) {
+    if(this.server_select_changed) {
+        this.server_select_changed = false;
+        return;
+    }
     this.update();
 };
 
