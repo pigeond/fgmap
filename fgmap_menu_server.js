@@ -90,6 +90,8 @@ FGMapMenuServer.prototype.setup = function() {
 
     this.fgmap.event_callback_add(FGMAP_EVENT_SERVER_ADDED,
         this.server_added_cb.bind_event(this), null);
+    this.fgmap.event_callback_add(FGMAP_EVENT_SERVER_CHANGED,
+        this.server_changed_cb.bind_event(this), null);
 };
 
 
@@ -161,4 +163,7 @@ FGMapMenuServer.prototype.server_added_cb = function(event,
     this.update();
 };
 
+FGMapMenuServer.prototype.server_changed_cb = function(event, name) {
+    this.update();
+};
 
