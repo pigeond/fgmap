@@ -72,6 +72,8 @@ sub rwy_nav
         my(%nav_hash) = %$nav_href;
 
         my($nav_name) = &htmlencode($nav_hash{'name'});
+        $nav_name =~ s/${apt_code} ${rwy_num}//gi;
+
         my($nav_type) = $nav_hash{'nav_type'};
         my($nav_lat) = $nav_hash{'lat'};
         my($nav_lng) = $nav_hash{'lng'};
