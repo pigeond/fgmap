@@ -170,35 +170,40 @@ FGMapMenuNav.prototype.setup = function() {
 
     li = element_clone(base_li, false);
     element_attach(li, ul);
-    this.apt_show_chbx = chbx = element_clone(base_chbx);
+    chbx = element_clone(base_chbx);
+    chbx.value = FGMAP_NAVAID_APT;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "apt");
 
     li = element_clone(base_li, false);
     element_attach(li, ul);
-    this.vor_show_chbx = chbx = element_clone(base_chbx);
+    chbx = element_clone(base_chbx);
+    chbx.value = FGMAP_NAVAID_VOR;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "vor");
 
     li = element_clone(base_li, false);
     element_attach(li, ul);
-    this.ndb_show_chbx = chbx = element_clone(base_chbx);
+    chbx = element_clone(base_chbx);
+    chbx.value = FGMAP_NAVAID_NDB;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "ndb");
 
     li = element_clone(base_li, false);
     element_attach(li, ul);
-    this.fix_show_chbx = chbx = element_clone(base_chbx);
+    chbx = element_clone(base_chbx);
+    chbx.value = FGMAP_NAVAID_FIX;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "fix");
 
     li = element_clone(base_li, false);
     element_attach(li, ul);
-    this.awy_show_chbx = chbx = element_clone(base_chbx);
+    chbx = element_clone(base_chbx);
+    chbx.value = FGMAP_NAVAID_AWY;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "awy");
@@ -214,8 +219,11 @@ FGMapMenuNav.prototype.setup = function() {
 
 
 
-FGMapMenuNav.prototype.toggle_click_cb = function() {
-
+FGMapMenuNav.prototype.toggle_click_cb = function(e) {
+    var target = target_get(e || window.event);
+    if(target.value != null) {
+        this.fgmap.nav_type_visible_set(target.value, target.checked);
+    }
 };
 
 
@@ -612,4 +620,5 @@ FGMapMenuNav.prototype.result_click_cb = function(e, tr, nav) {
 FGMapMenuNav.prototype.gmap_zoomend_cb = function(oldLevel, newLevel) {
     this.cbutton.disabled = !(newLevel > FGMAP_NAV_INVIEW_ZOOM_MAX);
 };
+
 

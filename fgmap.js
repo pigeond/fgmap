@@ -592,7 +592,6 @@ GMapElement.prototype.redraw = function(force) {
 };
 
 
-/*
 GMapElement.prototype.show = function() {
     element_show(this.elem);
 };
@@ -601,7 +600,6 @@ GMapElement.prototype.show = function() {
 GMapElement.prototype.hide = function() {
     element_hide(this.elem);
 };
-*/
 
 
 GMapElement.prototype.opacity_set = function(opacity) {
@@ -686,7 +684,7 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip) {
     // info box div
     elem = this.info_elem = element_create(null, "div");
     elem.className = "fgmap_pilot_info";
-    elem.style.zIndex = FGMAP_PILOT_INFO_ZINDEX;
+    //elem.style.zIndex = FGMAP_PILOT_INFO_ZINDEX;
 
     attach_event(elem, "mouseover",
         this.info_mouseover_cb.bind_event(this));
@@ -766,7 +764,7 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip) {
     /* pilot icon */
     elem = this.icon_elem = element_create(null, "img");
     elem.className = "fgmap_pilot_icon";
-    elem.style.zIndex = FGMAP_CRAFT_ICON_ZINDEX;
+    //elem.style.zIndex = FGMAP_CRAFT_ICON_ZINDEX;
     attach_event(elem, "mouseover",
         this.marker_mouse_event_cb.bind_event(this));
     attach_event(elem, "mouseout",
@@ -2190,6 +2188,18 @@ FGMap.prototype.nav_panto = function(nav_id) {
 };
 
 
+FGMap.prototype.nav_type_visible_set = function(nav_type, visible) {
+
+    // TODO: See if we need to optimize this function
+
+    for(var n in this.navs) {
+        var nav = this.navs[n];
+        if(nav.type  == nav_type) {
+            nav.visible_set(visible);
+        }
+    }
+};
+
 
 
 /* FGAirport */
@@ -2291,6 +2301,8 @@ FGAirport.prototype.setup = function() {
 
 FGAirport.prototype.runway_setup = function() {
 
+    var runway_opacity = FGMAP_NAV_OPACITY;
+
     if(this.rwy_cnt <= 0) {
         return false;
     }
@@ -2357,6 +2369,11 @@ FGAirport.prototype.runway_setup = function() {
                                         G_MAP_MARKER_SHADOW_PANE);
         attach_event(elem, "mouseover",
             this.runway_mouseover_cb.bind_event(this, label));
+
+        this.fgmap.gmap.addOverlay(label);
+        label.hide();
+        label.opacity_set(runway_opacity);
+
         this.rwy_labels.push(label);
 
 
@@ -2414,6 +2431,8 @@ FGAirport.prototype.runway_setup = function() {
 
 FGAirport.prototype.airport_setup = function() {
 
+    var airport_info_opacity = FGMAP_NAV_OPACITY;
+
     if(this.label == null) {
 
         var airport_info_align = new GPoint(48, 0);
@@ -2435,29 +2454,19 @@ FGAirport.prototype.airport_setup = function() {
 
         if(this.atcs) {
 
-            element_text_append(elem, "\u00a0");
-
-            var img = this.atc_toggle_img = element_create(elem, "img");
-            img.style.width = "12px";
-            img.style.height = "6px";
-            //img_ie_fix(img);
-            img.style.verticalAlign = "middle";
-            img.title = "Toggle airport details";
-            attach_event(img, "click",
-                this.atc_toggle_img_click_cb.bind_event(this));
-
-            element_create(elem, "br");
-
-            var table = this.atc_table = element_create(elem, "table");
-            table.style.display = "block";
-            var tbody = element_create(table, "tbody");
-            var tr, td;
-
-            this.atc_visible_set(false);
+            var table = null;
+            var tbody, tr, td;
 
             for(var type in this.atcs) {
+
                 /* TODO */
                 if(type == FGMAP_ATC_TYPE_ATIS || type == FGMAP_ATC_TYPE_TWR) {
+
+                    if(table == null) {
+                        table = this.atc_table = element_create(null, "table");
+                        table.style.display = "block";
+                        tbody = element_create(table, "tbody");
+                    }
 
                     var span_class = (type == FGMAP_ATC_TYPE_ATIS ?
                                         "fgmap_airport_info_atc_atis" :
@@ -2477,6 +2486,25 @@ FGAirport.prototype.airport_setup = function() {
                     }
                 }
             }
+
+            if(table != null) {
+
+                element_text_append(elem, "\u00a0");
+
+                var img = this.atc_toggle_img = element_create(elem, "img");
+                img.style.width = "12px";
+                img.style.height = "6px";
+                //img_ie_fix(img);
+                img.style.verticalAlign = "middle";
+                img.title = "Toggle airport details";
+                attach_event(img, "click",
+                    this.atc_toggle_img_click_cb.bind_event(this));
+
+                element_create(elem, "br");
+                element_attach(table, elem);
+
+                this.atc_visible_set(false);
+            }
         }
 
         if(!this.bounds.isEmpty())
@@ -2484,6 +2512,9 @@ FGAirport.prototype.airport_setup = function() {
             this.label = new GMapElement(this.bounds.getNorthEast(),
                                             airport_info_align, elem,
                                             G_MAP_MARKER_SHADOW_PANE);
+            this.fgmap.gmap.addOverlay(this.label);
+            this.label.hide();
+            this.label.opacity_set(airport_info_opacity);
             attach_event(elem, "mouseover",
                 this.airport_mouseover_cb.bind_event(this));
         }
@@ -2559,27 +2590,25 @@ FGAirport.prototype.visible_set = function(visible) {
     }
 
     if(visible) {
-        var runway_opacity = FGMAP_NAV_OPACITY;
-        var airport_info_opacity = FGMAP_NAV_OPACITY;
-
+        // TODO
         if(this.rwy_lines) {
             for(var i = 0; i < this.rwy_lines.length; i++) {
                 this.fgmap.gmap.addOverlay(this.rwy_lines[i]);
             }
         }
-
+        
         if(this.rwy_labels) {
             for(var i = 0; i < this.rwy_labels.length; i++) {
-                this.fgmap.gmap.addOverlay(this.rwy_labels[i]);
-                this.rwy_labels[i].opacity_set(runway_opacity);
+                this.rwy_labels[i].show();
             }
         }
 
-        this.fgmap.gmap.addOverlay(this.label);
-        this.label.opacity_set(airport_info_opacity);
+        if(this.label)
+            this.label.show();
 
     } else {
 
+        // TODO
         if(this.rwy_lines) {
             for(var i = 0; i < this.rwy_lines.length; i++) {
                 this.fgmap.gmap.removeOverlay(this.rwy_lines[i]);
@@ -2588,10 +2617,12 @@ FGAirport.prototype.visible_set = function(visible) {
 
         if(this.rwy_labels) {
             for(var i = 0; i < this.rwy_labels.length; i++) {
-                this.fgmap.gmap.removeOverlay(this.rwy_labels[i]);
+                this.rwy_labels[i].hide();
             }
         }
-        this.fgmap.gmap.removeOverlay(this.label);
+
+        if(this.label)
+            this.label.hide();
     }
 
     this.visible = visible;
@@ -2626,7 +2657,16 @@ FGAirport.prototype.remove = function() {
         delete(this.rwy_lines);
     }
 
-    delete(this.rwy_labels);
+    if(this.rwy_labels) {
+        for(var i = 0; i < this.rwy_labels.length; i++) {
+            this.fgmap.gmap.removeOverlay(this.rwy_labels[i]);
+        }
+        delete(this.rwy_labels);
+    }
+
+    if(this.label)
+        this.fgmap.gmap.removeOverlay(this.label);
+
     delete(this.runways);
     delete(this.ilss); // TODO: check this
 };
@@ -2652,6 +2692,7 @@ FGNavMarker.prototype.setup = function() {
     var dimen;
     var w, h;
 
+
     /* Image marker */
     var img = element_create(null, "img");
     img.src = FGMAP_NAVAID_ICONS[this.type];
@@ -2672,18 +2713,28 @@ FGNavMarker.prototype.setup = function() {
     this.img = new GMapElement(this.latlng, align,
                                 img, G_MAP_MARKER_SHADOW_PANE);
     attach_event(img, "mouseover", this.info_mouseover_cb.bind_event(this));
+    this.fgmap.gmap.addOverlay(this.img);
+    this.img.hide();
+
 
     /* Info elem */
     if(this.info_elem != null) {
+
         this.info_elem.className = "fgmap_nav_info";
+
         align = new GPoint(w * 3 / 4, h / -2);
+
         this.info = new GMapElement(this.latlng, align,
                                     this.info_elem, G_MAP_MARKER_SHADOW_PANE);
+
+        this.fgmap.gmap.addOverlay(this.info);
+        this.info.hide();
+
+        this.info.opacity_set(FGMAP_NAV_OPACITY);
 
         attach_event(this.info_elem, "mouseover",
             this.info_mouseover_cb.bind_event(this));
     }
-
 
     return true;
 };
@@ -2701,15 +2752,13 @@ FGNavMarker.prototype.visible_set = function(visible) {
     }
 
     if(visible) {
-        this.fgmap.gmap.addOverlay(this.img);
-        if(this.info) {
-            this.fgmap.gmap.addOverlay(this.info);
-            this.info.opacity_set(FGMAP_NAV_OPACITY);
-        }
-    } else {
-        this.fgmap.gmap.removeOverlay(this.img);
+        this.img.show();
         if(this.info)
-            this.fgmap.gmap.removeOverlay(this.info);
+            this.info.show();
+    } else {
+        this.img.hide();
+        if(this.info)
+            this.info.hide();
     }
 
     this.visible = visible;
@@ -2723,14 +2772,21 @@ FGNavMarker.prototype.center_get = function() {
 
 
 FGNavMarker.prototype.remove = function() {
+
     this.visible_set(false);
+
+    this.fgmap.gmap.removeOverlay(this.img);
+
+    if(this.info)
+        this.fgmap.gmap.removeOverlay(this.info);
+
     delete(this.img);
     delete(this.info);
 };
 
 
 
-/* FGNavVor and FGNavNdb */
+/* FGNavVor, FGNavNdb, FGNavFix, all three inheriting FGNavMarker */
 
 function FGNavVor(fgmap, id, code, name, lat, lng, freq) {
 
