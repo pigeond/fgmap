@@ -227,22 +227,6 @@ function rad_to_deg(rad) {
 }
 
 
-// Degree to quadrant
-function deg_to_quad(deg) {
-    if(deg >= 0 && deg <= 90) {
-        return 0;
-    } else if(deg >= 90 && deg <= 180) {
-        return 1;
-    } else if(deg >= 180 && deg <= 270) {
-        return 2;
-    } else if(deg >= 270 && deg <= 360) {
-        return 3;
-    } else {
-        return -1;
-    }
-}
-
-
 function rev_deg(deg) {
     return (deg > 180 ? deg - 180 : deg + 180);
 }
