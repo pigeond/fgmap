@@ -547,6 +547,7 @@ FGMapMenuNav.prototype.result_box_result_add = function(nav) {
         table.style.width = "92%";
         table.style.margin = "0px";
         table.style.padding = "0px";
+        table.style.cursor = "pointer";
         this.result_tbody = tbody = element_create(table, "tbody");
     } else {
         tbody = this.result_tbody;
