@@ -346,7 +346,7 @@ FGMapMenuNav.prototype.nav_apt_parse = function(xmldoc) {
         var apt_elevation = apts[i].getAttribute("elevation");
 
         var apt = new FGAirport(this.fgmap,
-            apt_id, apt_code, apt_name, apt_elevation, /* TODO */ false);
+            apt_id, apt_code, apt_name, apt_elevation);
 
         /* Runways */
         var runways = apts[i].getElementsByTagName("runway");

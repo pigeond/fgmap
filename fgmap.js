@@ -2203,12 +2203,11 @@ FGMap.prototype.nav_type_visible_set = function(nav_type, visible) {
 
 
 /* FGAirport */
-function FGAirport(fgmap, id, code, name, elevation, heli) {
+function FGAirport(fgmap, id, code, name, elevation) {
 
     FGNav.apply(this, [ fgmap, FGMAP_NAVAID_APT, id, code, name ]);
 
     this.elevation = elevation;
-    this.heli = heli || false;
     this.label = null;
 
     this.atcs = null;
