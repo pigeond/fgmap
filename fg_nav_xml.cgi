@@ -430,7 +430,18 @@ XML
 XML
             }
 
-            $xml .= "\t</airport>\n\n";
+            $xml .= "\t</";
+
+            if($apt_heli == 0)
+            {
+                $xml .= "airport";
+            }
+            else
+            {
+                $xml .= "heliport";
+            }
+
+            $xml .= ">\n\n";
         }
         $result_cnt += $sth->rows;
     }
