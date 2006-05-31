@@ -49,29 +49,55 @@ FGMapMenuNav.prototype.setup = function() {
     input.maxLength = 16;
     input.className = "fgmap_menu";
     input.value = "";
-    input.title = "search by navaids id (airport, vor, fix)";
+    input.title = "search selected navaids by string";
+    input.style.verticalAlign = "middle";
 
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     var but;
     
     /* search button */
+/*
     but = this.sbutton =
         element_create(this.nav_form, "input", "button");
+*/
+    but = this.sbutton = element_create(this.nav_form, "img");
+    but.src = "images/search.png";
+    but.style.verticalAlign = "middle";
     but.className = "fgmap_menu";
-    but.title = "search by navaids id (airport, vor, fix)";
-    attach_event(but, "click", this.nav_form_submit_cb.bind_event(this));
+    but.title = "search selected types of navaids by string";
+    but.style.cursor = "pointer";
+    attach_event(but, "mousedown", this.nav_search_mouse_cb.bind_event(this));
+    attach_event(but, "mouseup", this.nav_search_mouse_cb.bind_event(this));
+    attach_event(but, "mouseout", this.nav_search_mouse_cb.bind_event(this));
     this.sbutton_enabled_set(true);
 
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     /* Show all in current view button */
-    but = this.cbutton =
-        element_create(this.nav_form, "input", "button");
+    but = this.cbutton = element_create(this.nav_form, "img");
+    but.src = "images/inview.png";
     but.className = "fgmap_menu";
-    but.title = "Show all navaids in current view (high zoom level only)";
-    attach_event(but, "click", this.nav_cbutton_onclick_cb.bind_event(this));
+    but.style.verticalAlign = "middle";
+    but.title = "Show selected types of navaids in current view (high zoom level only)";
+    but.style.cursor = "pointer";
+    attach_event(but, "mousedown", this.nav_inview_mouse_cb.bind_event(this));
+    attach_event(but, "mouseup", this.nav_inview_mouse_cb.bind_event(this));
+    attach_event(but, "mouseout", this.nav_inview_mouse_cb.bind_event(this));
     this.cbutton_enabled_set(true);
+
+    element_text_append(this.nav_form, "\u00a0\u00a0");
+
+    /* Trash (clear all) button */
+    but = this.tbutton = element_create(this.nav_form, "img");
+    but.src = "images/trash.png";
+    but.style.verticalAlign = "middle";
+    but.className = "fgmap_menu";
+    but.title = "clear all shown navaids";
+    but.style.cursor = "pointer";
+    attach_event(but, "mousedown", this.nav_clearall_mouse_cb.bind_event(this));
+    attach_event(but, "mouseup", this.nav_clearall_mouse_cb.bind_event(this));
+    attach_event(but, "mouseout", this.nav_clearall_mouse_cb.bind_event(this));
 
     element_create(this.nav_form, "br");
 
@@ -496,12 +522,6 @@ FGMapMenuNav.prototype.nav_form_xml_request_cb = function() {
 };
 
 
-FGMapMenuNav.prototype.nav_cbutton_onclick_cb = function() {
-    this.bounds = this.fgmap.gmap.getBounds();
-    this.nav_form_submit_cb();
-};
-
-
 FGMapMenuNav.prototype.remove = function() {
     this.fgmapmenu.tab_remove("nav");
 };
@@ -613,6 +633,58 @@ FGMapMenuNav.prototype.result_click_cb = function(e, tr, nav) {
             this.fgmap.nav_panto(nav.id, nav);
             this.fgmap.nav_visible_set(nav.id, true);
         }
+    }
+};
+
+
+FGMapMenuNav.prototype.nav_clearall_mouse_cb = function(e) {
+
+    e = e || window.event;
+    var target = target_get(e);
+
+    if(e.type == "mouseup") {
+        target.src = "images/trash.png";
+        this.fgmap.nav_clear();
+        this.result_box_result_clear();
+        this.sbutton_enabled_set(true);
+        this.cbutton_enabled_set(true);
+    } else if(e.type == "mouseout") {
+        target.src = "images/trash.png";
+    } else if(e.type == "mousedown") {
+        target.src = "images/trash-pressed.png";
+    }
+};
+
+
+FGMapMenuNav.prototype.nav_inview_mouse_cb = function(e) {
+
+    e = e || window.event;
+    var target = target_get(e);
+
+    if(e.type == "mouseup") {
+        target.src = "images/inview.png";
+        this.bounds = this.fgmap.gmap.getBounds();
+        this.nav_form_submit_cb();
+    } else if(e.type == "mouseout") {
+        target.src = "images/inview.png";
+    } else if(e.type == "mousedown") {
+        target.src = "images/inview-pressed.png";
+    }
+};
+
+
+FGMapMenuNav.prototype.nav_search_mouse_cb = function(e) {
+
+    e = e || window.event;
+    var target = target_get(e);
+
+    if(e.type == "mouseup") {
+        target.src = "images/search.png";
+        this.nav_form_submit_cb();
+    } else if(e.type == "mouseout") {
+        target.src = "images/search.png";
+    } else if(e.type == "mousedown") {
+        target.src = "images/search-pressed.png";
     }
 };
 
