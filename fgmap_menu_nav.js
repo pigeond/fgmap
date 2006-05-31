@@ -240,10 +240,12 @@ FGMapMenuNav.prototype.setup = function() {
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "awy");
 
+/* TODO
     GEvent.addListener(this.fgmap.gmap, "zoomend",
         this.gmap_zoomend_cb.bind_event(this));
 
     this.gmap_zoomend_cb(-1, this.fgmap.gmap.getZoom());
+*/
 
     this.fgmapmenu.tab_add("nav", "nav", elem, this);
 
@@ -674,8 +676,13 @@ FGMapMenuNav.prototype.nav_inview_mouse_cb = function(e) {
 
     if(e.type == "mouseup") {
         target.src = "images/inview.gif";
-        this.bounds = this.fgmap.gmap.getBounds();
-        this.nav_form_submit_cb();
+            
+        if(this.fgmap.gmap.getZoom() > FGMAP_NAV_INVIEW_ZOOM_MAX) {
+            this.bounds = this.fgmap.gmap.getBounds();
+            this.nav_form_submit_cb();
+        } else {
+            this.result_box_msg_set("Zoom level too low, try zooming in a bit.");
+        }
     } else if(e.type == "mouseout") {
         target.src = "images/inview.gif";
     } else if(e.type == "mousedown") {
@@ -700,8 +707,10 @@ FGMapMenuNav.prototype.nav_search_mouse_cb = function(e) {
 };
 
 
+/* TODO
 FGMapMenuNav.prototype.gmap_zoomend_cb = function(oldLevel, newLevel) {
     this.cbutton.disabled = !(newLevel > FGMAP_NAV_INVIEW_ZOOM_MAX);
 };
+*/
 
 
