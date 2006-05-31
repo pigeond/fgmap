@@ -72,7 +72,7 @@ sub rwy_nav
         my(%nav_hash) = %$nav_href;
 
         my($nav_name) = &htmlencode($nav_hash{'name'});
-        $nav_name =~ s/${apt_code} ${rwy_num}//gi;
+        $nav_name =~ s/${apt_code} ${rwy_num} //gi;
 
         my($nav_type) = $nav_hash{'nav_type'};
         my($nav_lat) = $nav_hash{'lat'};
@@ -93,7 +93,7 @@ sub rwy_nav
         $nav_tag = "ilsdme" if($nav_type eq '12');
 
         $rwy_nav .= <<XML;
-\t\t\t\t<${nav_tag} name="${nav_name}" type="${nav_type}" lat="${nav_lat}" lng="${nav_lng}" elevation="${nav_elevation}" freq="${nav_freq}" range="${nav_range}" multi="${nav_multi}" ident="${nav_ident}" />
+\t\t\t<${nav_tag} name="${nav_name}" type="${nav_type}" lat="${nav_lat}" lng="${nav_lng}" elevation="${nav_elevation}" freq="${nav_freq}" range="${nav_range}" multi="${nav_multi}" ident="${nav_ident}" />
 XML
     }
 
@@ -272,7 +272,6 @@ my($sql);
 if($apt_code or $apt_name)
 {
     # airport
-    $xml .= "\t<apt>\n";
 
     if($sstr)
     {
@@ -325,11 +324,22 @@ if($apt_code or $apt_name)
             my($apt_id) = $row_hash{'apt_id'};
             my($apt_code) = $row_hash{'apt_code'};
             my($apt_name) = &htmlencode($row_hash{'apt_name'});
+            my($apt_heli) = $row_hash{'heliport'};
             my($elevation) = $row_hash{'elevation'};
 
+            $xml .= "\t<";
+
+            if($apt_heli == 0)
+            {
+                $xml .= "airport";
+            }
+            else
+            {
+                $xml .= "heliport";
+            }
 
             $xml .= <<XML;
-\t\t<airport id="${apt_id}" code="${apt_code}" name="${apt_name}" elevation="${elevation}">
+ id="${apt_id}" code="${apt_code}" name="${apt_name}" elevation="${elevation}">
 XML
 
             # Get runway/taxiway
@@ -364,36 +374,39 @@ XML
                 if($type eq "r")
                 {
                     $xml .= <<XML;
-\t\t\t<runway num="${num}" lat="${lat}" lng="${lng}" heading="${heading}" length="${length}" width="${width}">
+\t\t<runway num="${num}" lat="${lat}" lng="${lng}" heading="${heading}" length="${length}" width="${width}">
 XML
                     $xml .= &rwy_nav($dbi, $apt_code, ${num});
-                    $xml .= "\t\t\t</runway>\n\n";
+                    $xml .= "\t\t</runway>\n\n";
 
-                    # The reverse runway
-                    my($rnum) = &reverse_rwy(${num});
-
-                    if(${rnum} ne ${num})
+                    if($apt_heli == 0)
                     {
-                        if($heading > 180)
-                        {
-                            $heading -= 180;
-                        }
-                        else
-                        {
-                            $heading += 180;
-                        }
+                        # The reverse runway
+                        my($rnum) = &reverse_rwy(${num});
 
-                        $xml .= <<XML;
-\t\t\t<runway num="${rnum}" lat="${lat}" lng="${lng}" heading="${heading}" length="${length}" width="${width}">
+                        if(${rnum} ne ${num})
+                        {
+                            if($heading > 180)
+                            {
+                                $heading -= 180;
+                            }
+                            else
+                            {
+                                $heading += 180;
+                            }
+
+                            $xml .= <<XML;
+\t\t<runway num="${rnum}" lat="${lat}" lng="${lng}" heading="${heading}" length="${length}" width="${width}">
 XML
-                        $xml .= &rwy_nav($dbi, $apt_code, ${rnum});
-                        $xml .= "\t\t\t</runway>\n\n";
+                            $xml .= &rwy_nav($dbi, $apt_code, ${rnum});
+                            $xml .= "\t\t</runway>\n\n";
+                        }
                     }
                 }
                 elsif($type eq "t")
                 {
                     $xml .= <<XML;
-\t\t\t<taxiway lat="${lat}" lng="${lng}" heading="${heading}" length="${length}" width="${width}" />
+\t\t<taxiway lat="${lat}" lng="${lng}" heading="${heading}" length="${length}" width="${width}" />
 XML
                 }
 
@@ -413,16 +426,14 @@ XML
                 my($name) = &htmlencode($atc_hash{'name'});
 
                 $xml .= <<XML;
-\t\t\t<atc atc_type="${atc_type}" freq="${freq}" name="${name}" />
+\t\t<atc atc_type="${atc_type}" freq="${freq}" name="${name}" />
 XML
             }
 
-            $xml .= "\t\t</airport>\n\n";
+            $xml .= "\t</airport>\n\n";
         }
         $result_cnt += $sth->rows;
     }
-
-    $xml .= "\t</apt>\n\n";
 }
 
 
