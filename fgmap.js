@@ -2391,6 +2391,7 @@ FGAirport.prototype.runway_setup = function() {
 
             var img = ils.ils_toggle_img =
                 element_create(elem, "img");
+            img.style.cursor = "pointer";
             img.style.width = "12px";
             img.style.height = "6px";
             //img_ie_fix(img);
@@ -2491,6 +2492,7 @@ FGAirport.prototype.airport_setup = function() {
                 element_text_append(elem, "\u00a0");
 
                 var img = this.atc_toggle_img = element_create(elem, "img");
+                img.style.cursor = "pointer";
                 img.style.width = "12px";
                 img.style.height = "6px";
                 //img_ie_fix(img);
