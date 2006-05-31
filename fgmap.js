@@ -1245,7 +1245,7 @@ function FGMap(id)
  * Returns the version string of the FGMap API used.
  * @treturn String  the version of the FGMap API used.
  */
-FGMap.prototype.version = "0.1";
+FGMap.prototype.version = "0.2";
 
 
 /**
