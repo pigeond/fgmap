@@ -62,7 +62,7 @@ FGMapMenuNav.prototype.setup = function() {
         element_create(this.nav_form, "input", "button");
 */
     but = this.sbutton = element_create(this.nav_form, "img");
-    but.src = "images/search.png";
+    but.src = "images/search.gif";
     but.style.verticalAlign = "middle";
     but.className = "fgmap_menu";
     but.title = "search selected types of navaids by string";
@@ -76,7 +76,7 @@ FGMapMenuNav.prototype.setup = function() {
 
     /* Show all in current view button */
     but = this.cbutton = element_create(this.nav_form, "img");
-    but.src = "images/inview.png";
+    but.src = "images/inview.gif";
     but.className = "fgmap_menu";
     but.style.verticalAlign = "middle";
     but.title = "Show selected types of navaids in current view (high zoom level only)";
@@ -90,7 +90,7 @@ FGMapMenuNav.prototype.setup = function() {
 
     /* Trash (clear all) button */
     but = this.tbutton = element_create(this.nav_form, "img");
-    but.src = "images/trash.png";
+    but.src = "images/trash.gif";
     but.style.verticalAlign = "middle";
     but.className = "fgmap_menu";
     but.title = "clear all shown navaids";
@@ -654,15 +654,15 @@ FGMapMenuNav.prototype.nav_clearall_mouse_cb = function(e) {
     var target = target_get(e);
 
     if(e.type == "mouseup") {
-        target.src = "images/trash.png";
+        target.src = "images/trash.gif";
         this.fgmap.nav_clear();
         this.result_box_result_clear();
         this.sbutton_enabled_set(true);
         this.cbutton_enabled_set(true);
     } else if(e.type == "mouseout") {
-        target.src = "images/trash.png";
+        target.src = "images/trash.gif";
     } else if(e.type == "mousedown") {
-        target.src = "images/trash-pressed.png";
+        target.src = "images/trash-pressed.gif";
     }
 };
 
@@ -673,13 +673,13 @@ FGMapMenuNav.prototype.nav_inview_mouse_cb = function(e) {
     var target = target_get(e);
 
     if(e.type == "mouseup") {
-        target.src = "images/inview.png";
+        target.src = "images/inview.gif";
         this.bounds = this.fgmap.gmap.getBounds();
         this.nav_form_submit_cb();
     } else if(e.type == "mouseout") {
-        target.src = "images/inview.png";
+        target.src = "images/inview.gif";
     } else if(e.type == "mousedown") {
-        target.src = "images/inview-pressed.png";
+        target.src = "images/inview-pressed.gif";
     }
 };
 
@@ -690,12 +690,12 @@ FGMapMenuNav.prototype.nav_search_mouse_cb = function(e) {
     var target = target_get(e);
 
     if(e.type == "mouseup") {
-        target.src = "images/search.png";
+        target.src = "images/search.gif";
         this.nav_form_submit_cb();
     } else if(e.type == "mouseout") {
-        target.src = "images/search.png";
+        target.src = "images/search.gif";
     } else if(e.type == "mousedown") {
-        target.src = "images/search-pressed.png";
+        target.src = "images/search-pressed.gif";
     }
 };
 
