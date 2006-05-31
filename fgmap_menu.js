@@ -333,16 +333,6 @@ FGMapMenu.prototype.tab_add = function(id, title, child, data,
     attach_event(tab_span, "mouseout", mouseout_func.bind_event(this, id));
     attach_event(tab_span, "click", mouseclick_func.bind_event(this, id));
 
-    // Yet another IE workaround because it sux
-    if(USER_AGENT.is_ie) {
-        var elems = elem.getElementsByTagName("input");
-        for(var i = 0; i < elems.length; i++) {
-            if(elems[i].type == "checkbox" && elems[i].mychecked) {
-                elems[i].checked = true;
-            }
-        }
-    }
-
     return true;
 };
 

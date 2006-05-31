@@ -110,9 +110,7 @@ FGMapMenuPilots.prototype.update = function() {
 
         if(this.fgmap.follows.indexOf(callsign) != -1) {
             checkbox.checked = true;
-            if(USER_AGENT.is_ie) {
-                checkbox.mychecked = true;
-            }
+            checkbox.defaultChecked = true;
         }
 
         var span;

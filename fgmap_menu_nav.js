@@ -108,29 +108,35 @@ FGMapMenuNav.prototype.setup = function() {
 
     this.aptname_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
-    chbx.mychecked = true;
+    chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
     element_text_append(this.nav_form, "apt name");
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     this.aptcode_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
-    chbx.mychecked = true;
+    chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
     element_text_append(this.nav_form, "apt code");
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     this.vor_chbx = chbx = element_clone(base_chbx);
+    chbx.checked = true;
+    chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
     element_text_append(this.nav_form, "vor");
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     this.ndb_chbx = chbx = element_clone(base_chbx);
+    chbx.checked = true;
+    chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
     element_text_append(this.nav_form, "ndb");
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     this.fix_chbx = chbx = element_clone(base_chbx);
+    chbx.checked = true;
+    chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
     element_text_append(this.nav_form, "fix");
     element_text_append(this.nav_form, "\u00a0\u00a0");
@@ -192,7 +198,7 @@ FGMapMenuNav.prototype.setup = function() {
     var li;
 
     base_chbx.checked = true;
-    base_chbx.mychecked = true;
+    base_chbx.defaultChecked = true;
 
     li = element_clone(base_li, false);
     element_attach(li, ul);

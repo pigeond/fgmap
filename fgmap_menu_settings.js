@@ -84,9 +84,7 @@ FGMapMenuSettings.prototype.setup = function() {
     checkbox.className = "fgmap_menu";
     if(this.trail_visible) {
         checkbox.checked = true;
-        if(USER_AGENT.is_ie) {
-            checkbox.mychecked = true;
-        }
+        checkbox.defaultChecked = true;
     }
     element_text_append(li, "\u00a0");
     element_text_append(li, "Pilot trails");
@@ -102,9 +100,7 @@ FGMapMenuSettings.prototype.setup = function() {
     checkbox.className = "fgmap_menu";
     if(this.fgmap.model_icon) {
         checkbox.checked = true;
-        if(USER_AGENT.is_ie) {
-            checkbox.mychecked = true;
-        }
+        checkbox.defaultChecked = true;
     }
     element_text_append(li, "\u00a0");
     element_text_append(li, "Model icon");
@@ -121,9 +117,7 @@ FGMapMenuSettings.prototype.setup = function() {
     checkbox.className = "fgmap_menu";
     if(this.fgmap.debug) {
         checkbox.checked = true;
-        if(USER_AGENT.is_ie) {
-            checkbox.mychecked = true;
-        }
+        checkbox.defaultChecked = true;
         this.debug_show(true);
     }
     element_text_append(li, "\u00a0");
@@ -139,9 +133,7 @@ FGMapMenuSettings.prototype.setup = function() {
     checkbox.className = "fgmap_menu";
     if(this.fgmap.pantoall) {
         checkbox.checked = true;
-        if(USER_AGENT.is_ie) {
-            checkbox.mychecked = true;
-        }
+        checkbox.defaultChecked = true;
         this.debug_show(true);
     }
     element_text_append(li, "\u00a0");

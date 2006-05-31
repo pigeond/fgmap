@@ -49,9 +49,7 @@ FGMapMenuServer.prototype.setup = function() {
     checkbox.className = "fgmap_menu";
     if(this.fgmap.update) {
         checkbox.checked = true;
-        if(USER_AGENT.is_ie) {
-            checkbox.mychecked = true;
-        }
+        checkbox.defaultChecked = true;
     }
 
     attach_event(checkbox, "click", this.update_checkbox_cb.bind_event(this));
