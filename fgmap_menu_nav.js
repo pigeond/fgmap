@@ -275,7 +275,10 @@ FGMapMenuNav.prototype.cbutton_enabled_set = function(enabled) {
 
 FGMapMenuNav.prototype.nav_form_submit_cb = function(e) {
 
-    if(this.nav_lookup.value == "" && this.bounds == null) {
+    if((this.nav_lookup.value == "" || this.nav_lookup.value.length < 3)
+        && this.bounds == null) {
+
+        this.result_box_msg_set("Search string too short, minimum length 3.");
         return false;
     }
 
@@ -484,6 +487,7 @@ FGMapMenuNav.prototype.nav_form_xml_request_cb = function() {
             this.result_box_msg_set(err);
             this.sbutton_enabled_set(true);
             this.cbutton_enabled_set(true);
+            this.xml_request = null;
             return;
         }
 
@@ -493,6 +497,7 @@ FGMapMenuNav.prototype.nav_form_xml_request_cb = function() {
             this.result_box_msg_set("No result found");
             this.sbutton_enabled_set(true);
             this.cbutton_enabled_set(true);
+            this.xml_request = null;
             return;
         }
 
