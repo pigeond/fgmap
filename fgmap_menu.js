@@ -456,7 +456,8 @@ FGMapMenu.prototype.about_tab_setup = function() {
 FGMap " + this.fgmap.version + " - <a href=\"http://www.flightgear.org/\">FlightGear</a> network server traffic map<br>\
 Written by <a href=\"http://pigeond.net/\">Pigeon</a><br>\
 Powered by <a href=\"http://maps.google.com/\">Google Map</a><br>\
-<a href=\"http://www.o-schroeder.de/fg_server/\">FlightGear server</a> written by Oliver Schroeder\
+<a href=\"http://www.o-schroeder.de/fg_server/\">FlightGear server</a> written by Oliver Schroeder<br>\
+<div style=\"lineHeight: 100%;\">Disclaimer: All navigation info are for flight simulation use only</span>\
 ";
 
     this.tab_add("about", "about", elem, null, 1000, true);
