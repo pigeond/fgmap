@@ -11,6 +11,10 @@ function FGMapMenu(fgmap) {
     this.fgmap = fgmap;
     this.div = fgmap.div;
     this.init();
+
+    // Preload images
+    this.preload1 = new Image();
+    preload1.src = "images/link_active.gif";
 }
 
 
