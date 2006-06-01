@@ -12,6 +12,9 @@ function FGMapMenuNav(fgmapmenu) {
     this.result_cnt = 0;
     this.setup();
     this.bounds = null;
+
+    /* Preload some images */
+
 }
 
 FGMapMenuNav.prototype.setup = function() {
@@ -55,6 +58,7 @@ FGMapMenuNav.prototype.setup = function() {
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     var but;
+    var preload;
     
     /* search button */
 /*
@@ -72,6 +76,9 @@ FGMapMenuNav.prototype.setup = function() {
     attach_event(but, "mouseout", this.nav_search_mouse_cb.bind_event(this));
     this.sbutton_enabled_set(true);
 
+    preload = new Image();
+    preload.src = "images/search-pressed.gif";
+
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     /* Show all in current view button */
@@ -86,6 +93,9 @@ FGMapMenuNav.prototype.setup = function() {
     attach_event(but, "mouseout", this.nav_inview_mouse_cb.bind_event(this));
     this.cbutton_enabled_set(true);
 
+    preload = new Image();
+    preload.src = "images/inview-pressed.gif";
+
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     /* Trash (clear all) button */
@@ -98,6 +108,9 @@ FGMapMenuNav.prototype.setup = function() {
     attach_event(but, "mousedown", this.nav_clearall_mouse_cb.bind_event(this));
     attach_event(but, "mouseup", this.nav_clearall_mouse_cb.bind_event(this));
     attach_event(but, "mouseout", this.nav_clearall_mouse_cb.bind_event(this));
+
+    preload = new Image();
+    preload.src = "images/trash-pressed.gif";
 
     element_create(this.nav_form, "br");
 
@@ -249,6 +262,7 @@ FGMapMenuNav.prototype.setup = function() {
 
     this.fgmapmenu.tab_add("nav", "nav", elem, this);
 
+    preload = null;
 };
 
 
