@@ -14,7 +14,7 @@ function FGMapMenu(fgmap) {
 
     // Preload images
     this.preload1 = new Image();
-    preload1.src = "images/link_active.gif";
+    this.preload1.src = "images/link_active.gif";
 }
 
 
