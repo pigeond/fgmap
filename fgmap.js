@@ -1350,6 +1350,10 @@ FGMap.prototype.menu_setup = function() {
         if(!this.menuminimized) {
             this.fgmap_menu.menu_visible_set(true);
         }
+
+        if(this.start_tab != null) {
+            this.fgmap_menu.tab_set(this.start_tab);
+        }
     }
 };
 
@@ -1552,6 +1556,10 @@ FGMap.prototype.query_string_parse = function() {
             } else if(pair[1] == "mouseover") {
                 this.info_type = FGMAP_PILOT_INFO_MOUSEOVER;
             }
+
+        } else if(pair[0] == "menu") {
+        
+            this.start_tab = pair[1];
 
         }
     }

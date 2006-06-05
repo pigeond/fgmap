@@ -563,6 +563,10 @@ Currently valid keys and values are:<br>\
     example: <code>pilot_label=off</code>\
     </li>\
     <li style=\"line-height: 150%;\">\
+    <code>menu</code> - menu tab to display at startup.<br>\
+    example: <code>menu=nav</code>\
+    </li>\
+    <li style=\"line-height: 150%;\">\
     <code>nomapcontrol</code> - Hide Google Map zoom and map mode controls.<br>\
     </li>\
     <li style=\"line-height: 150%;\">\
