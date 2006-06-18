@@ -52,6 +52,10 @@ while(<STDIN>)
 
         $name =~ s/'/\\'/g;
 
+        my($type_name) = "";
+
+        ($name, $type_name) = ($name =~ m/^(.*) (.*?)$/);
+
         my($abslng) = $lng;
         if($abslng < 0)
         {
@@ -60,9 +64,9 @@ while(<STDIN>)
 
         $sql .= <<SQL;
 INSERT INTO fg_nav
-    (nav_type, lat, lng, abslng, elevation, freq, range, multi, ident, name)
+    (nav_type, lat, lng, abslng, elevation, freq, range, multi, ident, name, type_name)
     VALUES
-    ($type, $lat, $lng, $abslng, $elevation, $freq, $range, $multi, '$ident', '$name');
+    ($type, $lat, $lng, $abslng, $elevation, $freq, $range, $multi, '$ident', '$name', '$type_name');
 SQL
     }
     else

@@ -450,6 +450,17 @@ XML
 
 if($vor or $ndb)
 {
+    # NDB-DME: 2 and 13, 2 freqs
+    # NDB: 2, 1 freq
+
+    # VORTAC: 3 and 12, 1 freq
+    # VOR-DME: 3 and 12, 1 freq
+    # VOR: 3, 1 freq
+
+    # DME: 13, 1 freq
+
+    # TACAN: 12, 1 freq 
+
     $sql = "SELECT * FROM ${NAV_TABLE} WHERE ";
 
     if($sstr)
@@ -469,7 +480,18 @@ if($vor or $ndb)
 
     if($vor)
     {
+        $sql .= "(";
+
+        # VOR/VOR-DME/VORTAC
         $sql .= "nav_type = 3";
+
+        # TACAN
+        $sql .= " OR (nav_type = 12 AND type_name = 'TACAN')"; 
+
+        # DME
+        $sql .= " OR (nav_type = 13 AND type_name = 'DME')";
+
+        $sql .= ")";
     }
 
     if($ndb)
@@ -479,7 +501,7 @@ if($vor or $ndb)
             $sql .= " OR ";
         }
 
-        $sql .= " nav_type = 2";
+        $sql .= "nav_type = 2";
     }
 
     $sql .= ")";
@@ -504,18 +526,20 @@ if($vor or $ndb)
             my($range) = $row_hash{'range'};
             my($multi) = $row_hash{'multi'};
             my($ident) = $row_hash{'ident'};
-            my($name) = &htmlencode($row_hash{'name'});
+            my($type_name) = $row_hash{'type_name'};
+            my($name) = &htmlencode($row_hash{'name'})." ".${type_name};
 
-            my($nav_tag);
-            if($nav_type eq '2')
-            {
-                $nav_tag = "ndb";
-            }
-            elsif($nav_type eq '3')
-            {
-                $nav_tag = "vor";
-                $freq = &freqstr($freq);
-            }
+            my($nav_tag) = lc(${type_name});
+            $nav_tag =~ s/-//g;
+#            if($nav_type eq '2')
+#            {
+#                $nav_tag = "ndb";
+#            }
+#            elsif($nav_type eq '3')
+#            {
+#                $nav_tag = "vor";
+#                $freq = &freqstr($freq);
+#            }
 
             $xml .= <<XML;
 \t<${nav_tag} nav_type="${nav_type}" lat="${lat}" lng="${lng}" elevation="${elevation}" freq="${freq}" range="${range}" multi="${multi}" ident="${ident}" name="${name}" />"

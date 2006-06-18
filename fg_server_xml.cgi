@@ -61,7 +61,7 @@ while($l = <$socket>)
         $model =~ s#.*/(.*?)#$1#;
         $model =~ s#\..*?$##;
 
-        $xml .= "<marker server_ip=\"${server_ip}\" callsign=\"${callsign}\" lng=\"${lng}\" lat=\"${lat}\" alt=\"${alt}\" model=\"${model}\" />\n";
+        $xml .= "\t<marker server_ip=\"${server_ip}\" callsign=\"${callsign}\" lng=\"${lng}\" lat=\"${lat}\" alt=\"${alt}\" model=\"${model}\" />\n";
 
         $pilot_cnt++;
 

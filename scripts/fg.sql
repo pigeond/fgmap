@@ -63,6 +63,7 @@ create table fg_atc
 
 drop table fg_nav;
 drop table fg_nav_type;
+drop table fg_nav_name;
 
 -- Navaids types
 create table fg_nav_type
@@ -97,7 +98,8 @@ create table fg_nav
     range       integer,
     multi       float,
     ident       varchar(8),
-    name        varchar(128)
+    name        varchar(128),
+    type_name   varchar(12)
 );
 
 
