@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+
+# Convert TACAN_freq.dat into SQL statements, see fg.sql for database definition
+
+use strict;
+
+my($sql) = "";
+my($debug) = undef;
+
+#$debug = 1;
+
+sub dprintf
+{
+    my($str) = @_;
+
+    if($debug)
+    {
+        printf(STDERR $str);
+    }
+}
+
+while(<STDIN>)
+{
+    my($line) = $_;
+
+    if($line =~ /^$/)
+    {
+        next;
+    }
+
+    $line =~ s///g;
+    chomp($line);
+    
+    dprintf("[$line]\n");
+
+    if($line !~ m/^(.*?)\s+(\d+)$/)
+    {
+        next;
+    }
+
+    my($channel, $freq) = ($1, $2);
+
+    $sql .= <<SQL;
+INSERT INTO fg_nav_channel
+    (channel, freq) VALUES ('$channel', $freq);
+SQL
+}
+
+print($sql);
+

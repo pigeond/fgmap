@@ -15,6 +15,7 @@ my($APT_TABLE) = "fg_apt";
 my($APTWAY_TABLE) = "fg_apt_way";
 my($ATC_TABLE) = "fg_atc";
 my($NAV_TABLE) = "fg_nav";
+my($NAVCHAN_TABLE) = "fg_nav_channel";
 my($FIX_TABLE) = "fg_fix";
 my($AWY_TABLE) = "fg_awy";
 
@@ -141,6 +142,13 @@ sub freqstr
     return sprintf("%.2f", $freq / 100);
 }
 
+sub db_error
+{
+    my($statement, $err, $msg) = @_;
+    &err_print("Database error: \"$statement\", errno: $err, errmsg: $msg");
+}
+
+
 my($xml) = "";
 
 
@@ -224,6 +232,13 @@ my($sth);
 
 #$dbi = new DBIx::Easy qw(mysql flightgear fgmap);
 $dbi = new DBIx::Easy qw(Pg flightgear fgmap);
+$dbi->install_handler(\&db_error);
+
+if(!$dbi)
+{
+    # TODO
+    &err_print("Database connection object creation failed.");
+}
 
 if(!$sstr and !($ne and $sw))
 {
@@ -235,7 +250,7 @@ if($sstr)
     $sstr =~ s/%([a-fA-F0-9][a-f-A-F0-9])/pack("C", hex($1))/ge;
     $sstr =~ s/[\%\*\.\?\_]//g;
 
-    if(length($sstr) < 2)
+    if(length($sstr) < 3)
     {
         &err_print("Search string too short, minimum length 3.");
     }
@@ -254,13 +269,6 @@ if($ne and $sw)
     {
         &err_print("Bounds too high");
     }
-}
-
-
-if(!$dbi)
-{
-    # TODO
-    &err_print("Database connector error");
 }
 
 
@@ -461,7 +469,11 @@ if($vor or $ndb)
 
     # TACAN: 12, 1 freq 
 
-    $sql = "SELECT * FROM ${NAV_TABLE} WHERE ";
+    $sql = "SELECT ${NAV_TABLE}.*, ${NAVCHAN_TABLE}.channel";
+    $sql .= " FROM ${NAV_TABLE}";
+    $sql .= " LEFT JOIN ${NAVCHAN_TABLE} ON";
+    $sql .= " ${NAVCHAN_TABLE}.freq = ${NAV_TABLE}.freq";
+    $sql .= " WHERE"; 
 
     if($sstr)
     {
@@ -488,9 +500,6 @@ if($vor or $ndb)
         # TACAN
         $sql .= " OR (nav_type = 12 AND type_name = 'TACAN')"; 
 
-        # DME
-        $sql .= " OR (nav_type = 13 AND type_name = 'DME')";
-
         $sql .= ")";
     }
 
@@ -501,12 +510,16 @@ if($vor or $ndb)
             $sql .= " OR ";
         }
 
+        # NDB
         $sql .= "nav_type = 2";
+
+        # NDB-DME/DME
+        $sql .= " OR (nav_type = 13 AND (type_name = 'DME' or type_name = 'NDB-DME'))";
     }
 
     $sql .= ")";
 
-    $sql .= " ORDER BY ident;";
+    $sql .= " ORDER BY type_name, ident;";
 
     $sth = $dbi->process($sql);
 
@@ -522,7 +535,6 @@ if($vor or $ndb)
             my($lat) = $row_hash{'lat'};
             my($lng) = $row_hash{'lng'};
             my($elevation) = $row_hash{'elevation'};
-            my($freq) = $row_hash{'freq'};
             my($range) = $row_hash{'range'};
             my($multi) = $row_hash{'multi'};
             my($ident) = $row_hash{'ident'};
@@ -531,6 +543,30 @@ if($vor or $ndb)
 
             my($nav_tag) = lc(${type_name});
             $nav_tag =~ s/-//g;
+
+            my($channel) = "";
+            my($freq) = "";
+
+            # TACAN:    ID, Channel
+            # DME:      ID, Channel
+
+            # VOR:      ID, Freq
+            # VOR-DME:  ID, Channel, Freq
+            # VORTAC:   ID, Channel, Freq
+
+            # NDB:      ID, Freq
+            # NDB-DME:  ID, Channel, Freq
+
+            if(${type_name} ne 'VOR' and ${type_name} ne 'NDB')
+            {
+                $channel = "channel=\"".$row_hash{'channel'}."\" ";
+            }
+
+            if(${type_name} ne 'TACAN' and ${type_name} ne 'DME')
+            {
+                $freq = "freq=\"".$row_hash{'freq'}."\" ";
+            }
+
 #            if($nav_type eq '2')
 #            {
 #                $nav_tag = "ndb";
@@ -542,7 +578,7 @@ if($vor or $ndb)
 #            }
 
             $xml .= <<XML;
-\t<${nav_tag} nav_type="${nav_type}" lat="${lat}" lng="${lng}" elevation="${elevation}" freq="${freq}" range="${range}" multi="${multi}" ident="${ident}" name="${name}" />"
+\t<${nav_tag} nav_type="${nav_type}" lat="${lat}" lng="${lng}" elevation="${elevation}" ${freq}${channel}range="${range}" multi="${multi}" ident="${ident}" name="${name}" />"
 XML
         }
         $result_cnt += $sth->rows;
