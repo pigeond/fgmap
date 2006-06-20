@@ -91,16 +91,17 @@ insert into fg_nav_type (nav_type, nav_name) values (13, 'DME');
 create table fg_nav
 (
     nav_type    integer references fg_nav_type(nav_type),
+    type_name   varchar(12),
     lat         float,
     lng         float,
     abslng      float,
     elevation   integer,
     freq        integer,
+    channelfreq integer,
     range       integer,
     multi       float,
     ident       varchar(8),
-    name        varchar(128),
-    type_name   varchar(12)
+    name        varchar(128)
 );
 
 
@@ -149,7 +150,7 @@ create table fg_awy
 
 
 grant select on 
-fg_apt, fg_apt_way, fg_atc, fg_atc_type, fg_awy, fg_fix, fg_nav, fg_nav_channel, fg_nav_type
+fg_apt, fg_apt_way, fg_atc, fg_atc_type, fg_awy, fg_fix, fg_nav, fg_nav_channel, fg_nav_type, fg_nav_channel
 to fgmap;
 
 -- vim: filetype=sql

@@ -19,6 +19,7 @@ sub dprintf
     }
 }
 
+
 while(<STDIN>)
 {
     my($line) = $_;
@@ -62,12 +63,49 @@ while(<STDIN>)
             $abslng += 360;
         }
 
-        $sql .= <<SQL;
-INSERT INTO fg_nav
-    (nav_type, lat, lng, abslng, elevation, freq, range, multi, ident, name, type_name)
-    VALUES
-    ($type, $lat, $lng, $abslng, $elevation, $freq, $range, $multi, '$ident', '$name', '$type_name');
+
+        # TACAN:    ID, Channel
+        # DME:      ID, Channel
+
+        # VOR:      ID, Freq
+        # VOR-DME:  ID, Channel, Freq
+        # VORTAC:   ID, Channel, Freq
+
+        # NDB:      ID, Freq
+        # NDB-DME:  ID, Channel, Freq
+
+        # Workaround for NDB-DME in nav.dat
+        # Note: Some NDB-DME in the nav.dat has a DME part with a different
+        # lat/lng, this is ignored here for the moment
+        if(${type} == 13 and ${type_name} eq 'NDB-DME')
+        {
+            $sql .= <<SQL;
+UPDATE fg_nav
+    SET channelfreq = ${freq}
+    WHERE type_name = '${type_name}' AND ident = '${ident}';
 SQL
+        }
+        else
+        {
+            my($channelfreq) = "null";
+
+            if(${type_name} eq 'VOR-DME' || ${type_name} eq 'VORTAC')
+            {
+                $channelfreq = $freq;
+            }
+            elsif(${type_name} eq 'TACAN' || ${type_name} eq 'DME')
+            {
+                $channelfreq = $freq;
+                $freq = "null";
+            }
+
+            $sql .= <<SQL;
+INSERT INTO fg_nav
+    (nav_type, lat, lng, abslng, elevation, freq, channelfreq, range, multi, ident, name, type_name)
+    VALUES
+    ($type, $lat, $lng, $abslng, $elevation, $freq, $channelfreq, $range, $multi, '$ident', '$name', '$type_name');
+SQL
+        }
     }
     else
     {

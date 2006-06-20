@@ -471,8 +471,8 @@ if($vor or $ndb)
 
     $sql = "SELECT ${NAV_TABLE}.*, ${NAVCHAN_TABLE}.channel";
     $sql .= " FROM ${NAV_TABLE}";
-    $sql .= " LEFT JOIN ${NAVCHAN_TABLE} ON";
-    $sql .= " ${NAVCHAN_TABLE}.freq = ${NAV_TABLE}.freq";
+    $sql .= " FULL JOIN ${NAVCHAN_TABLE} ON";
+    $sql .= " ${NAVCHAN_TABLE}.freq = ${NAV_TABLE}.channelfreq";
     $sql .= " WHERE"; 
 
     if($sstr)
@@ -521,6 +521,8 @@ if($vor or $ndb)
 
     $sql .= " ORDER BY type_name, ident;";
 
+    #print("$sql\n\n");
+
     $sth = $dbi->process($sql);
 
     if($sth->rows > 0)
@@ -564,18 +566,13 @@ if($vor or $ndb)
 
             if(${type_name} ne 'TACAN' and ${type_name} ne 'DME')
             {
-                $freq = "freq=\"".$row_hash{'freq'}."\" ";
+                $freq = $row_hash{'freq'};
+                if(length($freq) >= 5)
+                {
+                    $freq = &freqstr($freq);
+                }
+                $freq = "freq=\"${freq}\" ";
             }
-
-#            if($nav_type eq '2')
-#            {
-#                $nav_tag = "ndb";
-#            }
-#            elsif($nav_type eq '3')
-#            {
-#                $nav_tag = "vor";
-#                $freq = &freqstr($freq);
-#            }
 
             $xml .= <<XML;
 \t<${nav_tag} nav_type="${nav_type}" lat="${lat}" lng="${lng}" elevation="${elevation}" ${freq}${channel}range="${range}" multi="${multi}" ident="${ident}" name="${name}" />"

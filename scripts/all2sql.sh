@@ -20,6 +20,7 @@ APT=${FG_ROOT}/Airports/apt.dat.gz
 NAV=${FG_ROOT}/Navaids/nav.dat.gz
 FIX=${FG_ROOT}/Navaids/fix.dat.gz
 AWY=${FG_ROOT}/Navaids/awy.dat.gz
+TACAN=${FG_ROOT}/Navaids/TACAN_freq.dat.gz
 
 if [ ! -f ${APT} ]; then
     echo "${APT} doesn't exist."
@@ -41,10 +42,16 @@ if [ ! -f ${AWY} ]; then
     exit -1
 fi
 
+if [ ! -f ${TACAN} ]; then
+    echo "${TACAN} doesn't exist."
+    exit -1
+fi
+
 
 zcat ${APT} | ./apt2sql > ++apt.sql
 zcat ${NAV} | ./nav2sql > ++nav.sql
 zcat ${FIX} | ./fix2sql > ++fix.sql
 zcat ${AWY} | ./awy2sql > ++awy.sql
+zcat ${TACAN} | ./tacan2sql > ++tacan.sql
 
 
