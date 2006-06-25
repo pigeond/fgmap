@@ -63,7 +63,6 @@ create table fg_atc
 
 drop table fg_nav;
 drop table fg_nav_type;
-drop table fg_nav_name;
 drop table fg_nav_channel;
 
 -- Navaids types
@@ -149,8 +148,8 @@ create table fg_awy
 );
 
 
-grant select on 
-fg_apt, fg_apt_way, fg_atc, fg_atc_type, fg_awy, fg_fix, fg_nav, fg_nav_channel, fg_nav_type, fg_nav_channel
+grant select on
+fg_apt, fg_apt_way, fg_atc, fg_atc_type, fg_awy, fg_fix, fg_nav, fg_nav_channel, fg_nav_type
 to fgmap;
 
 -- vim: filetype=sql

@@ -5,8 +5,18 @@
 
 var FGMAP_NAV_INVIEW_ZOOM_MAX = 10;
 
+var FGMAP_RADIONAV_TYPES = new Object();
+FGMAP_RADIONAV_TYPES["DME"] = FGMAP_NAVAID_DME;
+FGMAP_RADIONAV_TYPES["TACAN"] = FGMAP_NAVAID_TACAN;
+FGMAP_RADIONAV_TYPES["VOR"] = FGMAP_NAVAID_VOR;
+FGMAP_RADIONAV_TYPES["VOR-DME"] = FGMAP_NAVAID_VORDME;
+FGMAP_RADIONAV_TYPES["VORTAC"] = FGMAP_NAVAID_VORTAC;
+FGMAP_RADIONAV_TYPES["NDB"] = FGMAP_NAVAID_NDB;
+FGMAP_RADIONAV_TYPES["NDB-DME"] = FGMAP_NAVAID_NDBDME;
+
 
 function FGMapMenuNav(fgmapmenu) {
+
     this.fgmapmenu = fgmapmenu;
     this.fgmap = fgmapmenu.fgmap;
     this.result_cnt = 0;
@@ -23,6 +33,7 @@ function FGMapMenuNav(fgmapmenu) {
     this.preload3 = new Image();
     this.preload3.src = "images/trash-pressed.gif";
 }
+
 
 FGMapMenuNav.prototype.setup = function() {
 
@@ -210,10 +221,14 @@ FGMapMenuNav.prototype.setup = function() {
     base_chbx.checked = true;
     base_chbx.defaultChecked = true;
 
+    /* A hash lookup table for checkboxes */
+    this.toggles = new Object();
+
     li = element_clone(base_li, false);
     element_attach(li, ul);
     chbx = element_clone(base_chbx);
     chbx.value = FGMAP_NAVAID_APT;
+    this.toggles[FGMAP_NAVAID_APT] = chbx;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "apt");
@@ -222,6 +237,7 @@ FGMapMenuNav.prototype.setup = function() {
     element_attach(li, ul);
     chbx = element_clone(base_chbx);
     chbx.value = FGMAP_NAVAID_VOR;
+    this.toggles[FGMAP_NAVAID_VOR] = chbx;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "vor");
@@ -230,6 +246,7 @@ FGMapMenuNav.prototype.setup = function() {
     element_attach(li, ul);
     chbx = element_clone(base_chbx);
     chbx.value = FGMAP_NAVAID_NDB;
+    this.toggles[FGMAP_NAVAID_NDB] = chbx;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "ndb");
@@ -238,6 +255,7 @@ FGMapMenuNav.prototype.setup = function() {
     element_attach(li, ul);
     chbx = element_clone(base_chbx);
     chbx.value = FGMAP_NAVAID_FIX;
+    this.toggles[FGMAP_NAVAID_FIX] = chbx;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "fix");
@@ -246,6 +264,7 @@ FGMapMenuNav.prototype.setup = function() {
     element_attach(li, ul);
     chbx = element_clone(base_chbx);
     chbx.value = FGMAP_NAVAID_AWY;
+    this.toggles[FGMAP_NAVAID_AWY] = chbx;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_text_append(li, "awy");
@@ -262,11 +281,29 @@ FGMapMenuNav.prototype.setup = function() {
 };
 
 
+FGMapMenuNav.prototype.nav_type_visible_set = function(type, visible) {
+
+    this.fgmap.nav_type_visible_set(type, visible);
+
+    if(type == FGMAP_NAVAID_VOR) {
+
+        this.fgmap.nav_type_visible_set(FGMAP_NAVAID_VORTAC, visible);
+        this.fgmap.nav_type_visible_set(FGMAP_NAVAID_VORDME, visible);
+        this.fgmap.nav_type_visible_set(FGMAP_NAVAID_TACAN, visible);
+
+    } else if(type == FGMAP_NAVAID_NDB) {
+
+        this.fgmap.nav_type_visible_set(FGMAP_NAVAID_NDBDME, visible);
+        this.fgmap.nav_type_visible_set(FGMAP_NAVAID_DME, visible);
+
+    }
+};
+
 
 FGMapMenuNav.prototype.toggle_click_cb = function(e) {
     var target = target_get(e || window.event);
     if(target.value != null) {
-        this.fgmap.nav_type_visible_set(target.value, target.checked);
+        this.nav_type_visible_set(target.value, target.checked);
     }
 };
 
@@ -417,46 +454,37 @@ FGMapMenuNav.prototype.nav_apt_parse = function(xmldoc) {
 };
 
 
-/* This includes VOR and NDB */
-FGMapMenuNav.prototype.nav_vor_parse = function(xmldoc) {
+/* VOR VORTAC VOR-DME NDB NDB-DME TACAN DME */
+FGMapMenuNav.prototype.nav_radio_parse = function(xmldoc) {
 
     var i;
     var id;
-    var lat, lng, elevation, freq, range, multi, ident, name;
+    var lat, lng, elevation, freq, channel, range, multi, ident, name;
 
-    var vors = xmldoc.documentElement.getElementsByTagName("vor");
-    var vor, ndb;
+    var navs = xmldoc.documentElement.getElementsByTagName("radionav");
+    var nav;
 
-    for(i = 0; i < vors.length; i++) {
-        lat = vors[i].getAttribute('lat');
-        lng = vors[i].getAttribute('lng');
-        elevation = vors[i].getAttribute('elevation');
-        freq = vors[i].getAttribute('freq');
-        range = vors[i].getAttribute('range');
-        multi = vors[i].getAttribute('multi');
-        ident = vors[i].getAttribute('ident');
-        name = vors[i].getAttribute('name');
+    for(i = 0; i < navs.length; i++) {
 
-        id = 'vor:' + ident + ':' + lat + ':' + lng;
-        vor = new FGNavVor(this.fgmap, id, ident, name, lat, lng, freq);
-        this.result_box_result_add(vor);
-    }
+        lat = navs[i].getAttribute('lat');
+        lng = navs[i].getAttribute('lng');
+        elevation = navs[i].getAttribute('elevation');
+        freq = navs[i].getAttribute('freq');
+        channel = navs[i].getAttribute('channel');
+        range = navs[i].getAttribute('range');
+        multi = navs[i].getAttribute('multi');
+        ident = navs[i].getAttribute('ident');
+        name = navs[i].getAttribute('name');
+        type_name = navs[i].getAttribute('type_name');
 
-    var ndbs = xmldoc.documentElement.getElementsByTagName("ndb");
+        // An easy id / hash
+        id = 'radionav:' + ident + ':' + lat + ':' + lng;
 
-    for(i = 0; i < ndbs.length; i++) {
-        lat = ndbs[i].getAttribute('lat');
-        lng = ndbs[i].getAttribute('lng');
-        elevation = ndbs[i].getAttribute('elevation');
-        freq = ndbs[i].getAttribute('freq');
-        range = ndbs[i].getAttribute('range');
-        multi = ndbs[i].getAttribute('multi');
-        ident = ndbs[i].getAttribute('ident');
-        name = ndbs[i].getAttribute('name');
+        nav = new FGRadioNav(this.fgmap, id,
+            FGMAP_RADIONAV_TYPES[type_name],
+            ident, name, lat, lng, freq, channel);
 
-        id = 'ndb:' + ident + ':' + lat + ':' + lng;
-        ndb = new FGNavNdb(this.fgmap, id, ident, name, lat, lng, freq);
-        this.result_box_result_add(ndb);
+        this.result_box_result_add(nav);
     }
 
 };
@@ -522,7 +550,7 @@ FGMapMenuNav.prototype.nav_form_xml_request_cb = function() {
         this.result_box_result_clear();
 
         this.nav_apt_parse(xmldoc);
-        this.nav_vor_parse(xmldoc);
+        this.nav_radio_parse(xmldoc);
         this.nav_fix_parse(xmldoc);
         this.nav_awy_parse(xmldoc);
 
@@ -575,6 +603,20 @@ FGMapMenuNav.prototype.result_box_msg_set = function(msg) {
     return true;
 };
 
+
+/* Translate all radio nav types to general VOR or NDB, otherwise the same type
+is returned */
+FGMapMenuNav.prototype.nav_type_generalize = function(type) {
+
+    if(type == FGMAP_NAVAID_DME || type == FGMAP_NAVAID_NDBDME) {
+        return FGMAP_NAVAID_NDB;
+    }
+    if(type == FGMAP_NAVAID_VORTAC || type == FGMAP_NAVAID_VORDME ||
+        type == FGMAP_NAVAID_TACAN) {
+        return FGMAP_NAVAID_VOR;
+    }
+    return type;
+};
 
 
 FGMapMenuNav.prototype.result_box_result_add = function(nav) {
@@ -630,9 +672,12 @@ FGMapMenuNav.prototype.result_box_result_add = function(nav) {
     this.result_cnt += 1;
 
     if(this.bounds) {
-        /* In view lookup, show it straight away */
         if(this.fgmap.nav_add(nav) == true) {
-            this.fgmap.nav_visible_set(nav.id, true);
+            /* In view lookup, show it straight away if we have that type
+             * checked */
+            if(this.toggles[this.nav_type_generalize(nav.type)].checked) {
+                this.fgmap.nav_visible_set(nav.id, true);
+            }
         }
     }
 
@@ -653,8 +698,16 @@ FGMapMenuNav.prototype.result_mouseout_cb = function(e, tr, nav) {
 FGMapMenuNav.prototype.result_click_cb = function(e, tr, nav) {
     if(nav) {
         if(this.fgmap.nav_add(nav) == true) {
+
+            /* Turn the corresponding toggle checkbox on for the user */
+            this.toggles[this.nav_type_generalize(nav.type)].checked = true;
+
             this.fgmap.nav_panto(nav.id, nav);
             this.fgmap.nav_visible_set(nav.id, true);
+
+            /* Raise it, too */
+            /* TODO: This doesn't work sometimes, very odd */
+            nav.raise();
         }
     }
 };

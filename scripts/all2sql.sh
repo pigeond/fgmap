@@ -1,6 +1,6 @@
 #!/bin/sh
 
-FG_ROOT=
+#FG_ROOT=
 
 if [ -n "$1" ]; then
     FG_ROOT="$1"
@@ -48,10 +48,10 @@ if [ ! -f ${TACAN} ]; then
 fi
 
 
-zcat ${APT} | ./apt2sql > ++apt.sql
-zcat ${NAV} | ./nav2sql > ++nav.sql
-zcat ${FIX} | ./fix2sql > ++fix.sql
-zcat ${AWY} | ./awy2sql > ++awy.sql
-zcat ${TACAN} | ./tacan2sql > ++tacan.sql
+zcat ${APT} | iconv -f latin1 -t utf8 | ./apt2sql > ++apt.sql
+zcat ${NAV} | iconv -f latin1 -t utf8 | ./nav2sql > ++nav.sql
+zcat ${FIX} | iconv -f latin1 -t utf8 | ./fix2sql > ++fix.sql
+zcat ${AWY} | iconv -f latin1 -t utf8 | ./awy2sql > ++awy.sql
+zcat ${TACAN} | iconv -f latin1 -t utf8 | ./tacan2sql > ++tacan.sql
 
 

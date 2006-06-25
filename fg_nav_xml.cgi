@@ -31,6 +31,10 @@ print("Content-Type: text/xml\r\n\r\n");
 sub err_print
 {
     my($err) = @_;
+    $err =~ s/"/\&quot;/g;
+    $err =~ s/[\r\n]//g;
+    $err =~ s/</&lt;/g;
+    $err =~ s/>/&gt;/g;
     print("<navaids err=\"${err}\" />\n");
     exit(0);
 }
@@ -62,7 +66,7 @@ sub rwy_nav
         "nav_type=6 OR nav_type=7 OR nav_type=8 OR ".
         "nav_type=9 OR nav_type=12)";
     $nav_sql .= " AND UPPER(name) LIKE '".
-                    uc(${apt_code})." ".uc(${rwy_num})." %'";
+                    uc(${apt_code})." ".uc(${rwy_num})."'";
     $nav_sql .= ";";
 
     my($nav_sth) = $dbi->process($nav_sql);
@@ -541,10 +545,10 @@ if($vor or $ndb)
             my($multi) = $row_hash{'multi'};
             my($ident) = $row_hash{'ident'};
             my($type_name) = $row_hash{'type_name'};
-            my($name) = &htmlencode($row_hash{'name'})." ".${type_name};
+            my($name) = &htmlencode($row_hash{'name'});
 
-            my($nav_tag) = lc(${type_name});
-            $nav_tag =~ s/-//g;
+            #my($nav_tag) = lc(${type_name});
+            #$nav_tag =~ s/-//g;
 
             my($channel) = "";
             my($freq) = "";
@@ -575,7 +579,7 @@ if($vor or $ndb)
             }
 
             $xml .= <<XML;
-\t<${nav_tag} nav_type="${nav_type}" lat="${lat}" lng="${lng}" elevation="${elevation}" ${freq}${channel}range="${range}" multi="${multi}" ident="${ident}" name="${name}" />"
+\t<radionav nav_type="${nav_type}" type_name="${type_name}" lat="${lat}" lng="${lng}" elevation="${elevation}" ${freq}${channel}range="${range}" multi="${multi}" ident="${ident}" name="${name}" />"
 XML
         }
         $result_cnt += $sth->rows;
