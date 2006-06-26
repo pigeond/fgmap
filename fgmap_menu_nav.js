@@ -15,6 +15,23 @@ FGMAP_RADIONAV_TYPES["NDB"] = FGMAP_NAVAID_NDB;
 FGMAP_RADIONAV_TYPES["NDB-DME"] = FGMAP_NAVAID_NDBDME;
 
 
+/* Translate all radio nav types to general VOR or NDB, otherwise the same type
+is returned */
+function nav_type_generalize(type) {
+    if(type == FGMAP_NAVAID_DME || type == FGMAP_NAVAID_NDBDME) {
+        return FGMAP_NAVAID_NDB;
+    }
+    if(type == FGMAP_NAVAID_VORTAC || type == FGMAP_NAVAID_VORDME ||
+        type == FGMAP_NAVAID_TACAN) {
+        return FGMAP_NAVAID_VOR;
+    }
+    if(type == FGMAP_NAVAID_HPT) {
+        return FGMAP_NAVAID_APT;
+    }
+    return type;
+};
+
+
 function FGMapMenuNav(fgmapmenu) {
 
     this.fgmapmenu = fgmapmenu;
@@ -296,6 +313,10 @@ FGMapMenuNav.prototype.nav_type_visible_set = function(type, visible) {
         this.fgmap.nav_type_visible_set(FGMAP_NAVAID_NDBDME, visible);
         this.fgmap.nav_type_visible_set(FGMAP_NAVAID_DME, visible);
 
+    } else if(type == FGMAP_NAVAID_APT) {
+    
+        this.fgmap.nav_type_visible_set(FGMAP_NAVAID_HPT, visible);
+
     }
 };
 
@@ -393,22 +414,42 @@ FGMapMenuNav.prototype.nav_apt_parse = function(xmldoc) {
         var apt_code = apts[i].getAttribute("code");
         var apt_name = apts[i].getAttribute("name");
         var apt_elevation = apts[i].getAttribute("elevation");
+        var apt_heli = apts[i].getAttribute("heliport");
 
-        var apt = new FGAirport(this.fgmap,
-            apt_id, apt_code, apt_name, apt_elevation);
+        var apt;
+        
+        if(apt_heli == 1) {
+            apt = new FGHeliport(this.fgmap,
+                    apt_id, apt_code, apt_name, apt_elevation);
+        } else {
+            apt = new FGAirport(this.fgmap,
+                    apt_id, apt_code, apt_name, apt_elevation);
+        }
 
         /* Runways */
         var runways = apts[i].getElementsByTagName("runway");
 
         for(var r = 0; r < runways.length; r++) {
+
             var r_num = runways[r].getAttribute("num");
             var r_lat = parseFloat(runways[r].getAttribute("lat"));
             var r_lng = parseFloat(runways[r].getAttribute("lng"));
             var r_heading = parseFloat(runways[r].getAttribute("heading"));
             var r_length = parseFloat(runways[r].getAttribute("length"));
             var r_width = parseFloat(runways[r].getAttribute("width"));
-            apt.runway_add(r_num,
-                r_lat, r_lng, r_heading, r_length, r_width);
+
+            if(apt_heli == 1) {
+
+                apt.pad_add(r_num,
+                    r_lat, r_lng, r_heading, r_length, r_width);
+                continue;
+
+            } else {
+
+                apt.runway_add(r_num,
+                    r_lat, r_lng, r_heading, r_length, r_width);
+
+            }
 
             /* ILS */
             var ilss = runways[r].getElementsByTagName("ils");
@@ -437,14 +478,16 @@ FGMapMenuNav.prototype.nav_apt_parse = function(xmldoc) {
             /* TODO: GS/IM/MM/OM */
         }
         
-        /* ATC */
-        var atcs = apts[i].getElementsByTagName("atc");
+        if(apt_heli == 0) {
+            /* ATC */
+            var atcs = apts[i].getElementsByTagName("atc");
 
-        for(var a = 0; a < atcs.length; a++) {
-            var atc_type = atcs[a].getAttribute("atc_type");
-            var freq = atcs[a].getAttribute("freq");
-            var name = atcs[a].getAttribute("name");
-            apt.atc_add(atc_type, freq, name);
+            for(var a = 0; a < atcs.length; a++) {
+                var atc_type = atcs[a].getAttribute("atc_type");
+                var freq = atcs[a].getAttribute("freq");
+                var name = atcs[a].getAttribute("name");
+                apt.atc_add(atc_type, freq, name);
+            }
         }
 
         this.result_box_result_add(apt);
@@ -604,21 +647,6 @@ FGMapMenuNav.prototype.result_box_msg_set = function(msg) {
 };
 
 
-/* Translate all radio nav types to general VOR or NDB, otherwise the same type
-is returned */
-FGMapMenuNav.prototype.nav_type_generalize = function(type) {
-
-    if(type == FGMAP_NAVAID_DME || type == FGMAP_NAVAID_NDBDME) {
-        return FGMAP_NAVAID_NDB;
-    }
-    if(type == FGMAP_NAVAID_VORTAC || type == FGMAP_NAVAID_VORDME ||
-        type == FGMAP_NAVAID_TACAN) {
-        return FGMAP_NAVAID_VOR;
-    }
-    return type;
-};
-
-
 FGMapMenuNav.prototype.result_box_result_add = function(nav) {
 
     /*
@@ -675,7 +703,7 @@ FGMapMenuNav.prototype.result_box_result_add = function(nav) {
         if(this.fgmap.nav_add(nav) == true) {
             /* In view lookup, show it straight away if we have that type
              * checked */
-            if(this.toggles[this.nav_type_generalize(nav.type)].checked) {
+            if(this.toggles[nav_type_generalize(nav.type)].checked) {
                 this.fgmap.nav_visible_set(nav.id, true);
             }
         }
@@ -700,7 +728,7 @@ FGMapMenuNav.prototype.result_click_cb = function(e, tr, nav) {
         if(this.fgmap.nav_add(nav) == true) {
 
             /* Turn the corresponding toggle checkbox on for the user */
-            this.toggles[this.nav_type_generalize(nav.type)].checked = true;
+            this.toggles[nav_type_generalize(nav.type)].checked = true;
 
             this.fgmap.nav_panto(nav.id, nav);
             this.fgmap.nav_visible_set(nav.id, true);

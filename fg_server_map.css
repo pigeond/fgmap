@@ -195,10 +195,11 @@ a:hover     { color: #ddf; }
 .fgmap_airport_info_atc_tower { color: lime; }
 
 .fgmap_nav_apt { color: red; }
+.fgmap_nav_hpt { color: green; }
 .fgmap_nav_vor { color: cyan; }
 .fgmap_nav_ndb { color: magenta; }
 .fgmap_nav_fix { color: yellow; }
-.fgmap_nav_awy { color: green; }
+.fgmap_nav_awy { color: orange; }
 
 .fgmap_nav_ils { color: pink; }
 

@@ -145,6 +145,7 @@ var FGMAP_CRAFT_MODELS_KC135 = [ "KC135" ];
 /* Navaid types */
 var dummy_cnt = 1;
 var FGMAP_NAVAID_APT = dummy_cnt++;
+var FGMAP_NAVAID_HPT = dummy_cnt++;
 var FGMAP_NAVAID_DME = dummy_cnt++;
 var FGMAP_NAVAID_TACAN = dummy_cnt++;
 var FGMAP_NAVAID_VOR = dummy_cnt++;
@@ -157,6 +158,7 @@ var FGMAP_NAVAID_AWY = dummy_cnt++;
 
 var FGMAP_NAVAID_NAMES = new Object();
 FGMAP_NAVAID_NAMES[FGMAP_NAVAID_APT] = 'Airport';
+FGMAP_NAVAID_NAMES[FGMAP_NAVAID_HPT] = 'Heliport';
 FGMAP_NAVAID_NAMES[FGMAP_NAVAID_DME] = 'DME';
 FGMAP_NAVAID_NAMES[FGMAP_NAVAID_TACAN] = 'TACAN';
 FGMAP_NAVAID_NAMES[FGMAP_NAVAID_VOR] = 'VOR';
@@ -168,6 +170,7 @@ FGMAP_NAVAID_NAMES[FGMAP_NAVAID_FIX] = 'Fix';
 FGMAP_NAVAID_NAMES[FGMAP_NAVAID_AWY] = 'Airway';
 
 var FGMAP_NAVAID_ICONS = new Object();
+FGMAP_NAVAID_ICONS[FGMAP_NAVAID_HPT] = 'images/nav_icons/heliport.png';
 FGMAP_NAVAID_ICONS[FGMAP_NAVAID_DME] = 'images/nav_icons/dme.png';
 FGMAP_NAVAID_ICONS[FGMAP_NAVAID_TACAN] = 'images/nav_icons/tacan.png';
 FGMAP_NAVAID_ICONS[FGMAP_NAVAID_VOR] = 'images/nav_icons/vor.png';
@@ -179,6 +182,7 @@ FGMAP_NAVAID_ICONS[FGMAP_NAVAID_FIX] = 'images/nav_icons/fix.png';
 FGMAP_NAVAID_ICONS[FGMAP_NAVAID_AWY] = 'images/nav_icons/awy.png';
 
 var FGMAP_NAVAID_ICONS_DIMEN = new Object();
+FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_HPT] = '32x33';
 FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_TACAN] = '32x28';
 FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_VOR] = '32x28';
 FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_VORDME] = '32x28';
@@ -189,6 +193,7 @@ FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_FIX] = '16x12';
 
 var FGMAP_NAV_INFO_CLASSES = new Object();
 FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_APT] = 'fgmap_nav_apt';
+FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_HPT] = 'fgmap_nav_hpt';
 FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_DME] = 'fgmap_nav_ndb';
 FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_TACAN] = 'fgmap_nav_vor';
 FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_VOR] = 'fgmap_nav_vor';
@@ -441,6 +446,27 @@ if(agent_str.indexOf("opera") != -1) {
     USER_AGENT.is_opera = true;
 }
 
+
+/* GMap helpers */
+
+/**
+ * @bounds      GLatLngBounds
+ * @return      the GLatLng center of the given bounds
+ */
+function bounds_center_get(bounds) {
+
+    if(bounds.isEmpty()) {
+        return null;
+    }
+
+    var clat = (bounds.getNorthEast().lat() +
+                bounds.getSouthWest().lat()) / 2;
+
+    var clng = (bounds.getNorthEast().lng() +
+                bounds.getSouthWest().lng()) / 2;
+
+    return (new GLatLng(clat, clng));
+};
 
 
 /* element ********************************************************************/
@@ -2248,7 +2274,6 @@ function FGAirport(fgmap, id, code, name, elevation) {
     this.rwy_labels = null;
     this.rwy_cnt = 0;
 }
-
 FGAirport.prototype = new FGNav();
 
 
@@ -2666,18 +2691,7 @@ FGAirport.prototype.visible_set = function(visible) {
 
 
 FGAirport.prototype.center_get = function() {
-
-    if(this.bounds.isEmpty()) {
-        return null;
-    }
-
-    var clat = (this.bounds.getNorthEast().lat() +
-                this.bounds.getSouthWest().lat()) / 2;
-
-    var clng = (this.bounds.getNorthEast().lng() +
-                this.bounds.getSouthWest().lng()) / 2;
-
-    return (new GLatLng(clat, clng));
+    return bounds_center_get(this.bounds);
 };
 
 
@@ -2803,6 +2817,7 @@ FGNavMarker.prototype.raise = function() {
 
 
 FGNavMarker.prototype.visible_set = function(visible) {
+
     if(this.visible == visible) {
         return true;
     }
@@ -2877,6 +2892,8 @@ function FGRadioNav(fgmap, id, type, code, name, lat, lng, freq, channel) {
 FGRadioNav.prototype = new FGNavMarker();
 
 
+
+/* FGNavFix inherits FGNavMarker */
 function FGNavFix(fgmap, id, name, lat, lng) {
 
     var elem = element_create(null, "div");
@@ -2890,6 +2907,95 @@ function FGNavFix(fgmap, id, name, lat, lng) {
 }
 FGNavFix.prototype = new FGNavMarker();
 
+
+
+/* Heliport, it uses FGNavMarker for each pad */
+function FGHeliport(fgmap, id, code, name, elevation) {
+    FGNav.apply(this, [ fgmap, FGMAP_NAVAID_HPT, id, code, name ]);
+    this.fgmap = fgmap;
+    this.elevation = elevation;
+    this.pads = new Object();
+    this.bounds = new GLatLngBounds();
+};
+FGHeliport.prototype = new FGNav();
+
+
+FGHeliport.prototype.pad_add = function(num, lat, lng, heading, length, width) {
+
+    var elem = element_create(null, "span");
+    elem.className = FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_HPT];
+    element_text_append(elem, num);
+
+    var pad = new FGNavMarker(this.fgmap,
+        this.id + ":" + num, FGMAP_NAVAID_HPT, num, this.name, lat, lng, elem);
+    pad.visible_set(false);
+
+    this.pads[num] = pad;
+
+    this.bounds.extend(pad.latlng);
+};
+
+
+FGHeliport.prototype.setup = function() {
+
+    var heliport_info_align = new GPoint(48, 0);
+    var heliport_info_opacity = FGMAP_NAV_OPACITY;
+
+    this.info_elem = element_create(null, "div");
+    this.info_elem.className = "fgmap_nav_info";
+    this.info_elem.style.textAlign = "center";
+
+    var span = element_create(this.info_elem, "span");
+    span.className = "fgmap_nav_hpt";
+    element_text_append(span, this.name + " - " + this.code);
+
+    this.info = new GMapElement(this.bounds.getNorthEast(),
+                                heliport_info_align,
+                                this.info_elem
+                                /*, G_MAP_MARKER_SHADOW_PANE */);
+    this.fgmap.gmap.addOverlay(this.info);
+    this.info.hide();
+    this.info.opacity_set(heliport_info_opacity);
+
+    attach_event(this.info_elem, "mouseover",
+        this.heliport_mouseover_cb.bind_event(this));
+};
+
+
+FGHeliport.prototype.center_get = function() {
+    return bounds_center_get(this.bounds);
+};
+
+
+FGHeliport.prototype.raise = function() {
+    for(var p in this.pads) {
+        var pad = this.pads[p];
+        pad.raise();
+    }
+    this.info.raise();
+};
+
+
+FGHeliport.prototype.heliport_mouseover_cb = function(e) {
+    this.raise();
+};
+
+
+FGHeliport.prototype.visible_set = function(visible) {
+    if(this.visible == visible) {
+        return true;
+    }
+    this.visible = visible;
+
+    for(var p in this.pads) {
+        this.pads[p].visible_set(visible);
+    }
+
+    if(visible)
+        this.info.show();
+    else
+        this.info.hide();
+};
 
 /* vim: set sw=4 sts=4:*/
 

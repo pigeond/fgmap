@@ -339,19 +339,13 @@ if($apt_code or $apt_name)
             my($apt_heli) = $row_hash{'heliport'};
             my($elevation) = $row_hash{'elevation'};
 
-            $xml .= "\t<";
-
-            if($apt_heli == 0)
+            if($apt_heli == 1)
             {
-                $xml .= "airport";
-            }
-            else
-            {
-                $xml .= "heliport";
+                $apt_name =~ s/\[H\] //i;
             }
 
             $xml .= <<XML;
- id="${apt_id}" code="${apt_code}" name="${apt_name}" elevation="${elevation}">
+	<airport id="${apt_id}" code="${apt_code}" name="${apt_name}" elevation="${elevation}" heliport="${apt_heli}">
 XML
 
             # Get runway/taxiway
@@ -442,18 +436,8 @@ XML
 XML
             }
 
-            $xml .= "\t</";
+            $xml .= "\t</airport>\n\n";
 
-            if($apt_heli == 0)
-            {
-                $xml .= "airport";
-            }
-            else
-            {
-                $xml .= "heliport";
-            }
-
-            $xml .= ">\n\n";
         }
         $result_cnt += $sth->rows;
     }
