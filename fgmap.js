@@ -2248,9 +2248,7 @@ FGMap.prototype.nav_type_visible_set = function(nav_type, visible) {
     for(var n in this.navs) {
         var nav = this.navs[n];
         if(nav.type == nav_type) {
-            if(nav.initialized == false) {
-                nav.init();
-            }
+            nav.init();
             nav.visible_set(visible);
         }
     }
@@ -2922,12 +2920,17 @@ FGHeliport.prototype = new FGNav();
 
 FGHeliport.prototype.pad_add = function(num, lat, lng, heading, length, width) {
 
-    var elem = element_create(null, "span");
+    var div = element_create(null, "div");
+    
+    elem = element_create(div, "span");
     elem.className = FGMAP_NAV_INFO_CLASSES[FGMAP_NAVAID_HPT];
     element_text_append(elem, num);
 
     var pad = new FGNavMarker(this.fgmap,
-        this.id + ":" + num, FGMAP_NAVAID_HPT, num, this.name, lat, lng, elem);
+        this.id + ":" + num, FGMAP_NAVAID_HPT, num, this.name, lat, lng, div);
+
+    /* As we're not adding it to the map directly... */
+    pad.init();
     pad.visible_set(false);
 
     this.pads[num] = pad;
@@ -2938,7 +2941,7 @@ FGHeliport.prototype.pad_add = function(num, lat, lng, heading, length, width) {
 
 FGHeliport.prototype.setup = function() {
 
-    var heliport_info_align = new GPoint(48, 0);
+    var heliport_info_align = new GPoint(48, -16); /* TODO */
     var heliport_info_opacity = FGMAP_NAV_OPACITY;
 
     this.info_elem = element_create(null, "div");
@@ -2959,6 +2962,8 @@ FGHeliport.prototype.setup = function() {
 
     attach_event(this.info_elem, "mouseover",
         this.heliport_mouseover_cb.bind_event(this));
+
+    return true;
 };
 
 
@@ -2982,9 +2987,11 @@ FGHeliport.prototype.heliport_mouseover_cb = function(e) {
 
 
 FGHeliport.prototype.visible_set = function(visible) {
+
     if(this.visible == visible) {
         return true;
     }
+
     this.visible = visible;
 
     for(var p in this.pads) {
@@ -2996,6 +3003,26 @@ FGHeliport.prototype.visible_set = function(visible) {
     else
         this.info.hide();
 };
+
+
+FGHeliport.prototype.remove = function() {
+
+    this.visible_set(false);
+
+    for(var p in this.pads) {
+        this.pads[p].remove();
+    }
+
+    delete(this.pads);
+    this.pads = null;
+
+    delete(this.info);
+    delete(this.bounds);
+};
+
+
+
+
 
 /* vim: set sw=4 sts=4:*/
 
