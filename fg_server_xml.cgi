@@ -79,6 +79,12 @@ if($socket)
     close($socket);
 }
 
+my($testing) = 0;
+
+if($testing)
+{
+    $xml .= "\t<marker server_ip=\"server\" callsign=\"testing\" lng=\"-122.357237\" lat=\"37.613545\" alt=\"100\" model=\"model\" />\n";
+}
 
 print("Pragma: no-cache\r\n");
 print("Cache-Control: no-cache\r\n");

@@ -6,6 +6,9 @@ function FGMapMenuPilots(fgmapmenu) {
     this.fgmapmenu = fgmapmenu;
     this.fgmap = fgmapmenu.fgmap;
     this.setup();
+
+    /* A list of objects containing document elements for each pilot */
+    this.pilots = new Object();
 }
 
 
@@ -24,6 +27,12 @@ FGMapMenuPilots.prototype.setup = function() {
     list.style.margin = "0px auto";
     list.style.padding = "0px";
     element_hide(list);
+
+    var ul = this.list_ul = element_create(this.list, "ul");
+    ul.style.width = "90%";
+    ul.style.listStyle = "none inside none";
+    ul.style.margin = "0px auto";
+    ul.style.padding = "0px"
 
     var msg = this.msg = element_create(elem, "div");
     msg.className = "fgmap_pilot_tab_msg";
@@ -57,6 +66,12 @@ FGMapMenuPilots.prototype.setup = function() {
     this.fgmap.event_callback_add(FGMAP_EVENT_PILOTS_POS_UPDATE,
         this.pilots_pos_update_cb.bind_event(this), null);
 
+    this.fgmap.event_callback_add(FGMAP_EVENT_PILOT_JOIN,
+        this.pilot_join_cb.bind_event(this), null);
+
+    this.fgmap.event_callback_add(FGMAP_EVENT_PILOT_PART,
+        this.pilot_part_cb.bind_event(this), null);
+
     this.fgmap.event_callback_add(FGMAP_EVENT_PILOT_PAN,
         this.pilot_pan_cb.bind_event(this), null);
 
@@ -73,88 +88,23 @@ FGMapMenuPilots.prototype.update = function() {
 
     var cnt = 0;
 
-    this.list.innerHTML = "";
-
-    var ul = element_create(this.list, "ul");
-    ul.style.width = "90%";
-    ul.style.listStyle = "none inside none";
-    ul.style.margin = "0px auto";
-    ul.style.padding = "0px"
-
-    var base_li = element_create(null, "li");
-    base_li.style.width = "48%";
-    base_li.style.cssFloat = "left";
-    base_li.style.styleFloat = "left";
-    base_li.style.verticalAlign = "middle";
-    base_li.style.whiteSpace = "nowrap";
-    base_li.style.paddingTop = "6px";
-    base_li.style.paddingBottom = "6px";
+    var pilot;
 
     for(var callsign in this.fgmap.pilots) {
+
+        cnt++;
+
+        if((pilot = this.pilots[callsign]) == null) {
+            // TODO: This should not happen(?)
+            continue;
+        }
 
         var p = this.fgmap.pilots[callsign];
         var lat = p.latlng.lat();
         var lng = p.latlng.lng();
-
-        var li = element_clone(base_li, false);
-        element_attach(li, ul);
-
-        var checkbox = element_create(li, "input", "checkbox");
-        checkbox.className = "fgmap_menu";
-        checkbox.style.cssFloat = "left";
-        checkbox.style.styleFloat = "left";
-        checkbox.title = "Tick to make this pilot always visible";
-        checkbox.name = "follow_checkbox";
-        attach_event(checkbox, "click",
-            this.pilot_follow_checkbox_cb.bind_event(this, callsign));
-
-        if(this.fgmap.follows.indexOf(callsign) != -1) {
-            checkbox.checked = true;
-            checkbox.defaultChecked = true;
-        }
-
-        var span;
-
-        span = element_create(li, "span");
-        span.className = "fgmap_pilot_callsign";
-        span.style.cssFloat = "left";
-        span.style.styleFloat = "left";
-        span.style.paddingLeft = "4px";
-        span.style.textDecoration = "underline";
-        span.style.cursor = "pointer";
-        span.title = "Click to pan to this pilot";
-        span.innerHTML = callsign;
-        attach_event(span, "click",
-            this.pilot_callsign_mouse_event_cb.bind_event(this, callsign));
-        attach_event(span, "mouseover",
-            this.pilot_callsign_mouse_event_cb.bind_event(this, callsign));
-        attach_event(span, "mouseout",
-            this.pilot_callsign_mouse_event_cb.bind_event(this, callsign));
-
-        element_text_append(li, "@");
-
-        span = element_create(li, "span");
-        span.className = "fgmap_pilot_tab_server";
-        span.innerHTML = p.server_ip;
-
-        element_create(li, "br");
-        element_text_append(li, "\u00a0");
-
-        element_text_append(li, "(");
-
-        span = element_create(li, "span");
-        span.className = "fgmap_pilot_tab_lat";
-        span.innerHTML = lat.toFixed(4);
-
-        element_text_append(li, " , ");
-
-        span = element_create(li, "span");
-        span.className = "fgmap_pilot_tab_lng";
-        span.innerHTML = lng.toFixed(4);
-
-        element_text_append(li, ")");
-
-        cnt++;
+        
+        pilot.lat_span.innerHTML = lat;
+        pilot.lng_span.innerHTML = lng;
     }
     
     if(cnt == 0) {
@@ -229,7 +179,123 @@ FGMapMenuPilots.prototype.pilot_pan_cb = function(event, cb_data, callsign) {
 
 
 FGMapMenuPilots.prototype.pilot_follow_cb = function(event, cb_data, callsign) {
-    this.update();
+
+    if(event == FGMAP_EVENT_PILOT_FOLLOW_ADD) {
+
+        this.pilots[callsign].checkbox.checked = true;
+
+    } else if(event == FGMAP_EVENT_PILOT_FOLLOW_REMOVE) {
+
+        this.pilots[callsign].checkbox.checked = false;
+
+    } else if(event == FGMAP_EVENT_PILOT_FOLLOWS_CLEAR) {
+
+        for(var p in this.pilots) {
+            var pilot;
+            if((pilot = this.pilots[p])) {
+                pilot.checkbox.checked = false;
+            }
+        }
+    }
 }
 
+
+FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
+
+    var p = this.fgmap.pilots[callsign];
+
+    if(p == null)
+        return;
+
+    var pilot = new Object();
+
+    var lat = p.latlng.lat();
+    var lng = p.latlng.lng();
+
+    var li = pilot.li = element_create(null, "li");
+    li.style.width = "48%";
+    li.style.cssFloat = "left";
+    li.style.styleFloat = "left";
+    li.style.verticalAlign = "middle";
+    li.style.whiteSpace = "nowrap";
+    li.style.paddingTop = "6px";
+    li.style.paddingBottom = "6px";
+
+    element_attach(li, this.list_ul);
+
+    var checkbox = pilot.checkbox = element_create(li, "input", "checkbox");
+    checkbox.className = "fgmap_menu";
+    checkbox.style.cssFloat = "left";
+    checkbox.style.styleFloat = "left";
+    checkbox.title = "Tick to make this pilot always visible";
+    checkbox.name = "follow_checkbox";
+    attach_event(checkbox, "click",
+        this.pilot_follow_checkbox_cb.bind_event(this, callsign));
+
+    if(this.fgmap.follows.indexOf(callsign) != -1) {
+        checkbox.checked = true;
+        checkbox.defaultChecked = true;
+    }
+
+    var span;
+
+    span = element_create(li, "span");
+    span.className = "fgmap_pilot_callsign";
+    span.style.cssFloat = "left";
+    span.style.styleFloat = "left";
+    span.style.paddingLeft = "4px";
+    span.style.textDecoration = "underline";
+    span.style.cursor = "pointer";
+    span.title = "Click to pan to this pilot";
+    span.innerHTML = callsign;
+    attach_event(span, "click",
+        this.pilot_callsign_mouse_event_cb.bind_event(this, callsign));
+    attach_event(span, "mouseover",
+        this.pilot_callsign_mouse_event_cb.bind_event(this, callsign));
+    attach_event(span, "mouseout",
+        this.pilot_callsign_mouse_event_cb.bind_event(this, callsign));
+
+    element_text_append(li, "@");
+
+    span = element_create(li, "span");
+    span.className = "fgmap_pilot_tab_server";
+    span.innerHTML = p.server_ip;
+
+    element_create(li, "br");
+    element_text_append(li, "\u00a0");
+
+    element_text_append(li, "(");
+
+    span = pilot.lat_span = element_create(li, "span");
+    span.className = "fgmap_pilot_tab_lat";
+    span.innerHTML = lat.toFixed(4);
+
+    element_text_append(li, " , ");
+
+    span = pilot.lng_span = element_create(li, "span");
+    span.className = "fgmap_pilot_tab_lng";
+    span.innerHTML = lng.toFixed(4);
+
+    element_text_append(li, ")");
+
+    this.pilots[callsign] = pilot;
+};
+
+
+FGMapMenuPilots.prototype.pilot_part_cb = function(event, cb_data, callsign) {
+
+    var pilot;
+
+    if((pilot = this.pilots[callsign])) {
+        this.pilots[callsign] = null;
+        element_remove(pilot.li);
+        /* Do we need all these? */
+        pilot.li = null;
+        pilot.checkbox = null;
+        pilot.lat_span = null;
+        pilot.lng_span = null;
+        pilot = null;
+        delete(pilot);
+    }
+};
 

@@ -183,6 +183,7 @@ FGMAP_NAVAID_ICONS[FGMAP_NAVAID_AWY] = 'images/nav_icons/awy.png';
 
 var FGMAP_NAVAID_ICONS_DIMEN = new Object();
 FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_HPT] = '32x33';
+FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_DME] = '32x32';
 FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_TACAN] = '32x28';
 FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_VOR] = '32x28';
 FGMAP_NAVAID_ICONS_DIMEN[FGMAP_NAVAID_VORDME] = '32x28';
@@ -2751,8 +2752,8 @@ FGNavMarker.prototype.setup = function() {
         img.src = src;
 
         if((dimen = FGMAP_NAVAID_ICONS_DIMEN[this.type]) == null) {
-            w = 64;
-            h = 64;
+            w = 32;
+            h = 32;
         } else {
             var arr = dimen.match(/(\d+)x(\d+)/);
             w = parseInt(arr[1]);
