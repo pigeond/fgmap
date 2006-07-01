@@ -35,7 +35,10 @@ while(<STDIN>)
 
     chomp($line);
 
-    if($line =~ m/^1\s+.*?$/ or $line =~ m/^17\s+.*?$/)
+    if(($line =~ m/^1\s+.*?$/) ||
+            ($line =~ m/^16\s+.*?$/) ||
+            ($line =~ m/^17\s+.*?$/))
+
     {
         # airport/heliport
 
@@ -107,10 +110,10 @@ SQL
     {
         # ramp startup position
     }
-    elsif($line =~ m/^16\s+.*?/)
-    {
-        # seaplane base
-    }
+#   elsif($line =~ m/^16\s+.*?/)
+#   {
+#       # seaplane base
+#   }
     elsif($line =~ m/^18\s+.*?/)
     {
         # beacons

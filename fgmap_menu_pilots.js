@@ -202,6 +202,11 @@ FGMapMenuPilots.prototype.pilot_follow_cb = function(event, cb_data, callsign) {
 
 FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
 
+    if(this.pilots[callsign] != null) {
+        // TODO
+        return;
+    }
+
     var p = this.fgmap.pilots[callsign];
 
     if(p == null)
