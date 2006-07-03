@@ -120,7 +120,20 @@ FGMapMenuPilots.prototype.update = function() {
 
 
 FGMapMenuPilots.prototype.server_changed_cb = function(event, cb_data, name) {
+
     element_hide(this.list);
+
+    // TODO: one way is more efficient, the other seems more clean(?). See, i
+    // don't really know DOM :)
+    /*
+    this.list_ul.innerHTML = "";
+    delete(this.pilots);
+    this.pilots = new Object();
+    */
+    for(var p in this.pilots) {
+        this.pilot_part_cb(FGMAP_EVENT_PILOT_PART, null, p);
+    }
+
     element_show(this.msg);
     this.msg.innerHTML = "Loading pilots...";
 };
