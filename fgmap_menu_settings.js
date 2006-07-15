@@ -1,5 +1,8 @@
 /*
  * Settings menu
+ *
+ * Pigeon <pigeon at pigeond dot net>
+ * All rights reserved, 2006.
  */
 
 function FGMapMenuSettings(fgmapmenu) {
