@@ -1,8 +1,5 @@
 /*
  * Server tab
- *
- * Pigeon <pigeon at pigeond dot net>
- * All rights reserved, 2006.
  */
 
 function FGMapMenuServer(fgmapmenu) {

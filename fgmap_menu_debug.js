@@ -1,8 +1,5 @@
 /*
  * Debug menu
- *
- * Pigeon <pigeon at pigeond dot net>
- * All rights reserved, 2006.
  */
 
 
