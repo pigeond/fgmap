@@ -14,6 +14,15 @@ FGMAP_RADIONAV_TYPES["VORTAC"] = FGMAP_NAVAID_VORTAC;
 FGMAP_RADIONAV_TYPES["NDB"] = FGMAP_NAVAID_NDB;
 FGMAP_RADIONAV_TYPES["NDB-DME"] = FGMAP_NAVAID_NDBDME;
 
+var FGMAP_ILS_TYPES = new Object();
+FGMAP_ILS_TYPES["ils"] = FGMAP_ILS_TYPE_ILS;
+FGMAP_ILS_TYPES["loc"] = FGMAP_ILS_TYPE_LOC;
+FGMAP_ILS_TYPES["gs"] = FGMAP_ILS_TYPE_GS;
+FGMAP_ILS_TYPES["om"] = FGMAP_ILS_TYPE_OM;
+FGMAP_ILS_TYPES["mm"] = FGMAP_ILS_TYPE_MM;
+FGMAP_ILS_TYPES["im"] = FGMAP_ILS_TYPE_IM;
+FGMAP_ILS_TYPES["dme"] = FGMAP_ILS_TYPE_DME;
+
 
 /* Translate all radio nav types to general VOR or NDB, otherwise the same type
 is returned */
@@ -117,7 +126,7 @@ FGMapMenuNav.prototype.setup = function() {
     but.src = "images/inview.gif";
     but.className = "fgmap_menu";
     but.style.verticalAlign = "middle";
-    but.title = "Show selected types of navaids in current view (high zoom level only)";
+    but.title = "show selected types of navaids in current view (high zoom level only)";
     but.style.cursor = "pointer";
     attach_event(but, "mousedown", this.nav_inview_mouse_cb.bind_event(this));
     attach_event(but, "mouseup", this.nav_inview_mouse_cb.bind_event(this));
@@ -455,23 +464,35 @@ FGMapMenuNav.prototype.nav_apt_parse = function(xmldoc) {
             var ilss = runways[r].getElementsByTagName("ils");
 
             if(ilss.length > 0) {
-                var ils = ilss[0];
-                var ils_type = ils.getAttribute("type");
-                var ils_lat = ils.getAttribute("lat");
-                var ils_lng = ils.getAttribute("lng");
-                var ils_elevation = ils.getAttribute("elevation");
-                var ils_freq = ils.getAttribute("freq");
-                var ils_range = ils.getAttribute("range");
-                var ils_multi = ils.getAttribute("multi");
-                var ils_ident = ils.getAttribute("ident");
-                var ils_name = ils.getAttribute("name");
+            
+                for(var ii = 0; ii < ilss.length; ii++) {
 
-                if(apt.ils_add(r_num, ils_type, ils_lat, ils_lng,
-                                ils_elevation, ils_freq, ils_range,
-                                ils_multi, ils_ident, ils_name) == false) {
+                    var ils = ilss[ii];
+                    var ils_type = ils.getAttribute("type");
 
-                    /* TODO */
-                    dprint(this.fgmap, "ILS add failed for apt[" + apt_code + "] runway[" + num + "] ils[" + ident + "]");
+                    ils_type = FGMAP_ILS_TYPES[ils_type];
+
+                    var ils_lat = ils.getAttribute("lat");
+                    var ils_lng = ils.getAttribute("lng");
+                    var ils_elevation = ils.getAttribute("elevation");
+                    var ils_freq = ils.getAttribute("freq");
+                    var ils_range = ils.getAttribute("range");
+                    //var ils_multi = ils.getAttribute("multi");
+                    var ils_ident = ils.getAttribute("ident");
+                    var ils_name = ils.getAttribute("name");
+                    var ils_heading = ils.getAttribute("heading");
+
+                    /* GS */
+                    var ils_angle = ils.getAttribute("angle");
+
+
+                    if(apt.ils_add(r_num, ils_type,
+                                    ils_ident, ils_name,
+                                    ils_lat, ils_lng,
+                                    ils_elevation, ils_freq, ils_range,
+                                    ils_heading, ils_angle) == false) {
+                        /* TODO */
+                    }
                 }
             }
 

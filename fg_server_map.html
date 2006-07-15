@@ -6,13 +6,17 @@
 
 <!--#if expr="\"${HTTP_HOST}\" = \"localhost\"" -->
 
-<!--
     <script src="http://localgoogle.com/localgm.js"></script>
--->
 
     <!-- <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBQsnjKtmoBcGM7Hr46AB7vQ9RgJehStikuzXFq1JhXNmGuz2srLpjo-WQ" type="text/javascript"></script> -->
 
+<!--
     <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBSSDzLYxvyashWcRaKE0aRFfeXqiBT-k8HQ3MAYQqUw2bKJcU1Dwcb-kA" type="text/javascript"></script>
+-->
+
+<!--#elif expr="\"${HTTP_HOST}\" = \"pikkoro\"" -->
+
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBQHXQQzrYH0bJO7DJTBa_3107bfvBT834N06Y7Md-TeMuaz25EY8nBQEw" type="text/javascript"></script>
     
 <!--#elif expr="\"${HTTP_HOST}\" = \"buu\"" -->
 
@@ -102,7 +106,9 @@
                 "mpserver03.flightgear.org", 5003);
 
             //fgmap.debug_set(true);
+            //fgmap.server_update_set(false);
         }
+
 
     </script>
 

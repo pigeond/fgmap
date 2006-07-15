@@ -19,7 +19,14 @@ my($NAVCHAN_TABLE) = "fg_nav_channel";
 my($FIX_TABLE) = "fg_fix";
 my($AWY_TABLE) = "fg_awy";
 
-my($SQL_LIMIT) = 100;
+my($SQL_LIMIT);
+
+$SQL_LIMIT = $ENV{'SQL_LIMIT'};
+
+if(!$SQL_LIMIT)
+{
+    $SQL_LIMIT = 100;
+}
 
 
 print("Pragma: no-cache\r\n");
@@ -61,6 +68,17 @@ sub rwy_nav
     my($rwy_nav) = "";
     my($k);
 
+    my(%nav_type_hash) =
+    (
+        4   => "ils",
+        5   => "loc",
+        6   => "gs",
+        7   => "om",
+        8   => "mm",
+        9   => "im",
+        12  => "dme",
+    );
+
     my($nav_sql) = "SELECT * FROM ${NAV_TABLE}";
     $nav_sql .= " WHERE (nav_type=4 OR nav_type=5 OR ".
         "nav_type=6 OR nav_type=7 OR nav_type=8 OR ".
@@ -80,6 +98,7 @@ sub rwy_nav
         $nav_name =~ s/${apt_code} ${rwy_num} //gi;
 
         my($nav_type) = $nav_hash{'nav_type'};
+        my($nav_type_name) = $nav_hash{'type_name'};
         my($nav_lat) = $nav_hash{'lat'};
         my($nav_lng) = $nav_hash{'lng'};
         my($nav_elevation) = $nav_hash{'elevation'};
@@ -88,17 +107,31 @@ sub rwy_nav
         my($nav_multi) = $nav_hash{'multi'};
         my($nav_ident) = $nav_hash{'ident'};
 
-        my($nav_tag);
-        $nav_tag = "ils" if($nav_type eq '4');
-        $nav_tag = "ils" if($nav_type eq '5');
-        $nav_tag = "gs" if($nav_type eq '6');
-        $nav_tag = "om" if($nav_type eq '7');
-        $nav_tag = "mm" if($nav_type eq '8');
-        $nav_tag = "im" if($nav_type eq '9');
-        $nav_tag = "ilsdme" if($nav_type eq '12');
+        # ILS (LLZ/LOC)
+        # GS
+        # IM MM OM (These work together with NDB)
+
+        my($extras) = "";
+
+        $nav_type = $nav_type_hash{$nav_type};
+
+        if($nav_type eq 'gs')
+        {
+            my($angle, $heading) = &multi_to_gs($nav_multi);
+            $extras .= " heading=\"".$heading."\" angle=\"".$angle."\"";
+        }
+        elsif($nav_type eq 'dme')
+        {
+            $extras .= " bias=\"".$nav_multi."\"";
+        }
+        else
+        {
+            # ils,loc,om,mm,im
+            $extras .= " heading=\"".$nav_multi."\"";
+        }
 
         $rwy_nav .= <<XML;
-\t\t\t<${nav_tag} name="${nav_name}" type="${nav_type}" lat="${nav_lat}" lng="${nav_lng}" elevation="${nav_elevation}" freq="${nav_freq}" range="${nav_range}" multi="${nav_multi}" ident="${nav_ident}" />
+\t\t\t<ils type="${nav_type}" lat="${nav_lat}" lng="${nav_lng}" elevation="${nav_elevation}" freq="${nav_freq}" range="${nav_range}" ident="${nav_ident}" name="${nav_name}" type_name="${nav_type_name}"${extras} />
 XML
     }
 
@@ -144,6 +177,15 @@ sub freqstr
 {
     my($freq) = @_;
     return sprintf("%.2f", $freq / 100);
+}
+
+sub multi_to_gs
+{
+    my($multi) = @_;
+    my($angle, $heading);
+    $angle = sprintf("%.2f", $multi / 100000);
+    $heading = sprintf("%.3f", $multi - $angle * 100000);
+    return ($angle, $heading);
 }
 
 sub db_error
@@ -254,7 +296,7 @@ if($sstr)
     $sstr =~ s/%([a-fA-F0-9][a-f-A-F0-9])/pack("C", hex($1))/ge;
     $sstr =~ s/[\%\*\.\?\_]//g;
 
-    if(length($sstr) < 3)
+    if(length($sstr) < 3 && $ENV{'HTTP_HOST'})
     {
         &err_print("Search string too short, minimum length 3.");
     }

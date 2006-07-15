@@ -34,49 +34,51 @@ my($socket) = IO::Socket::INET->new(PeerAddr => $server,
                                     Proto => "tcp",
                                     Type => SOCK_STREAM,
                                     Timeout => 10);
-
-while($l = <$socket>)
-{
-    my($callsign, $server_ip, $lng, $lat, $alt, $model);
-
-    chomp($l);
-
-    if(substr($l, 0, 1) eq "#")
-    {
-        if($l =~ /^# (\d+) .*? online/)
-        {
-            $pilot_total = $1;
-        }
-        next;
-    }
-
-    ($callsign, $server_ip, $lng, $lat, $alt, $model) =
-        ($l =~ m/(.*?)@(.*?): .*? .*? .*? (.*?) (.*?) (.*?) (.*?)$/);
-
-    # Aircraft/ComperSwift/Models/ComperSwift-model.x
-
-    if($callsign and $model)
-    {
-        #$model =~ s#.*/(.*?)\..*?$#$1#;
-        $model =~ s#.*/(.*?)#$1#;
-        $model =~ s#\..*?$##;
-
-        $xml .= "\t<marker server_ip=\"${server_ip}\" callsign=\"${callsign}\" lng=\"${lng}\" lat=\"${lat}\" alt=\"${alt}\" model=\"${model}\" />\n";
-
-        $pilot_cnt++;
-
-        if($pilot_cnt >= $pilot_total)
-        {
-            close($socket);
-            undef($socket);
-            last;
-        }
-    }
-}
-
 if($socket)
 {
-    close($socket);
+    while($l = <$socket>)
+    {
+        my($callsign, $server_ip, $lng, $lat, $alt, $model);
+
+        chomp($l);
+
+        if(substr($l, 0, 1) eq "#")
+        {
+            if($l =~ /^# (\d+) .*? online/)
+            {
+                $pilot_total = $1;
+            }
+            next;
+        }
+
+        ($callsign, $server_ip, $lng, $lat, $alt, $model) =
+            ($l =~ m/(.*?)@(.*?): .*? .*? .*? (.*?) (.*?) (.*?) (.*?)$/);
+
+        # Aircraft/ComperSwift/Models/ComperSwift-model.x
+
+        if($callsign and $model)
+        {
+            #$model =~ s#.*/(.*?)\..*?$#$1#;
+            $model =~ s#.*/(.*?)#$1#;
+            $model =~ s#\..*?$##;
+
+            $xml .= "\t<marker server_ip=\"${server_ip}\" callsign=\"${callsign}\" lng=\"${lng}\" lat=\"${lat}\" alt=\"${alt}\" model=\"${model}\" />\n";
+
+            $pilot_cnt++;
+
+            if($pilot_cnt >= $pilot_total)
+            {
+                close($socket);
+                undef($socket);
+                last;
+            }
+        }
+    }
+
+    if($socket)
+    {
+        close($socket);
+    }
 }
 
 my($testing) = 0;
