@@ -489,7 +489,7 @@ include_js("fgmap_menu_nav.js");
 var USER_AGENT = new Object();
 var agent_str = navigator.userAgent.toLowerCase();
 
-if((agent_str.indexOf("msie") != -1) && (agent_str.indexOf("opera") == -1)) {
+if(agent_str.indexOf("msie") != -1) {
     USER_AGENT.is_ie = true;
 }
 if(agent_str.indexOf("mozilla") != -1) {
