@@ -79,7 +79,10 @@ sub rwy_nav
         12  => "dme",
     );
 
-    my($nav_sql) = "SELECT * FROM ${NAV_TABLE}";
+    my($nav_sql) = "SELECT ${NAV_TABLE}.*, ${NAVCHAN_TABLE}.channel";
+    $nav_sql .= " FROM ${NAV_TABLE}";
+    $nav_sql .= " FULL JOIN ${NAVCHAN_TABLE} ON";
+    $nav_sql .= " ${NAVCHAN_TABLE}.freq = ${NAV_TABLE}.freq";
     $nav_sql .= " WHERE (nav_type=4 OR nav_type=5 OR ".
         "nav_type=6 OR nav_type=7 OR nav_type=8 OR ".
         "nav_type=9 OR nav_type=12)";
@@ -128,6 +131,14 @@ sub rwy_nav
         {
             # ils,loc,om,mm,im
             $extras .= " heading=\"".$nav_multi."\"";
+        }
+
+        if($nav_hash{'channel'})
+        {
+            my($nav_channel) = $nav_hash{'channel'};
+            $nav_channel =~ s/^0+//g;
+            $nav_channel =~ s/[XY]$//g;
+            $extras .= " channel=\"".$nav_channel."\"";
         }
 
         $rwy_nav .= <<XML;

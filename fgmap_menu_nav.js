@@ -476,6 +476,7 @@ FGMapMenuNav.prototype.nav_apt_parse = function(xmldoc) {
                     var ils_lng = ils.getAttribute("lng");
                     var ils_elevation = ils.getAttribute("elevation");
                     var ils_freq = ils.getAttribute("freq");
+                    var ils_channel = ils.getAttribute("channel");
                     var ils_range = ils.getAttribute("range");
                     //var ils_multi = ils.getAttribute("multi");
                     var ils_ident = ils.getAttribute("ident");
@@ -489,7 +490,9 @@ FGMapMenuNav.prototype.nav_apt_parse = function(xmldoc) {
                     if(apt.ils_add(r_num, ils_type,
                                     ils_ident, ils_name,
                                     ils_lat, ils_lng,
-                                    ils_elevation, ils_freq, ils_range,
+                                    ils_elevation,
+                                    ils_freq, ils_channel,
+                                    ils_range,
                                     ils_heading, ils_angle) == false) {
                         /* TODO */
                     }

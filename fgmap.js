@@ -308,6 +308,12 @@ function latlng_dist_heading(latlng, dist, heading) {
     return new GLatLng(latlng.lat() + dlat, latlng.lng() + dlng);
 }
 
+
+function deg_to_quad(deg) {
+    return parseInt(deg / 90);
+}
+
+
 function dimen_to_wh(dimen) {
     var arr = dimen.match(/(\d+)x(\d+)/);
     w = parseInt(arr[1]);
@@ -667,6 +673,10 @@ GMapElement.prototype.initialize = function(gmap) {
 
     this.update(this.latlng, this.align);
     this.child_set(this.child);
+
+    if(this.opacity != null) {
+        this.opacity_set(this.opacity);
+    }
 };
 
 
@@ -687,8 +697,8 @@ GMapElement.prototype.update = function(latlng, align) {
         this.align = align;
 
     var dc = this.gmap.fromLatLngToDivPixel(this.latlng);
-    this.elem.style.left = str_to_pos(dc.x + this.align.x);
-    this.elem.style.top = str_to_pos(dc.y + this.align.y);
+    this.elem.style.left = str_to_pos(parseInt(dc.x + this.align.x));
+    this.elem.style.top = str_to_pos(parseInt(dc.y + this.align.y));
 };
 
 
@@ -716,8 +726,11 @@ GMapElement.prototype.visible_set = function(visible) {
 
 
 GMapElement.prototype.opacity_set = function(opacity) {
+    this.opacity = opacity;
     //element_opacity_set(this.child, opacity);
-    element_opacity_set(this.elem, opacity);
+    if(this.elem) {
+        element_opacity_set(this.elem, opacity);
+    }
 };
 
 
@@ -1505,7 +1518,7 @@ FGMap.prototype.server_add = function(name, longname, host, port) {
         this.server_set(name);
 
         if(this.update) {
-            this.map_update_start();
+            this.server_update_start();
         }
     }
 
@@ -1556,10 +1569,10 @@ FGMap.prototype.server_set = function(name) {
 };
 
 
-FGMap.prototype.map_update_start = function() {
+FGMap.prototype.server_update_start = function() {
     if(this.update) {
         this.map_update();
-        setTimeout(this.map_update_start.bind_event(this),
+        setTimeout(this.server_update_start.bind_event(this),
                 this.update_interval);
     }
 };
@@ -1837,12 +1850,12 @@ FGMap.prototype.pilots_clear = function() {
  *
  * @tparam Boolean update        true for update, false for no update
  */
-FGMap.prototype.map_update_set = function(update) {
+FGMap.prototype.server_update_set = function(update) {
     if(this.update != update) {
         this.update = update;
         dprint(this, "server update is now " + update);
         if(update) {
-            this.map_update_start();
+            this.server_update_start();
         }
     }
 };
@@ -2379,7 +2392,7 @@ FGAirport.prototype.runway_add = function(num, lat, lng,
  * freq, range, angle, heading are optional */
 FGAirport.prototype.ils_add = function(num, type, ident, name,
                                         lat, lng, elevation,
-                                        freq, range,
+                                        freq, channel, range,
                                         heading,
                                         angle /* for GS */)
 {
@@ -2396,6 +2409,7 @@ FGAirport.prototype.ils_add = function(num, type, ident, name,
     ils.lng = lng;
     ils.elevation = elevation;
     ils.freq = freq;
+    ils.channel = channel;
     ils.range = range;
     ils.heading = heading;
     ils.angle = angle;
@@ -2419,13 +2433,13 @@ FGAirport.prototype.setup = function() {
 
 FGAirport.prototype.ils_setup = function(runway) {
 
-    var ils_course_length = 35000;
-    var ils_course_side_length = ils_course_length + 4000;
-    var ils_course_angle = 10;
-    var ils_course_step = 5;
+    var ils_course_length = 40000;
+    var ils_course_side_length = ils_course_length + 2000;
+    var ils_course_angle = 6;
     var ils_course_color = '#ffff00';
     var ils_course_line_width = 2;
     var ils_course_opacity = 1.0;
+    //var ils_course_step = 5;
 
     var ils_marker_step = 5;
 
@@ -2435,17 +2449,20 @@ FGAirport.prototype.ils_setup = function(runway) {
 
     element_text_append(elem, "\u00a0");
 
-    // Dropdown arror
+    // ILS toggle icon
     img = runway.ils_toggle_img = element_create(elem, "img");
     img.style.cursor = "pointer";
-    img.style.width = "12px";
-    img.style.height = "6px";
+    //img.style.width = "12px";
+    //img.style.height = "6px";
+    //img.style.width = "16px";
+    //img.style.height = "16px";
     //img_ie_fix(img);
     img.style.verticalAlign = "middle";
     img.title = "Toggle ILS details";
     attach_event(img, "click",
         this.ils_toggle_img_click_cb.bind_event(this, runway));
 
+    /*
     element_create(elem, "br");
 
     var ils;
@@ -2463,6 +2480,8 @@ FGAirport.prototype.ils_setup = function(runway) {
     span.className = "fgmap_nav_ils";
     //element_text_append(span, ils.name + " - " + ils.ident);
     element_text_append(span, ils.ident + " " + ils.freq);
+
+    */
 
     this.ils_visible_set(runway, false);
 
@@ -2527,13 +2546,32 @@ FGAirport.prototype.ils_setup = function(runway) {
     // For each ILS type, add the icon/info, if needed
     for(var ii in runway.ilss) {
 
-        ils = runway.ilss[ii];
+        var info_elem = null;
+
+        imgdimen = null;
         
+        ils = runway.ilss[ii];
+
+        /* debugging */
+        /*
+        var dummy = new GMarker(new GLatLng(ils.lat, ils.lng),
+                {title:FGMAP_ILS_NAMES[ii] + ":" + ils.name + ":" + ils.ident});
+        this.fgmap.gmap.addOverlay(dummy);
+        */
+
         if(ii == FGMAP_ILS_TYPE_ILS ||
             ii == FGMAP_ILS_TYPE_LOC) {
 
             imgsrc = FGMAP_ILS_LOC_ICON;
             imgdimen = FGMAP_ILS_LOC_ICON_DIMEN;
+
+            info_elem = element_create(null, 'div');
+            element_text_append(info_elem, runway.num +
+                ' Localizer ' + ils.freq);
+            element_create(info_elem, 'br');
+            element_text_append(info_elem, ils.ident);  /* morse code? */
+            element_create(info_elem, 'br');
+            element_text_append(info_elem, "Channel " + ils.channel);
 
         } else if(ii == FGMAP_ILS_TYPE_IM ||
             ii == FGMAP_ILS_TYPE_MM ||
@@ -2545,6 +2583,10 @@ FGAirport.prototype.ils_setup = function(runway) {
             imgsrc += '-' + hdg + FGMAP_ILS_MARKER_ICON_SUFFIX;
             imgdimen = FGMAP_ILS_MARKER_ICON_DIMEN;
 
+            info_elem = element_create(null, 'div');
+            element_text_append(info_elem, runway.num + ' ' +
+                FGMAP_ILS_NAMES[ii]);
+
         } else if(ii == FGMAP_ILS_TYPE_DME) {
 
             imgsrc = FGMAP_ILS_LOCDME_ICON;
@@ -2555,6 +2597,8 @@ FGAirport.prototype.ils_setup = function(runway) {
             continue;
         } else {
             // TODO
+            GLog.write("Got unknown ILS type [" + ii + "]");
+            continue;
         }
 
         var div = element_create(null, "div");
@@ -2571,15 +2615,34 @@ FGAirport.prototype.ils_setup = function(runway) {
         img = element_create(null, "img");
         img.src = imgsrc;
         wh = dimen_to_wh(imgdimen);
-        img.style.width = wh.w;
-        img.style.height = wh.h;
+        img.style.width = str_to_pos(wh.w);
+        img.style.height = str_to_pos(wh.h);
 
-        ils.icon = new GMapElement(new GLatLng(ils.lat, ils.lng), null,
+        ils.icon = new GMapElement(new GLatLng(ils.lat, ils.lng),
+                new GPoint(-wh.w / 2, -wh.h / 2),
                 img, null, null);
         this.fgmap.gmap.addOverlay(ils.icon);
         ils.icon.visible_set(false);
+
+        attach_event(img, "mouseover",
+            this.runway_mouseover_cb.bind_event(this, runway));
+
+        if(info_elem) {
+            info_elem.style.textAlign = 'center';
+            info_elem.className = 'fgmap_nav_ils';
+            ils.info = new GMapElement(new GLatLng(ils.lat, ils.lng),
+                    new GPoint(10, 15),
+                    info_elem, null, "fgmap_nav_info");
+            ils.info.opacity_set(FGMAP_NAV_OPACITY);
+            this.fgmap.gmap.addOverlay(ils.info);
+            ils.info.visible_set(false);
+
+            attach_event(info_elem, "mouseover",
+                this.runway_mouseover_cb.bind_event(this, runway));
+        }
     }
 
+    /* Silly, but it works */
     runway.ils_toggle = true;
     this.ils_toggle(runway);
 };
@@ -2593,8 +2656,7 @@ FGAirport.prototype.runway_setup = function() {
     var runway_color = "#0000ff";
     var runway_opacity = FGMAP_NAV_OPACITY;
     var runway_width = 3;
-    var runway_info_offset = 250;
-    var runway_info_align = new GPoint(-12, 0);
+    var runway_info_offset = 1000;
 
 
     if(this.rwy_cnt <= 0) {
@@ -2627,13 +2689,40 @@ FGAirport.prototype.runway_setup = function() {
         elem.className = "fgmap_runway_info";
         element_text_append(elem, num);
 
+
+        // Calculating/Adjusting the position for the runway label
+        var hdg = rev_deg(heading);
+        var len = (length / 2.0) + runway_info_offset;
+        var q = deg_to_quad(hdg);
+
+        var runway_info_align_x = 0;
+        var runway_info_align_y = 0;
+
+        if(q == 0 || q == 3) {
+            len += runway_info_offset / 2;
+        }
+
+        if(num.match(/\d+L$/i)) {
+            if(q == 2) {
+                hdg += 25;
+            } else {
+                hdg += 15;
+            }
+        } else if(num.match(/\d+R$/i)) {
+            if(q == 0) {
+                hdg -= 25;
+            } else {
+                hdg -= 15;
+            }
+        }
+
+
         var label = runway.label =
-            new GMapElement(latlng_dist_heading(latlng,
-                        (length / 2.0) + runway_info_offset, rev_deg(heading)),
-                        runway_info_align, elem
-                        /*, G_MAP_MARKER_SHADOW_PANE */);
+            new GMapElement(latlng_dist_heading(latlng, len, hdg),
+                        new GPoint(runway_info_align_x, runway_info_align_y),
+                        elem /*, G_MAP_MARKER_SHADOW_PANE */);
         attach_event(elem, "mouseover",
-            this.runway_mouseover_cb.bind_event(this, label));
+            this.runway_mouseover_cb.bind_event(this, runway));
 
         this.fgmap.gmap.addOverlay(label);
         label.hide();
@@ -2750,25 +2839,49 @@ FGAirport.prototype.airport_mouseover_cb = function(e) {
 };
 
 
-FGAirport.prototype.runway_mouseover_cb = function(e, label) {
+FGAirport.prototype.runway_mouseover_cb = function(e, runway) {
     this.raise();
-    if(label) {
-        label.raise();
+    this.runway_raise(runway);
+};
+
+
+FGAirport.prototype.runways_raise = function() {
+    for(var r in this.runways) {
+        this.runway_raise(this.runways[r]);
+    }
+};
+
+
+FGAirport.prototype.runway_raise = function(runway) {
+
+    if(runway.label) {
+        runway.label.raise();
+    }
+
+    if(runway.ils_toggle) {
+        for(var ii in runway.ilss) {
+            var ils = runway.ilss[ii];
+            if(ils.icon) {
+                ils.icon.raise();
+            }
+            if(ils.info) {
+                ils.info.raise();
+            }
+        }
+    }
+};
+
+
+FGAirport.prototype.airport_raise = function() {
+    if(this.label) {
+        this.label.raise();
     }
 };
 
 
 FGAirport.prototype.raise = function() {
-    for(var r in this.runways) {
-        var runway = this.runways[r];
-        if(runway.label) {
-            runway.label.raise();
-        }
-    }
-
-    if(this.label) {
-        this.label.raise();
-    }
+    this.runways_raise();
+    this.airport_raise();
 };
 
 
@@ -2777,6 +2890,7 @@ FGAirport.prototype.atc_visible_set = function(visible) {
         if(visible) {
             this.atc_toggle_img.src = "images/arrow_up.gif";
             element_show(this.atc_table);
+            this.airport_raise();
         } else {
             this.atc_toggle_img.src = "images/arrow_down.gif";
             element_hide(this.atc_table);
@@ -2815,6 +2929,9 @@ FGAirport.prototype.ils_visible_set = function(runway, visible) {
             if(ils.icon) {
                 ils.icon.visible_set(visible);
             }
+            if(ils.info) {
+                ils.info.visible_set(visible);
+            }
         }
     }
 };
@@ -2828,8 +2945,19 @@ FGAirport.prototype.ils_toggle = function(runway) {
 
     runway.ils_toggle = !runway.ils_toggle;
 
+    for(var ii in runway.ilss) {
+        ils = runway.ilss[ii];
+        if(ils.icon) {
+            ils.icon.visible_set(runway.ils_toggle);
+        }
+        if(ils.info) {
+            ils.info.visible_set(runway.ils_toggle);
+        }
+    }
+
     if(runway.ils_toggle) {
-        runway.ils_toggle_img.src = "images/arrow_up.gif";
+        //runway.ils_toggle_img.src = "images/arrow_up.gif";
+        runway.ils_toggle_img.src = "images/nav_icons/ils-on.gif";
         if(runway.ils_table) {
             element_show(runway.ils_table);
         }
@@ -2838,8 +2966,12 @@ FGAirport.prototype.ils_toggle = function(runway) {
                 this.fgmap.gmap.addOverlay(runway.ils_course_lines[i]);
             }
         }
+
+        this.runway_raise(runway);
+
     } else {
-        runway.ils_toggle_img.src = "images/arrow_down.gif";
+        //runway.ils_toggle_img.src = "images/arrow_down.gif";
+        runway.ils_toggle_img.src = "images/nav_icons/ils-off.gif";
         if(runway.ils_table) {
             element_hide(runway.ils_table);
         }
@@ -2850,12 +2982,6 @@ FGAirport.prototype.ils_toggle = function(runway) {
         }
     }
 
-    for(var ii in runway.ilss) {
-        ils = runway.ilss[ii];
-        if(ils.icon) {
-            ils.icon.visible_set(runway.ils_toggle);
-        }
-    }
 }
 
 FGAirport.prototype.ils_toggle_img_click_cb = function(e, runway) {

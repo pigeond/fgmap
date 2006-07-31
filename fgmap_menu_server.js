@@ -163,7 +163,7 @@ FGMapMenuServer.prototype.update_interval_change_cb = function(e) {
 
 FGMapMenuServer.prototype.update_checkbox_cb = function(e) {
     var checkbox = target_get((e || window.event));
-    this.fgmap.map_update_set(checkbox.checked);
+    this.fgmap.server_update_set(checkbox.checked);
 };
 
 

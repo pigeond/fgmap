@@ -77,6 +77,10 @@ while(<STDIN>)
         # Workaround for NDB-DME in nav.dat
         # Note: Some NDB-DME in the nav.dat has a DME part with a different
         # lat/lng, this is ignored here for the moment
+
+        # TODO: Fill ILS with channelfreq? I'm using freq directly atm in
+        # fg_nav_xml.cgi
+
         if(${type} == 13 and ${type_name} eq 'NDB-DME')
         {
             $sql .= <<SQL;
