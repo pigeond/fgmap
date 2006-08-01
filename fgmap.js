@@ -2390,17 +2390,15 @@ FGAirport.prototype.runway_add = function(num, lat, lng,
 
 /* This includes ILS, GS, OM/MM/IM.
  * freq, range, angle, heading are optional */
-FGAirport.prototype.ils_add = function(num, type, ident, name,
-                                        lat, lng, elevation,
-                                        freq, channel, range,
-                                        heading,
-                                        angle /* for GS */)
-{
+FGAirport.prototype.ils_add = function(num, ils_hash) {
+
+    /* type, ident, name, lat, lng, elevation, freq, channel, range, heading, angle /* for GS */
     var runway;
 
     if((runway = this.runways[num]) == null)
         return false;
 
+    /*
     var ils = new Object();
     ils.type = type;
     ils.ident = ident;
@@ -2413,12 +2411,13 @@ FGAirport.prototype.ils_add = function(num, type, ident, name,
     ils.range = range;
     ils.heading = heading;
     ils.angle = angle;
+    */
 
     if(runway.ilss == null) {
         runway.ilss = new Object();
     }
 
-    runway.ilss[type] = ils;
+    runway.ilss[ils_hash.type] = ils_hash;
 
     return true;
 };
@@ -2463,8 +2462,6 @@ FGAirport.prototype.ils_setup = function(runway) {
         this.ils_toggle_img_click_cb.bind_event(this, runway));
 
     /*
-    element_create(elem, "br");
-
     var ils;
 
     // Pick either the full ILS of LOC for the ident and details
@@ -2483,7 +2480,33 @@ FGAirport.prototype.ils_setup = function(runway) {
 
     */
 
-    this.ils_visible_set(runway, false);
+    var ils;
+
+    element_create(elem, "br");
+    var div = runway.ils_detail = element_create(elem, 'div');
+    element_opacity_set(div, FGMAP_NAV_OPACITY);
+    var span = element_create(div, 'span');
+    span.className = "fgmap_nav_ils";
+
+    if((ils = runway.ilss[FGMAP_ILS_TYPE_ILS]) != null) {
+        element_text_append(span, ils.type_name);
+    } else if((ils = runway.ilss[FGMAP_ILS_TYPE_LOC]) != null) {
+        element_text_append(span, 'Loc');
+    } else {
+        // Hmm...
+    }
+
+
+    /* Glide slope angle */
+    if((ils = runway.ilss[FGMAP_ILS_TYPE_GS]) != null) {
+
+        element_text_append(span, "\u00a0\u00a0");
+
+        element_text_append(span, 'GS ' +
+            runway.ilss[FGMAP_ILS_TYPE_GS].angle + "\u00b0");
+
+        this.ils_visible_set(runway, false);
+    }
 
 /*
     // Course image
@@ -2571,7 +2594,7 @@ FGAirport.prototype.ils_setup = function(runway) {
             element_create(info_elem, 'br');
             element_text_append(info_elem, ils.ident);  /* morse code? */
             element_create(info_elem, 'br');
-            element_text_append(info_elem, "Channel " + ils.channel);
+            element_text_append(info_elem, "Chan " + ils.channel);
 
         } else if(ii == FGMAP_ILS_TYPE_IM ||
             ii == FGMAP_ILS_TYPE_MM ||
@@ -2802,8 +2825,8 @@ FGAirport.prototype.airport_setup = function() {
 
                 var img = this.atc_toggle_img = element_create(elem, "img");
                 img.style.cursor = "pointer";
-                img.style.width = "12px";
-                img.style.height = "6px";
+                //img.style.width = "12px";
+                //img.style.height = "6px";
                 //img_ie_fix(img);
                 img.style.verticalAlign = "middle";
                 img.title = "Toggle airport details";
@@ -2958,8 +2981,8 @@ FGAirport.prototype.ils_toggle = function(runway) {
     if(runway.ils_toggle) {
         //runway.ils_toggle_img.src = "images/arrow_up.gif";
         runway.ils_toggle_img.src = "images/nav_icons/ils-on.gif";
-        if(runway.ils_table) {
-            element_show(runway.ils_table);
+        if(runway.ils_detail) {
+            element_show(runway.ils_detail);
         }
         if(runway.ils_course_lines) {
             for(var i = 0; i < runway.ils_course_lines.length; i++) {
@@ -2972,8 +2995,8 @@ FGAirport.prototype.ils_toggle = function(runway) {
     } else {
         //runway.ils_toggle_img.src = "images/arrow_down.gif";
         runway.ils_toggle_img.src = "images/nav_icons/ils-off.gif";
-        if(runway.ils_table) {
-            element_hide(runway.ils_table);
+        if(runway.ils_detail) {
+            element_hide(runway.ils_detail);
         }
         if(runway.ils_course_lines) {
             for(var i = 0; i < runway.ils_course_lines.length; i++) {

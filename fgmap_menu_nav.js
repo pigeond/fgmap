@@ -467,33 +467,34 @@ FGMapMenuNav.prototype.nav_apt_parse = function(xmldoc) {
             
                 for(var ii = 0; ii < ilss.length; ii++) {
 
-                    var ils = ilss[ii];
-                    var ils_type = ils.getAttribute("type");
+                    var ils_hash = new Object();
 
+                    var ils = ilss[ii];
+
+                    var ils_type = ils.getAttribute('type');
                     ils_type = FGMAP_ILS_TYPES[ils_type];
 
-                    var ils_lat = ils.getAttribute("lat");
-                    var ils_lng = ils.getAttribute("lng");
-                    var ils_elevation = ils.getAttribute("elevation");
-                    var ils_freq = ils.getAttribute("freq");
-                    var ils_channel = ils.getAttribute("channel");
-                    var ils_range = ils.getAttribute("range");
-                    //var ils_multi = ils.getAttribute("multi");
-                    var ils_ident = ils.getAttribute("ident");
-                    var ils_name = ils.getAttribute("name");
-                    var ils_heading = ils.getAttribute("heading");
+                    ils_hash['type'] = ils_type;
+                    ils_hash['lat'] = ils.getAttribute('lat');
+                    ils_hash['lng'] = ils.getAttribute('lng');
+                    ils_hash['elevation'] = ils.getAttribute('elevation');
+                    ils_hash['freq'] = ils.getAttribute('freq');
+                    ils_hash['channel'] = ils.getAttribute('channel');
+                    ils_hash['range'] = ils.getAttribute('range');
+                    ils_hash['ident'] = ils.getAttribute('ident');
+                    ils_hash['name'] = ils.getAttribute('name');
+                    ils_hash['heading'] = ils.getAttribute('heading');
 
                     /* GS */
-                    var ils_angle = ils.getAttribute("angle");
+                    if(ils_type == FGMAP_ILS_TYPE_GS) {
+                        ils_hash['angle'] = ils.getAttribute('angle');
+                    }
 
+                    if(ils_type == FGMAP_ILS_TYPE_ILS) {
+                        ils_hash['type_name'] = ils.getAttribute('type_name');
+                    }
 
-                    if(apt.ils_add(r_num, ils_type,
-                                    ils_ident, ils_name,
-                                    ils_lat, ils_lng,
-                                    ils_elevation,
-                                    ils_freq, ils_channel,
-                                    ils_range,
-                                    ils_heading, ils_angle) == false) {
+                    if(apt.ils_add(r_num, ils_hash) == false) {
                         /* TODO */
                     }
                 }
