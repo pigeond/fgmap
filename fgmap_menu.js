@@ -460,7 +460,7 @@ FGMapMenu.prototype.about_tab_setup = function() {
     elem.style.lineHeight = "180%";
 
     elem.innerHTML = "\
-FGMap " + this.fgmap.version + " - <a href=\"http://www.flightgear.org/\">FlightGear</a> network server traffic map<br>\
+<a href=\"http://pigeond.net/flightgear/fgmap.html\" target=\"_blank\">FGMap</a> " + this.fgmap.version + " - <a href=\"http://www.flightgear.org/\">FlightGear</a> network server traffic map<br>\
 Written by <a href=\"http://pigeond.net/\">Pigeon</a><br>\
 Powered by <a href=\"http://maps.google.com/\">Google Map</a><br>\
 <a href=\"http://www.o-schroeder.de/fg_server/\">FlightGear server</a> written by Oliver Schroeder<br>\
