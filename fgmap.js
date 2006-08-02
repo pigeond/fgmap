@@ -2877,10 +2877,6 @@ FGAirport.prototype.runways_raise = function() {
 
 FGAirport.prototype.runway_raise = function(runway) {
 
-    if(runway.label) {
-        runway.label.raise();
-    }
-
     if(runway.ils_toggle) {
         for(var ii in runway.ilss) {
             var ils = runway.ilss[ii];
@@ -2891,6 +2887,10 @@ FGAirport.prototype.runway_raise = function(runway) {
                 ils.info.raise();
             }
         }
+    }
+
+    if(runway.label) {
+        runway.label.raise();
     }
 };
 
