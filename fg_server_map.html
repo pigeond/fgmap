@@ -72,7 +72,7 @@
         {
             var fgmap = new FGMap("fgmap");
 
-            fgmap.server_add("-- For FG 0.9.10 --", null, null, 0);
+            fgmap.server_group_add("-- For FG 0.9.10 --");
 
             // 50.026388889N 8.543055556E
             fgmap.server_add("mpserver01:5000",
@@ -89,9 +89,7 @@
                 "mpserver03.flightgear.org:5000 (East Coast US)",
                 "mpserver03.flightgear.org", 5001);
 
-            fgmap.server_add("", null, null, 0);
-
-            fgmap.server_add("-- For FG CVS --", null, null, 0);
+            fgmap.server_group_add("-- For FG CVS --");
 
             fgmap.server_add("mpserver01:5002",
                 "mpserver01.flightgear.org:5002 (Germany)",

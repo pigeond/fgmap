@@ -1293,11 +1293,12 @@ FGPilot.prototype.raise = function() {
 
 /* fg_server ******************************************************************/
 
-function fg_server(name, longname, host, port) {
+function fg_server(name, longname, host, port, group) {
     this.name = name;
     this.longname = longname;
     this.host = host;
     this.port = port;
+    this.group = group;
 }
 
 
@@ -1483,6 +1484,16 @@ FGMap.prototype.menu_setup = function() {
 
 
 /**
+ * Start a server group
+ */
+FGMap.prototype.server_group_add = function(group) {
+    if(group == null)
+        return;
+
+    this.fg_server_group = group;
+};
+
+/**
  * Add a server to servers list.
  * 
  * @tparam String name      a short name to be appeared for this server, must be
@@ -1490,7 +1501,7 @@ FGMap.prototype.menu_setup = function() {
  * @tparam String longname  a long name, possibly with description of this
  *                          server
  * @tparam String host      the host of the server to connect to (ip or host
- *                          name). null for a placeholder item.
+ *                          name)
  * @tparam Integer port     the port to connect to (FG server admin port)
  * @treturn Boolean         true on success, false on failure
  */
@@ -1506,13 +1517,14 @@ FGMap.prototype.server_add = function(name, longname, host, port) {
         return true;
     }
 
-    if(name == null)
+    if(name == null || host == null || port <= 0)
         return false;
 
-    this.fg_servers[name] = new fg_server(name, longname, host, port);
+    this.fg_servers[name] = new fg_server(name, longname, host, port,
+        this.fg_server_group);
 
     this.event_callback_call(FGMAP_EVENT_SERVER_ADDED,
-        name, longname, host, port);
+        name, longname, host, port, this.fg_server_group);
 
     if(this.fg_server_current == null) {
         this.server_set(name);
