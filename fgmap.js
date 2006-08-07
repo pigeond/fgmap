@@ -144,6 +144,10 @@ var FGMAP_CRAFT_MODELS_KC135 = [ "KC135" ];
 var FGMAP_CRAFT_ICON_CH53E = "ch53e/ch53e";
 var FGMAP_CRAFT_MODELS_CH53E = [ "ch53e-model" ];
 
+var FGMAP_CRAFT_ICON_E3B = "e3b/e3b";
+var FGMAP_CRAFT_MODELS_E3B = [ "E3B" ];
+
+
 var dummy_cnt = 1;
 
 /* Navaid types */
@@ -1137,6 +1141,8 @@ FGPilot.prototype.marker_update = function(force) {
                 img += FGMAP_CRAFT_ICON_KC135;
             } else if(FGMAP_CRAFT_MODELS_CH53E.indexOf(this.model) != -1) {
                 img += FGMAP_CRAFT_ICON_CH53E;
+            } else if(FGMAP_CRAFT_MODELS_E3B.indexOf(this.model) != -1) {
+                img += FGMAP_CRAFT_ICON_E3B;
 
             } else {
                 // TODO
