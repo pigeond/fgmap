@@ -200,6 +200,7 @@ a:hover     { color: #ddf; }
 .fgmap_airport_info_code { color: red; font-weight: bold; }
 .fgmap_airport_info_atc_atis { color: cyan; }
 .fgmap_airport_info_atc_tower { color: lime; }
+.fgmap_airport_elevation { color: grey; }
 
 .fgmap_nav_apt { color: red; }
 .fgmap_nav_hpt { color: green; }

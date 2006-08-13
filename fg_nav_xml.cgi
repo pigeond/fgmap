@@ -691,12 +691,21 @@ if($sstr and $awy)
             my($lng_end) = $row_hash{'lng_end'};
 
             my($enroute) = $row_hash{'enroute'};
+            if($enroute eq '1') 
+            {
+                $enroute = 'low';
+            }
+            else
+            {
+                $enroute = 'high';
+            }
+
             my($base) = $row_hash{'base'};
             my($top) = $row_hash{'top'};
             my($seg_name) = $row_hash{'seg_name'};
 
             $xml .= <<XML;
-\t<awy name_start="${name_start}" lat="${lat_start}" lng="${lng_start}" name_end="${name_end}" lat="${lat_end}" lng="${lng_end}" enroute="${enroute}" base="${base}" top="${top}" seg_name="${seg_name}" />"
+\t<awy name_start="${name_start}" lat_start="${lat_start}" lng_start="${lng_start}" name_end="${name_end}" lat_end="${lat_end}" lng_end="${lng_end}" enroute="${enroute}" base="${base}" top="${top}" seg_name="${seg_name}" />"
 XML
         }
         $result_cnt += $sth->rows;

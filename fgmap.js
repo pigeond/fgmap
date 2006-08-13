@@ -513,26 +513,6 @@ if(agent_str.indexOf("opera") != -1) {
 }
 
 
-/* GMap helpers */
-
-/**
- * @bounds      GLatLngBounds
- * @return      the GLatLng center of the given bounds
- */
-function bounds_center_get(bounds) {
-
-    if(bounds.isEmpty()) {
-        return null;
-    }
-
-    var clat = (bounds.getNorthEast().lat() +
-                bounds.getSouthWest().lat()) / 2;
-
-    var clng = (bounds.getNorthEast().lng() +
-                bounds.getSouthWest().lng()) / 2;
-
-    return (new GLatLng(clat, clng));
-};
 
 
 /* element ********************************************************************/
@@ -2237,10 +2217,11 @@ FGNav.prototype.init = function() {
 
 
 /* Abstract methods */
-//FGNav.prototype.setup = function() {};
-//FGNav.prototype.visible_set = function(visible) {};
-//FGNav.prototype.center_get = function() {};
-//FGNav.prototype.remove = function() {};
+FGNav.prototype.setup = function() {};
+FGNav.prototype.visible_set = function(visible) {};
+FGNav.prototype.center_get = function() {};
+FGNav.prototype.remove = function() {};
+FGNav.prototype.raise = function() {};
 
 
 
@@ -2450,6 +2431,7 @@ FGAirport.prototype.setup = function() {
 
 FGAirport.prototype.ils_setup = function(runway) {
 
+    var ils_range = 0;
     var ils_course_length = 40000;
     var ils_course_side_length = ils_course_length + 2000;
     var ils_course_angle = 6;
@@ -2463,6 +2445,8 @@ FGAirport.prototype.ils_setup = function(runway) {
     var elem = runway.label_elem;
     var img, imgsrc, imgdimen, wh;
     var hdg;
+
+    var ils_heading;
 
     element_text_append(elem, "\u00a0");
 
@@ -2514,6 +2498,19 @@ FGAirport.prototype.ils_setup = function(runway) {
         // Hmm...
     }
 
+    if(ils) {
+        ils_heading = ils.heading;
+    }
+
+    // Use ILS/LOC's range for the length of the ILS dart
+    // Commented out as it seems too long
+    /*
+    if(ils) {
+        ils_course_length = ils.range * 6076.1155;
+        ils_course_side_length = ils_course_length + 2000;
+        //GLog.write(ils_course_length + ':' + ils_course_side_length);
+    }
+    */
 
     /* Glide slope angle */
     if((ils = runway.ilss[FGMAP_ILS_TYPE_GS]) != null) {
@@ -2582,6 +2579,32 @@ FGAirport.prototype.ils_setup = function(runway) {
     line = new GPolyline([ept1, ept3],
             ils_course_color, ils_course_line_width, ils_course_opacity);
     runway.ils_course_lines.push(line);
+
+    // Debug
+    /*
+    if(runway.num == '28R') {
+        this.fgmap.gmap.addOverlay(new GMarker(spt));
+        this.fgmap.gmap.addOverlay(new GMarker(ept1));
+        this.fgmap.gmap.addOverlay(new GMarker(ept2));
+        this.fgmap.gmap.addOverlay(new GMarker(ept3));
+    }
+    */
+
+
+    /* ILS heading label */
+    var ils_hdg_elem = element_create(null, 'div');
+    ils_hdg_elem.style.textAlign = 'center';
+    ils_hdg_elem.className = 'fgmap_nav_ils';
+    element_text_append(ils_hdg_elem, ils_heading + "\u00b0");
+    attach_event(ils_hdg_elem, "mouseover",
+        this.runway_mouseover_cb.bind_event(this, runway));
+    runway.ils_hdg_label = new GMapElement(
+            latlng_dist_heading(spt, ils_course_length / 2, hdg),
+            new GPoint(-10, -10),
+            ils_hdg_elem, null, 'fgmap_nav_info');
+    this.fgmap.gmap.addOverlay(runway.ils_hdg_label);
+    runway.ils_hdg_label.hide();
+    runway.ils_hdg_label.opacity_set(FGMAP_NAV_OPACITY);
 
 
     // For each ILS type, add the icon/info, if needed
@@ -2802,6 +2825,40 @@ FGAirport.prototype.airport_setup = function() {
         span.className = "fgmap_airport_info_code";
         span.innerHTML = this.code;
 
+        element_text_append(elem, "\u00a0");
+
+        var div;
+        var img;
+        
+        img = this.details_toggle_img = element_create(elem, "img");
+        img.style.cursor = "pointer";
+        //img.style.width = "12px";
+        //img.style.height = "6px";
+        //img_ie_fix(img);
+        img.style.verticalAlign = "middle";
+        img.title = "Toggle airport details";
+        attach_event(img, "click",
+            this.details_toggle_img_click_cb.bind_event(this));
+
+        element_create(elem, "br");
+
+        div = this.details_div = element_create(elem, 'div');
+
+        span = element_create(this.details_div, 'span');
+        span.className = 'fgmap_airport_elevation';
+        element_text_append(span, 'Elevation: ' + this.elevation + 'ft');
+
+        element_create(this.details_div, 'br');
+
+        div = this.details_content = element_create(this.details_div, 'div');
+        div.style.position = 'relative';
+        div.style.left = '0px';
+        div.style.top = '0px';
+        div.style.width = '80%';
+
+        this.details_visible_set(false);
+
+        // ATC details
         if(this.atcs) {
 
             var table = null;
@@ -2838,23 +2895,7 @@ FGAirport.prototype.airport_setup = function() {
             }
 
             if(table != null) {
-
-                element_text_append(elem, "\u00a0");
-
-                var img = this.atc_toggle_img = element_create(elem, "img");
-                img.style.cursor = "pointer";
-                //img.style.width = "12px";
-                //img.style.height = "6px";
-                //img_ie_fix(img);
-                img.style.verticalAlign = "middle";
-                img.title = "Toggle airport details";
-                attach_event(img, "click",
-                    this.atc_toggle_img_click_cb.bind_event(this));
-
-                element_create(elem, "br");
-                element_attach(table, elem);
-
-                this.atc_visible_set(false);
+                element_attach(table, this.details_content);
             }
         }
 
@@ -2910,6 +2951,10 @@ FGAirport.prototype.runway_raise = function(runway) {
     if(runway.label) {
         runway.label.raise();
     }
+
+    if(runway.ils_hdg_label) {
+        runway.ils_hdg_label.raise();
+    }
 };
 
 
@@ -2926,22 +2971,22 @@ FGAirport.prototype.raise = function() {
 };
 
 
-FGAirport.prototype.atc_visible_set = function(visible) {
-    if(this.atc_table) {
+FGAirport.prototype.details_visible_set = function(visible) {
+    if(this.details_div) {
         if(visible) {
-            this.atc_toggle_img.src = "images/arrow_up.gif";
-            element_show(this.atc_table);
+            this.details_toggle_img.src = "images/arrow_up.gif";
+            element_show(this.details_div);
             this.airport_raise();
         } else {
-            this.atc_toggle_img.src = "images/arrow_down.gif";
-            element_hide(this.atc_table);
+            this.details_toggle_img.src = "images/arrow_down.gif";
+            element_hide(this.details_div);
         }
     }
 };
 
 
-FGAirport.prototype.atc_toggle_img_click_cb = function(e) {
-    this.atc_visible_set(this.atc_table.style.display != "block");
+FGAirport.prototype.details_toggle_img_click_cb = function(e) {
+    this.details_visible_set(this.details_div.style.display != "block");
 };
 
 
@@ -2952,6 +2997,7 @@ FGAirport.prototype.ils_visible_set = function(runway, visible) {
     }
 
     if(runway.ils_toggle) {
+
         if(visible) {
             if(runway.ils_course_lines) {
                 for(var i = 0; i < runway.ils_course_lines.length; i++) {
@@ -2965,6 +3011,9 @@ FGAirport.prototype.ils_visible_set = function(runway, visible) {
                 }
             }
         }
+
+        runway.ils_hdg_label.visible_set(visible);
+
         for(var ii in runway.ilss) {
             ils = runway.ilss[ii];
             if(ils.icon) {
@@ -3002,6 +3051,9 @@ FGAirport.prototype.ils_toggle = function(runway) {
         if(runway.ils_detail) {
             element_show(runway.ils_detail);
         }
+        if(runway.ils_hdg_label) {
+            runway.ils_hdg_label.show();
+        }
         if(runway.ils_course_lines) {
             for(var i = 0; i < runway.ils_course_lines.length; i++) {
                 this.fgmap.gmap.addOverlay(runway.ils_course_lines[i]);
@@ -3015,6 +3067,9 @@ FGAirport.prototype.ils_toggle = function(runway) {
         runway.ils_toggle_img.src = "images/nav_icons/ils-off.gif";
         if(runway.ils_detail) {
             element_hide(runway.ils_detail);
+        }
+        if(runway.ils_hdg_label) {
+            runway.ils_hdg_label.hide();
         }
         if(runway.ils_course_lines) {
             for(var i = 0; i < runway.ils_course_lines.length; i++) {
@@ -3078,7 +3133,7 @@ FGAirport.prototype.visible_set = function(visible) {
 
 
 FGAirport.prototype.center_get = function() {
-    return bounds_center_get(this.bounds);
+    return this.bounds.getCenter();
 };
 
 
@@ -3301,6 +3356,149 @@ function FGNavFix(fgmap, id, name, lat, lng) {
 FGNavFix.prototype = new FGNavMarker();
 
 
+/* FGNavAirway */
+function FGNavAirway(fgmap, id, awy_hash) {
+    this.awy_hash = awy_hash;
+    FGNav.apply(this, [ fgmap, FGMAP_NAVAID_AWY, id,
+        awy_hash['seg_name'], awy_hash['seg_name'] ]);
+}
+FGNavAirway.prototype = new FGNav();
+
+FGNavAirway.prototype.setup = function() {
+
+    var awy_high_color = '#ff2222';
+    var awy_low_color = '#2222ff';
+    var awy_width = 2;
+    var awy_opacity = 0.8;
+    var awy_align = new GPoint(-20, -20);
+
+    var latlng_start = new GLatLng(
+            this.awy_hash['lat_start'], this.awy_hash['lng_start']);
+
+    var latlng_end = new GLatLng(
+            this.awy_hash['lat_end'], this.awy_hash['lng_end']);
+
+    this.polyline = new GPolyline([ latlng_start, latlng_end ],
+        (this.awy_hash['route'] == 'high' ? awy_high_color : awy_low_color),
+        awy_width, awy_opacity);
+
+    this.bounds = new GLatLngBounds();
+    this.bounds.extend(latlng_start);
+    this.bounds.extend(latlng_end);
+    this.latlng_center = this.bounds.getCenter();
+
+    var div = element_create(div, 'div');
+    div.className = 'fgmap_nav_awy';
+    element_text_append(div, this.awy_hash['seg_name']);
+    element_text_append(div, ' (FL' + this.awy_hash['base'] + ' - FL' +
+            this.awy_hash['top'] + ')');
+
+    this.info = new GMapElement(this.latlng_center, awy_align, div, null,
+        'fgmap_nav_info');
+    this.fgmap.gmap.addOverlay(this.info);
+    this.info.opacity_set(FGMAP_NAV_OPACITY);
+    this.info.hide();
+
+
+    GEvent.addListener(this.fgmap.gmap, "moveend",
+        this.gmap_moveend_cb.bind_event(this));
+
+    GEvent.addListener(this.fgmap.gmap, "zoomend",
+        this.gmap_zoomend_cb.bind_event(this));
+
+    return true;
+};
+
+
+FGNavAirway.prototype.info_reposition = function() {
+
+    if(this.info == null)
+        return;
+
+    var gmap_bounds = this.fgmap.gmap.getBounds();
+
+    if(gmap_bounds.containsBounds(this.bounds)) {
+
+        this.info.update(this.latlng_center);
+
+    } else if(gmap_bounds.intersects(this.bounds)) {
+
+        // Adjust the label position so that it's visible if the part of
+        // the airway is visible
+
+        // TODO: Make this a generic action for all overlay
+
+        var gbt = gmap_bounds.getNorthEast().lat();
+        var gbb = gmap_bounds.getSouthWest().lat();
+        var gbl = gmap_bounds.getNorthEast().lng();
+        if(gbl < 0) gbl += 360;
+        var gbr = gmap_bounds.getSouthWest().lng();
+        if(gbr < 0) gbr += 360;
+
+        var bt = this.bounds.getNorthEast().lat();
+        var bb = this.bounds.getSouthWest().lat();
+        var bl = this.bounds.getNorthEast().lng();
+        if(bl < 0) bl += 360;
+        var br = this.bounds.getSouthWest().lng();
+        if(br < 0) br += 360;
+
+        bt = Math.min(gbt, bt);
+        bb = Math.max(gbb, bb);
+        bl = Math.min(gbl, bl);
+        br = Math.max(gbr, br);
+
+        var bounds = new GLatLngBounds();
+        bounds.extend(new GLatLng(bt, bl));
+        bounds.extend(new GLatLng(bt, br));
+        bounds.extend(new GLatLng(bb, bl));
+        bounds.extend(new GLatLng(bb, br));
+
+        this.info.update(bounds.getCenter());
+    }
+};
+
+
+FGNavAirway.prototype.gmap_moveend_cb = function() {
+    this.info_reposition();
+};
+
+
+FGNavAirway.prototype.gmap_zoomend_cb = function() {
+    this.info_reposition();
+};
+
+
+FGNavAirway.prototype.center_get = function() {
+    return this.latlng_center;
+};
+
+
+FGNavAirway.prototype.visible_set = function(visible) {
+
+    if(this.visible == visible)
+        return true;
+
+    this.visible = visible;
+
+    if(visible) {
+        this.fgmap.gmap.addOverlay(this.polyline);
+    } else {
+        this.fgmap.gmap.removeOverlay(this.polyline);
+    }
+
+    this.info.visible_set(visible);
+
+    this.visible = visible;
+    return true;
+};
+
+FGNavAirway.prototype.remove = function() {
+    this.fgmap.gmap.removeOverlay(this.polyline);
+    this.info.remove();
+    delete(this.info);
+    this.info = null;
+};
+
 
 /* Heliport, it uses FGNavMarker for each pad */
 function FGHeliport(fgmap, id, code, name, elevation) {
@@ -3363,7 +3561,7 @@ FGHeliport.prototype.setup = function() {
 
 
 FGHeliport.prototype.center_get = function() {
-    return bounds_center_get(this.bounds);
+    return this.bounds.getCenter();
 };
 
 

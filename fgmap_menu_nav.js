@@ -189,6 +189,8 @@ FGMapMenuNav.prototype.setup = function() {
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     this.awy_chbx = chbx = element_clone(base_chbx);
+    chbx.checked = true;
+    chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
     element_text_append(this.nav_form, "airway");
     element_text_append(this.nav_form, "\u00a0\u00a0");
@@ -561,15 +563,14 @@ FGMapMenuNav.prototype.nav_radio_parse = function(xmldoc) {
 FGMapMenuNav.prototype.nav_fix_parse = function(xmldoc) {
 
     var fixes = xmldoc.documentElement.getElementsByTagName("fix");
-    var fix;
 
-    for(i = 0; i < fixes.length; i++) {
-        lat = fixes[i].getAttribute('lat');
-        lng = fixes[i].getAttribute('lng');
-        name = fixes[i].getAttribute('name');
+    for(var i = 0; i < fixes.length; i++) {
+        var lat = fixes[i].getAttribute('lat');
+        var lng = fixes[i].getAttribute('lng');
+        var name = fixes[i].getAttribute('name');
 
-        id = 'fix:' + name + ':' + lat + ':' + lng;
-        fix = new FGNavFix(this.fgmap, id, name, lat, lng);
+        var id = 'fix:' + name + ':' + lat + ':' + lng;
+        var fix = new FGNavFix(this.fgmap, id, name, lat, lng);
         this.result_box_result_add(fix);
     }
 
@@ -577,7 +578,29 @@ FGMapMenuNav.prototype.nav_fix_parse = function(xmldoc) {
 
 
 FGMapMenuNav.prototype.nav_awy_parse = function(xmldoc) {
-    /* TODO */
+
+    var awys = xmldoc.documentElement.getElementsByTagName("awy");
+
+    for(var i = 0; i < awys.length; i++) {
+
+        var awy_hash = new Object();
+
+        awy_hash['name_start'] = awys[i].getAttribute('name_start');
+        awy_hash['name_end'] = awys[i].getAttribute('name_end');
+        awy_hash['lat_start'] = awys[i].getAttribute('lat_start');
+        awy_hash['lng_start'] = awys[i].getAttribute('lng_start');
+        awy_hash['lat_end'] = awys[i].getAttribute('lat_end');
+        awy_hash['lng_end'] = awys[i].getAttribute('lng_end');
+        awy_hash['enroute'] = awys[i].getAttribute('enroute');
+        awy_hash['base'] = awys[i].getAttribute('base');
+        awy_hash['top'] = awys[i].getAttribute('top');
+        awy_hash['seg_name'] = awys[i].getAttribute('seg_name');
+
+        var id = 'awy:' + awy_hash['seg_name'] + ':' + awy_hash['lat_start'] +
+            ':' + awy_hash['lat_end'];
+        var awy = new FGNavAirway(this.fgmap, id, awy_hash);
+        this.result_box_result_add(awy);
+    }
 };
 
 
