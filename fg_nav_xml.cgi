@@ -666,10 +666,91 @@ XML
 }
 
 
-if($sstr and $awy)
+if($awy)
 {
-    $sql = "SELECT * FROM ${AWY_TABLE}";
-    $sql .= " WHERE UPPER(seg_name) LIKE '\%".uc(${sstr})."\%'";
+    if($sstr)
+    {
+        $sql = "SELECT * FROM ${AWY_TABLE} WHERE ";
+        $sql .= "UPPER(seg_name) LIKE '\%".uc(${sstr})."\%'";
+    }
+    elsif($ne and $sw)
+    {
+        # left:  $sw_lng (x)
+        # right: $ne_lng (x)
+        # top:   $ne_lat (y)
+        # bot:   $sw_lat (y)
+
+        $sql = "SELECT *";
+
+        # TODO: account for null b and null m
+
+#        $sql .= ", ";
+#        # top boundary check
+#        $sql .= "(($ne_lat - b) / m) AS top_check";
+#        $sql .= ", ";
+#
+#        # bottom boundary check
+#        $sql .= "(($sw_lat - b) / m) AS bot_check";
+#        $sql .= ", ";
+#
+#        # left boundary check
+#        $sql .= "(m * $sw_lng + b) AS left_check";
+#        $sql .= ", ";
+#
+#        # right boundary check
+#        $sql .= "(m * $ne_lng + b) AS right_check";
+
+        my($top_check) = "(($ne_lat - b) / m)";
+        my($bot_check) = "(($sw_lat - b) / m)";
+        my($left_check) = "(m * $sw_lng + b)";
+        my($right_check) = "(m * $ne_lng + b)";
+
+        $sql .= " FROM ${AWY_TABLE} WHERE ";
+
+        $sql .= "m IS NOT NULL AND m != 0.0 ";
+        $sql .= "AND ";
+        $sql .= "(";
+
+        # start point within the current view
+        $sql .= "(lat_start < ${ne_lat}";
+        $sql .= " AND lat_start > ${sw_lat}";
+        $sql .= " AND abslng_start < ${ne_lng}";
+        $sql .= " AND abslng_start > ${sw_lng})";
+
+        $sql .= " OR ";
+
+        # end point within the current view
+        $sql .= "(lat_end < ${ne_lat}";
+        $sql .= " AND lat_end > ${sw_lat}";
+        $sql .= " AND abslng_end < ${ne_lng}";
+        $sql .= " AND abslng_end > ${sw_lng})";
+
+        $sql .= " OR ";
+
+        # The hard way
+#        $sql .= "(";
+#        $sql .= "(top_check >= $sw_lat AND top_check <= $ne_lat)";
+#        $sql .= " OR ";
+#        $sql .= "(bot_check >= $sw_lat AND bot_check <= $ne_lat)";
+#        $sql .= " OR ";
+#        $sql .= "(left_check >= $sw_lng AND left_check <= $ne_lng)";
+#        $sql .= " OR ";
+#        $sql .= "(right_check >= $sw_lng AND right_check <= $ne_lng)";
+#        $sql .= ")";
+
+        $sql .= "(";
+        $sql .= "($top_check >= $sw_lat AND $top_check <= $ne_lat)";
+        $sql .= " OR ";
+        $sql .= "($bot_check >= $sw_lat AND $bot_check <= $ne_lat)";
+        $sql .= " OR ";
+        $sql .= "($left_check >= $sw_lng AND $left_check <= $ne_lng)";
+        $sql .= " OR ";
+        $sql .= "($right_check >= $sw_lng AND $right_check <= $ne_lng)";
+        $sql .= ")";
+
+        $sql .= ")";
+    }
+
     $sql .= ";";
 
     $sth = $dbi->process($sql);
@@ -682,13 +763,17 @@ if($sstr and $awy)
             my($row_href) = $sth->fetchrow_hashref;
             my(%row_hash) = %$row_href;
 
+            my($awy_id) = $row_hash{'awy_id'};
+
             my($name_start) = $row_hash{'name_start'};
             my($lat_start) = $row_hash{'lat_start'};
             my($lng_start) = $row_hash{'lng_start'};
+            my($abslng_start) = $row_hash{'abslng_start'};
 
             my($name_end) = $row_hash{'name_end'};
             my($lat_end) = $row_hash{'lat_end'};
             my($lng_end) = $row_hash{'lng_end'};
+            my($abslng_end) = $row_hash{'abslng_end'};
 
             my($enroute) = $row_hash{'enroute'};
             if($enroute eq '1') 
@@ -700,12 +785,14 @@ if($sstr and $awy)
                 $enroute = 'high';
             }
 
+            my($m) = $row_hash{'m'};
+            my($b) = $row_hash{'b'};
             my($base) = $row_hash{'base'};
             my($top) = $row_hash{'top'};
             my($seg_name) = $row_hash{'seg_name'};
 
             $xml .= <<XML;
-\t<awy name_start="${name_start}" lat_start="${lat_start}" lng_start="${lng_start}" name_end="${name_end}" lat_end="${lat_end}" lng_end="${lng_end}" enroute="${enroute}" base="${base}" top="${top}" seg_name="${seg_name}" />"
+\t<awy awy_id="${awy_id}" name_start="${name_start}" lat_start="${lat_start}" lng_start="${lng_start}" abslng_start="${abslng_start}" name_end="${name_end}" lat_end="${lat_end}" lng_end="${lng_end}" abslng_end="${abslng_end}" m="${m}" b="${b}" enroute="${enroute}" base="${base}" top="${top}" seg_name="${seg_name}" />"
 XML
         }
         $result_cnt += $sth->rows;

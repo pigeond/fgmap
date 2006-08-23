@@ -152,47 +152,76 @@ FGMapMenuNav.prototype.setup = function() {
     var base_chbx = element_create(null, "input", "checkbox");
     base_chbx.style.verticalAlign = "middle";
     base_chbx.checked = false;
+    base_chbx.style.cursor = 'pointer';
+
+    var span;
+    var base_span = element_create(null, 'span');
+    base_span.style.cursor = 'pointer';
 
     this.aptname_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
-    element_text_append(this.nav_form, "apt name");
+    span = element_clone(base_span);
+    attach_event(span, "mousedown",
+            this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
+    element_text_append(span, "apt name");
+    element_attach(span, this.nav_form);
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     this.aptcode_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
-    element_text_append(this.nav_form, "apt code");
+    span = element_clone(base_span);
+    attach_event(span, "mousedown",
+            this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
+    element_text_append(span, "apt code");
+    element_attach(span, this.nav_form);
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     this.vor_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
-    element_text_append(this.nav_form, "vor");
+    span = element_clone(base_span);
+    attach_event(span, "mousedown",
+            this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
+    element_text_append(span, "vor");
+    element_attach(span, this.nav_form);
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     this.ndb_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
-    element_text_append(this.nav_form, "ndb");
+    span = element_clone(base_span);
+    attach_event(span, "mousedown",
+            this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
+    element_text_append(span, "ndb");
+    element_attach(span, this.nav_form);
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     this.fix_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
-    element_text_append(this.nav_form, "fix");
+    span = element_clone(base_span);
+    attach_event(span, "mousedown",
+            this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
+    element_text_append(span, "fix");
+    element_attach(span, this.nav_form);
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     this.awy_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
     element_attach(chbx, this.nav_form);
-    element_text_append(this.nav_form, "airway");
+    span = element_clone(base_span);
+    attach_event(span, "mousedown",
+            this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
+    element_text_append(span, "airway");
+    element_attach(span, this.nav_form);
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
     var box = this.box =
@@ -259,7 +288,12 @@ FGMapMenuNav.prototype.setup = function() {
     this.toggles[FGMAP_NAVAID_APT] = chbx;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
-    element_text_append(li, "apt");
+    span = element_clone(base_span);
+    span.value = FGMAP_NAVAID_APT;
+    element_attach(span, li);
+    attach_event(span, "mousedown",
+            this.toggle_click_cb.bind_event(this, chbx));
+    element_text_append(span, "apt");
 
     li = element_clone(base_li, false);
     element_attach(li, ul);
@@ -268,7 +302,12 @@ FGMapMenuNav.prototype.setup = function() {
     this.toggles[FGMAP_NAVAID_VOR] = chbx;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
-    element_text_append(li, "vor");
+    span = element_clone(base_span);
+    span.value = FGMAP_NAVAID_VOR;
+    element_attach(span, li);
+    attach_event(span, "mousedown",
+            this.toggle_click_cb.bind_event(this, chbx));
+    element_text_append(span, "vor");
 
     li = element_clone(base_li, false);
     element_attach(li, ul);
@@ -277,7 +316,12 @@ FGMapMenuNav.prototype.setup = function() {
     this.toggles[FGMAP_NAVAID_NDB] = chbx;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
-    element_text_append(li, "ndb");
+    span = element_clone(base_span);
+    element_attach(span, li);
+    span.value = FGMAP_NAVAID_NDB;
+    attach_event(span, "mousedown",
+            this.toggle_click_cb.bind_event(this, chbx));
+    element_text_append(span, "ndb");
 
     li = element_clone(base_li, false);
     element_attach(li, ul);
@@ -286,7 +330,12 @@ FGMapMenuNav.prototype.setup = function() {
     this.toggles[FGMAP_NAVAID_FIX] = chbx;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
-    element_text_append(li, "fix");
+    span = element_clone(base_span);
+    span.value = FGMAP_NAVAID_FIX;
+    element_attach(span, li);
+    attach_event(span, "mousedown",
+            this.toggle_click_cb.bind_event(this, chbx));
+    element_text_append(span, "fix");
 
     li = element_clone(base_li, false);
     element_attach(li, ul);
@@ -295,7 +344,12 @@ FGMapMenuNav.prototype.setup = function() {
     this.toggles[FGMAP_NAVAID_AWY] = chbx;
     element_attach(chbx, li);
     attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
-    element_text_append(li, "awy");
+    span = element_clone(base_span);
+    span.value = FGMAP_NAVAID_AWY;
+    element_attach(span, li);
+    attach_event(span, "mousedown",
+            this.toggle_click_cb.bind_event(this, chbx));
+    element_text_append(span, "awy");
 
 /* TODO
     GEvent.addListener(this.fgmap.gmap, "zoomend",
@@ -308,6 +362,12 @@ FGMapMenuNav.prototype.setup = function() {
 
 };
 
+FGMapMenuNav.prototype.nav_search_checkbox_text_toggle_cb =
+    function(event, chbx) {
+    if(chbx) {
+        chbx.checked = !chbx.checked;
+    }
+};
 
 FGMapMenuNav.prototype.nav_type_visible_set = function(type, visible) {
 
@@ -332,10 +392,19 @@ FGMapMenuNav.prototype.nav_type_visible_set = function(type, visible) {
 };
 
 
-FGMapMenuNav.prototype.toggle_click_cb = function(e) {
+FGMapMenuNav.prototype.toggle_click_cb = function(e, chbx) {
+
     var target = target_get(e || window.event);
+    var checked;
+
+    if(chbx) {
+        chbx.checked = !chbx.checked;
+        checked = chbx.checked;
+    } else {
+        checked = target.checked;
+    }
     if(target.value != null) {
-        this.nav_type_visible_set(target.value, target.checked);
+        this.nav_type_visible_set(target.value, checked);
     }
 };
 
@@ -586,18 +655,24 @@ FGMapMenuNav.prototype.nav_awy_parse = function(xmldoc) {
         var awy_hash = new Object();
 
         awy_hash['name_start'] = awys[i].getAttribute('name_start');
-        awy_hash['name_end'] = awys[i].getAttribute('name_end');
         awy_hash['lat_start'] = awys[i].getAttribute('lat_start');
         awy_hash['lng_start'] = awys[i].getAttribute('lng_start');
+        awy_hash['abslng_start'] = awys[i].getAttribute('abslng_start');
+
+        awy_hash['name_end'] = awys[i].getAttribute('name_end');
         awy_hash['lat_end'] = awys[i].getAttribute('lat_end');
         awy_hash['lng_end'] = awys[i].getAttribute('lng_end');
+        awy_hash['abslng_end'] = awys[i].getAttribute('abslng_end');
+
         awy_hash['enroute'] = awys[i].getAttribute('enroute');
         awy_hash['base'] = awys[i].getAttribute('base');
         awy_hash['top'] = awys[i].getAttribute('top');
         awy_hash['seg_name'] = awys[i].getAttribute('seg_name');
 
-        var id = 'awy:' + awy_hash['seg_name'] + ':' + awy_hash['lat_start'] +
-            ':' + awy_hash['lat_end'];
+        awy_hash['m'] = awys[i].getAttribute('m');
+        awy_hash['b'] = awys[i].getAttribute('b');
+
+        var id = awys[i].getAttribute('awy_id');
         var awy = new FGNavAirway(this.fgmap, id, awy_hash);
         this.result_box_result_add(awy);
     }
@@ -778,7 +853,7 @@ FGMapMenuNav.prototype.result_click_cb = function(e, tr, nav) {
             /* Turn the corresponding toggle checkbox on for the user */
             this.toggles[nav_type_generalize(nav.type)].checked = true;
 
-            this.fgmap.nav_panto(nav.id, nav);
+            this.fgmap.nav_panto(nav.id);
             this.fgmap.nav_visible_set(nav.id, true);
 
             /* Raise it, too */

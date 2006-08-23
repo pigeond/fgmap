@@ -135,16 +135,25 @@ drop table fg_awy;
 
 create table fg_awy
 (
-    name_start  varchar(5),
-    lat_start   float,
-    lng_start   float,
-    name_end    varchar(5),
-    lat_end     float,
-    lng_end     float,
-    enroute     integer check (enroute = 1 or enroute = 2),
-    base        integer,
-    top         integer,
-    seg_name    varchar(128)
+    awy_id       integer primary key,
+
+    name_start   varchar(5),
+    lat_start    float,
+    lng_start    float,
+    abslng_start float,
+
+    name_end     varchar(5),
+    lat_end      float,
+    lng_end      float,
+    abslng_end   float,
+
+    m            float,
+    b            float,
+
+    enroute      integer check (enroute = 1 or enroute = 2),
+    base         integer,
+    top          integer,
+    seg_name     varchar(128)
 );
 
 

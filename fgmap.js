@@ -325,6 +325,15 @@ function dimen_to_wh(dimen) {
     return { w:w, h:h };
 }
 
+/* returns true if val is between bound1 and bound2, inclusive */
+function values_in_bounds(val, bound1, bound2) {
+    if(bound1 < bound2) {
+        return ((val >= bound1) && (val <= bound2));
+    } else {
+        return ((val >= bound2) && (val <= bound1));
+    }
+}
+
 
 // Handy functions for Array objects
 Array.prototype.indexOf = function(item) {
@@ -3423,29 +3432,90 @@ FGNavAirway.prototype.info_reposition = function() {
 
     } else if(gmap_bounds.intersects(this.bounds)) {
 
+        /* This check is only a rough check */
+
         // Adjust the label position so that it's visible if the part of
         // the airway is visible
 
         // TODO: Make this a generic action for all overlay
 
-        var gbt = gmap_bounds.getNorthEast().lat();
-        var gbb = gmap_bounds.getSouthWest().lat();
-        var gbl = gmap_bounds.getNorthEast().lng();
-        if(gbl < 0) gbl += 360;
-        var gbr = gmap_bounds.getSouthWest().lng();
-        if(gbr < 0) gbr += 360;
+        var mbt = gmap_bounds.getNorthEast().lat();
+        var mbb = gmap_bounds.getSouthWest().lat();
+        var mbl = gmap_bounds.getSouthWest().lng();
+        if(mbl < 0) mbl += 360;
+        var mbr = gmap_bounds.getNorthEast().lng();
+        if(mbr < 0) mbr += 360;
 
         var bt = this.bounds.getNorthEast().lat();
         var bb = this.bounds.getSouthWest().lat();
-        var bl = this.bounds.getNorthEast().lng();
+        var bl = this.bounds.getSouthWest().lng();
         if(bl < 0) bl += 360;
-        var br = this.bounds.getSouthWest().lng();
+        var br = this.bounds.getNorthEast().lng();
         if(br < 0) br += 360;
 
-        bt = Math.min(gbt, bt);
-        bb = Math.max(gbb, bb);
-        bl = Math.min(gbl, bl);
-        br = Math.max(gbr, br);
+        bt = Math.min(mbt, bt);
+        bb = Math.max(mbb, bb);
+        bl = Math.max(mbl, bl);
+        br = Math.min(mbr, br);
+
+        var lat_start = this.awy_hash['lat_start'];
+        var lng_start = this.awy_hash['abslng_start'];
+
+        var lat_end = this.awy_hash['lat_end'];
+        var lng_end = this.awy_hash['abslng_end'];
+
+
+        // More checks
+        var x, y;
+        var m, b;
+
+        m = parseFloat(this.awy_hash['m']);
+        b = parseFloat(this.awy_hash['b']);
+
+        // TODO: Account for null m and null b
+
+        // y = mx + b
+        // x = (y - b) / m
+
+        // top bound
+        x = (mbt - b) / m;
+        if(!isNaN(x) && values_in_bounds(x, lng_start, lng_end)) {
+            if(m < 0) {
+                bl = Math.max(x, bl);
+            } else {
+                br = Math.min(x, br);
+            }
+        }
+
+        // bottom bound
+        x = (mbb - b) / m;
+        if(!isNaN(x) && values_in_bounds(x, lng_start, lng_end)) {
+            if(m < 0) {
+                br = Math.min(x, br);
+            } else {
+                bl = Math.max(x, bl);
+            }
+        }
+
+        // left bound
+        y = m * mbl + b;
+        if(!isNaN(y) && values_in_bounds(y, lat_start, lat_end)) {
+            if(m < 0) {
+                bt = Math.min(y, bt);
+            } else {
+                bb = Math.max(y, bb);
+            }
+        }
+
+        // right bound
+        y = m * mbr + b;
+        if(!isNaN(y) && values_in_bounds(y, lat_start, lat_end)) {
+            if(m < 0) {
+                bb = Math.max(y, bb);
+            } else {
+                bt = Math.min(y, bt);
+            }
+        }
 
         var bounds = new GLatLngBounds();
         bounds.extend(new GLatLng(bt, bl));
@@ -3453,18 +3523,36 @@ FGNavAirway.prototype.info_reposition = function() {
         bounds.extend(new GLatLng(bb, bl));
         bounds.extend(new GLatLng(bb, br));
 
+        // Debug
+        /*
+        if(this.debug)
+            this.fgmap.gmap.removeOverlay(this.debug);
+        this.debug = new GPolyline(
+            [ new GLatLng(bt, bl),
+              new GLatLng(bt, br),
+              new GLatLng(bb, br),
+              new GLatLng(bb, bl),
+              new GLatLng(bt, bl) ],
+              '#ff0000', 1.0, 1.0);
+        this.fgmap.gmap.addOverlay(this.debug);
+        */
+
         this.info.update(bounds.getCenter());
     }
 };
 
 
 FGNavAirway.prototype.gmap_moveend_cb = function() {
-    this.info_reposition();
+    if(this.visible) {
+        this.info_reposition();
+    }
 };
 
 
 FGNavAirway.prototype.gmap_zoomend_cb = function() {
-    this.info_reposition();
+    if(this.visible) {
+        this.info_reposition();
+    }
 };
 
 
@@ -3480,15 +3568,17 @@ FGNavAirway.prototype.visible_set = function(visible) {
 
     this.visible = visible;
 
+    this.info.visible_set(visible);
+
     if(visible) {
         this.fgmap.gmap.addOverlay(this.polyline);
+        this.info_reposition();
     } else {
         this.fgmap.gmap.removeOverlay(this.polyline);
     }
 
-    this.info.visible_set(visible);
-
     this.visible = visible;
+
     return true;
 };
 
