@@ -1971,7 +1971,8 @@ FGMap.prototype.follows_update = function() {
 
     var map_bounds = this.gmap.getBounds();
 
-    if(map_bounds.containsBounds(follow_bounds) == false) {
+    if(map_bounds.containsBounds(follow_bounds) == false ||
+            this.follows_always_center) {
 
         /* Change the zoom only if we need to */
         var map_zoom = this.gmap.getZoom();
@@ -2077,6 +2078,16 @@ FGMap.prototype.pantoall_set = function(pantoall) {
         }
     } else {
         this.pilot_follows_clear();
+    }
+};
+
+
+FGMap.prototype.follows_always_center_set = function(follows_always_center) {
+    if(this.follows_always_center == follows_always_center)
+        return;
+    this.follows_always_center = follows_always_center;
+    if(follows_always_center) {
+        this.follows_update();
     }
 };
 

@@ -144,6 +144,28 @@ FGMapMenuSettings.prototype.setup = function() {
     attach_event(checkbox, "click", this.pantoall_checkbox_cb.bind_event(this));
 
 
+    // Placeholder
+    li = element_clone(li, false);
+    li.className = "fgmap_field_label";
+    element_attach(li, ul);
+    element_text_append(li, "\u00a0");
+
+
+    // Always center
+    li = element_clone(li, false);
+    li.className = "fgmap_field_label";
+    element_attach(li, ul);
+    this.debug_checkbox = checkbox = element_create(li, "input", "checkbox");
+    checkbox.className = "fgmap_menu";
+    if(this.fgmap.follow_always_center) {
+        checkbox.checked = true;
+        checkbox.defaultChecked = true;
+    }
+    element_text_append(li, "\u00a0");
+    element_text_append(li, "Always center follows");
+    attach_event(checkbox, "click",
+            this.follows_always_center_checkbox_cb.bind_event(this));
+
     this.fgmapmenu.tab_add("settings", "settings", elem, this);
 };
 
@@ -195,6 +217,11 @@ FGMapMenuSettings.prototype.pantoall_checkbox_cb = function(e) {
     this.fgmap.pantoall_set(target.checked);
 };
 
+
+FGMapMenuSettings.prototype.follows_always_center_checkbox_cb = function(e) {
+    var target = target_get(e || window.event);
+    this.fgmap.follows_always_center_set(target.checked);
+};
 
 FGMapMenuSettings.prototype.model_icon_checkbox_cb = function(e) {
     this.fgmap.model_icon = (target_get(e || window.event)).checked;
