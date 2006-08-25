@@ -3595,7 +3595,7 @@ FGNavAirway.prototype.visible_set = function(visible) {
 
 FGNavAirway.prototype.remove = function() {
     this.fgmap.gmap.removeOverlay(this.polyline);
-    this.info.remove();
+    this.fgmap.gmap.removeOverlay(this.info);
     delete(this.info);
     this.info = null;
 };
