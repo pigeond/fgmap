@@ -106,7 +106,7 @@ a:hover     { color: #ddf; }
     background-color: #000;
 }
 
-.fgmap_menu input,textarea
+.fgmap_menu input,textarea,option,optgroup
 {
     font-family: sans-serif;
     font-size: 11px;
