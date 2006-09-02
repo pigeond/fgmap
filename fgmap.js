@@ -2504,7 +2504,7 @@ FGAirport.prototype.ils_setup = function(runway) {
 
     var ils;
 
-    element_create(elem, "br");
+    element_create(elem, 'br');
     var div = runway.ils_detail = element_create(elem, 'div');
     element_opacity_set(div, FGMAP_NAV_OPACITY);
     var span = element_create(div, 'span');
@@ -2610,18 +2610,22 @@ FGAirport.prototype.ils_setup = function(runway) {
     }
     */
 
+    var span;
 
     /* ILS heading label */
     var ils_hdg_elem = element_create(null, 'div');
-    ils_hdg_elem.style.textAlign = 'center';
-    ils_hdg_elem.className = 'fgmap_nav_ils';
-    element_text_append(ils_hdg_elem, ils_heading + "\u00b0");
-    attach_event(ils_hdg_elem, "mouseover",
+    ils_hdg_elem.className = 'fgmap_nav_info';
+
+    span = element_create(ils_hdg_elem, 'span');
+    span.style.textAlign = 'center';
+    span.className = 'fgmap_nav_ils';
+    element_text_append(span, ils_heading + "\u00b0");
+    attach_event(span, "mouseover",
         this.runway_mouseover_cb.bind_event(this, runway));
     runway.ils_hdg_label = new GMapElement(
             latlng_dist_heading(spt, ils_course_length / 2, hdg),
             new GPoint(-10, -10),
-            ils_hdg_elem, null, 'fgmap_nav_info');
+            ils_hdg_elem);
     this.fgmap.gmap.addOverlay(runway.ils_hdg_label);
     runway.ils_hdg_label.hide();
     runway.ils_hdg_label.opacity_set(FGMAP_NAV_OPACITY);
@@ -2631,6 +2635,7 @@ FGAirport.prototype.ils_setup = function(runway) {
     for(var ii in runway.ilss) {
 
         var info_elem = null;
+        span = null;
 
         imgdimen = null;
         
@@ -2650,12 +2655,13 @@ FGAirport.prototype.ils_setup = function(runway) {
             imgdimen = FGMAP_ILS_LOC_ICON_DIMEN;
 
             info_elem = element_create(null, 'div');
-            element_text_append(info_elem, runway.num +
+            span = element_create(info_elem, 'span');
+            element_text_append(span, runway.num +
                 ' Localizer ' + ils.freq);
-            element_create(info_elem, 'br');
-            element_text_append(info_elem, ils.ident);  /* morse code? */
-            element_create(info_elem, 'br');
-            element_text_append(info_elem, "Chan " + ils.channel);
+            element_create(span, 'br');
+            element_text_append(span, ils.ident);  /* morse code? */
+            element_create(span, 'br');
+            element_text_append(span, "Chan " + ils.channel);
 
         } else if(ii == FGMAP_ILS_TYPE_IM ||
             ii == FGMAP_ILS_TYPE_MM ||
@@ -2668,7 +2674,8 @@ FGAirport.prototype.ils_setup = function(runway) {
             imgdimen = FGMAP_ILS_MARKER_ICON_DIMEN;
 
             info_elem = element_create(null, 'div');
-            element_text_append(info_elem, runway.num + ' ' +
+            span = element_create(info_elem, 'span');
+            element_text_append(span, runway.num + ' ' +
                 FGMAP_ILS_NAMES[ii]);
 
         } else if(ii == FGMAP_ILS_TYPE_DME) {
@@ -2684,9 +2691,6 @@ FGAirport.prototype.ils_setup = function(runway) {
             GLog.write("Got unknown ILS type [" + ii + "]");
             continue;
         }
-
-        var div = element_create(null, "div");
-        element_text_append(div, FGMAP_ILS_NAMES[ii] + ":" + ils.ident);
 
         /*
         ils.icon = new FGNavMarker(this.fgmap,
@@ -2711,12 +2715,13 @@ FGAirport.prototype.ils_setup = function(runway) {
         attach_event(img, "mouseover",
             this.runway_mouseover_cb.bind_event(this, runway));
 
-        if(info_elem) {
+        if(info_elem && span) {
+            span.className = 'fgmap_nav_ils';
             info_elem.style.textAlign = 'center';
-            info_elem.className = 'fgmap_nav_ils';
+            info_elem.className = 'fgmap_nav_info';
             ils.info = new GMapElement(new GLatLng(ils.lat, ils.lng),
                     new GPoint(10, 15),
-                    info_elem, null, "fgmap_nav_info");
+                    info_elem);
             ils.info.opacity_set(FGMAP_NAV_OPACITY);
             this.fgmap.gmap.addOverlay(ils.info);
             ils.info.visible_set(false);
@@ -3407,14 +3412,17 @@ FGNavAirway.prototype.setup = function() {
     this.bounds.extend(latlng_end);
     this.latlng_center = this.bounds.getCenter();
 
-    var div = element_create(div, 'div');
-    div.className = 'fgmap_nav_awy';
-    element_text_append(div, this.awy_hash['seg_name']);
-    element_text_append(div, ' (FL' + this.awy_hash['base'] + ' - FL' +
+    var div = element_create(null, 'div');
+    div.className = 'fgmap_runway_info';
+
+    var span = element_create(div, 'span');
+    span.className = 'fgmap_nav_awy';
+    span.textAlign = 'center';
+    element_text_append(span, this.awy_hash['seg_name']);
+    element_text_append(span, ' (FL' + this.awy_hash['base'] + ' - FL' +
             this.awy_hash['top'] + ')');
 
-    this.info = new GMapElement(this.latlng_center, awy_align, div, null,
-        'fgmap_nav_info');
+    this.info = new GMapElement(this.latlng_center, awy_align, div);
     this.fgmap.gmap.addOverlay(this.info);
     this.info.opacity_set(FGMAP_NAV_OPACITY);
     this.info.hide();
