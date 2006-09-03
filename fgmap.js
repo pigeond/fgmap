@@ -3414,6 +3414,8 @@ FGNavAirway.prototype.setup = function() {
 
     var div = element_create(null, 'div');
     div.className = 'fgmap_runway_info';
+    attach_event(div, "mouseover",
+        this.airway_mouseover_cb.bind_event(this));
 
     var span = element_create(div, 'span');
     span.className = 'fgmap_nav_awy';
@@ -3437,6 +3439,9 @@ FGNavAirway.prototype.setup = function() {
     return true;
 };
 
+FGNavAirway.prototype.airway_mouseover_cb = function() {
+    this.info.raise();
+};
 
 FGNavAirway.prototype.info_reposition = function() {
 
