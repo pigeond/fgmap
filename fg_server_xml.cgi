@@ -51,7 +51,7 @@ if($socket)
             next;
         }
 
-        ($callsign, $server_ip, $lng, $lat, $alt, $model) =
+        ($callsign, $server_ip, $lat, $lng, $alt, $model) =
             ($l =~ m/(.*?)@(.*?): .*? .*? .*? (.*?) (.*?) (.*?) (.*?)$/);
 
         # Aircraft/ComperSwift/Models/ComperSwift-model.x
