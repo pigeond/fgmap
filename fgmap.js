@@ -3391,8 +3391,8 @@ FGNavAirway.prototype = new FGNav();
 
 FGNavAirway.prototype.setup = function() {
 
-    var awy_high_color = '#ff2222';
-    var awy_low_color = '#2222ff';
+    var awy_high_color = '#ffb972';
+    var awy_low_color = '#ff8000';
     var awy_width = 2;
     var awy_opacity = 0.8;
     var awy_align = new GPoint(-20, -20);
