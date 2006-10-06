@@ -46,6 +46,15 @@ sub err_print
     exit(0);
 }
 
+sub quadratic
+{
+    my($a, $b, $c) = @_;
+    my($k) = sqrt($b * $b - 4 * $a * $c);
+    my($x1) = (-$b + $k) / 2 / $a;
+    my($x2) = (-$b - $k) / 2 / $a;
+    return ($x1, $x2);
+}
+
 
 sub min
 {
@@ -60,6 +69,40 @@ sub htmlencode
     $str =~ s/\</\&lt;/g;
     $str =~ s/\>/\&gt;/g;
     return $str;
+}
+
+sub bound_sql_cond_get
+{
+    my($ret) = "(";
+    my($ne, $sw, $lat_colname, $lng_colname) = @_;
+
+    my($ne_lat, $ne_lng) = split(/,/, $ne);
+    my($sw_lat, $sw_lng) = split(/,/, $sw);
+
+    if($ne_lng < $sw_lng)
+    {
+        $ret .= "(${lat_colname} < ${ne_lat}";
+        $ret .= " AND ${lat_colname} > ${sw_lat})";
+        $ret .= " AND ";
+        $ret .= "(";
+        $ret .= "(${lng_colname} < 180";
+        $ret .= " AND ${lng_colname} > ${sw_lng})";
+        $ret .= " OR ";
+        $ret .= " (${lng_colname} < ${ne_lng}";
+        $ret .= " AND ${lng_colname} > -180)";
+        $ret .= ")";
+    }
+    else
+    {
+        $ret .= "${lat_colname} < ${ne_lat}";
+        $ret .= " AND ${lat_colname} > ${sw_lat}";
+        $ret .= " AND ${lng_colname} < ${ne_lng}";
+        $ret .= " AND ${lng_colname} > ${sw_lng}";
+    }
+
+    $ret .= ")";
+
+    return $ret;
 }
 
 sub rwy_nav
@@ -218,6 +261,8 @@ if(!$ENV{'QUERY_STRING'})
 # search string
 my($sstr);
 
+my($debug) = "";
+
 # search options
 my($apt_code, $apt_name, $vor, $ndb, $fix, $awy, $taxiway, $bounds);
 
@@ -268,21 +313,14 @@ foreach $p (@a)
     {
         $ne = $value;
         ($ne_lat, $ne_lng) = split(/,/, $ne);
-        if($ne_lng < 0)
-        {
-            $ne_lng += 360;
-        }
     }
     elsif($key eq 'sw')
     {
         $sw = $value;
         ($sw_lat, $sw_lng) = split(/,/, $sw);
-        if($sw_lng < 0)
-        {
-            $sw_lng += 360;
-        }
     }
 }
+
 
 my($dbi);
 my($sth);
@@ -318,14 +356,14 @@ if($ne and $sw)
     # Check if the bounds is way too big, we want to limit this
 
     # this is gmap z=10
-    my($lat_max) = 0.5199925335038184;
-    my($lng_max) = 1.1714172363281472;
-
-    if((($ne_lat - $sw_lat) > $lat_max) or
-            (($ne_lng - $sw_lng) > $lng_max))
-    {
-        &err_print("Bounds too high");
-    }
+#    my($lat_max) = 0.5199925335038184;
+#    my($lng_max) = 1.1714172363281472;
+#
+#    if((($ne_lat - $sw_lat) > $lat_max) or
+#            (($ne_lng - $sw_lng) > $lng_max))
+#    {
+#        &err_print("Bounds too high");
+#    }
 }
 
 
@@ -365,10 +403,10 @@ if($apt_code or $apt_name)
         $sql .= "JOIN ${APTWAY_TABLE} ON ";
         $sql .= "${APT_TABLE}.apt_id = ${APTWAY_TABLE}.apt_id";
         $sql .= " WHERE ${APTWAY_TABLE}.type = 'r'";
-        $sql .= " AND (lat < ${ne_lat}";
-        $sql .= " AND lat > ${sw_lat}";
-        $sql .= " AND abslng < ${ne_lng}";
-        $sql .= " AND abslng > ${sw_lng})";
+        
+        $sql .= " AND ";
+        $sql .= &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
+
         $sql .= " ORDER BY ${APT_TABLE}.apt_id, apt_code;";
     }
 
@@ -523,10 +561,7 @@ if($vor or $ndb)
     }
     elsif($ne and $sw)
     {
-        $sql .= "(lat < ${ne_lat}";
-        $sql .= " AND lat > ${sw_lat}";
-        $sql .= " AND abslng < ${ne_lng}";
-        $sql .= " AND abslng > ${sw_lng})";
+        $sql .= &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
     }
 
     $sql .= " AND (";
@@ -635,10 +670,7 @@ if($fix)
     }
     elsif($ne and $sw)
     {
-        $sql .= "(lat < ${ne_lat}";
-        $sql .= " AND lat > ${sw_lat}";
-        $sql .= " AND abslng < ${ne_lng}";
-        $sql .= " AND abslng > ${sw_lng})";
+        $sql .= &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
     }
 
     $sql .= ";";
@@ -672,83 +704,80 @@ if($awy)
     {
         $sql = "SELECT * FROM ${AWY_TABLE} WHERE ";
         $sql .= "UPPER(seg_name) LIKE '\%".uc(${sstr})."\%'";
+        $sql .= " OR UPPER(name_start) LIKE '\%".uc(${sstr})."\%'";
+        $sql .= " OR UPPER(name_end) LIKE '\%".uc(${sstr})."\%'";
     }
     elsif($ne and $sw)
     {
+        # the check:
         # left:  $sw_lng (x)
         # right: $ne_lng (x)
         # top:   $ne_lat (y)
         # bot:   $sw_lat (y)
 
-        $sql = "SELECT *";
-
-        # TODO: account for null b and null m
-
-#        $sql .= ", ";
-#        # top boundary check
-#        $sql .= "(($ne_lat - b) / m) AS top_check";
-#        $sql .= ", ";
-#
-#        # bottom boundary check
-#        $sql .= "(($sw_lat - b) / m) AS bot_check";
-#        $sql .= ", ";
-#
-#        # left boundary check
-#        $sql .= "(m * $sw_lng + b) AS left_check";
-#        $sql .= ", ";
-#
-#        # right boundary check
-#        $sql .= "(m * $ne_lng + b) AS right_check";
-
-        my($top_check) = "(($ne_lat - b) / m)";
-        my($bot_check) = "(($sw_lat - b) / m)";
-        my($left_check) = "(m * $sw_lng + b)";
-        my($right_check) = "(m * $ne_lng + b)";
-
-        $sql .= " FROM ${AWY_TABLE} WHERE ";
-
-        $sql .= "m IS NOT NULL AND m != 0.0 ";
-        $sql .= "AND ";
-        $sql .= "(";
+        $sql = "SELECT * FROM ${AWY_TABLE} WHERE ";
 
         # start point within the current view
-        $sql .= "(lat_start < ${ne_lat}";
-        $sql .= " AND lat_start > ${sw_lat}";
-        $sql .= " AND abslng_start < ${ne_lng}";
-        $sql .= " AND abslng_start > ${sw_lng})";
+        $sql .= &bound_sql_cond_get($ne, $sw, 'lat_start', 'lng_start');
 
         $sql .= " OR ";
 
         # end point within the current view
-        $sql .= "(lat_end < ${ne_lat}";
-        $sql .= " AND lat_end > ${sw_lat}";
-        $sql .= " AND abslng_end < ${ne_lng}";
-        $sql .= " AND abslng_end > ${sw_lng})";
+        $sql .= &bound_sql_cond_get($ne, $sw, 'lat_end', 'lng_end');
 
         $sql .= " OR ";
 
-        # The hard way
-#        $sql .= "(";
-#        $sql .= "(top_check >= $sw_lat AND top_check <= $ne_lat)";
-#        $sql .= " OR ";
-#        $sql .= "(bot_check >= $sw_lat AND bot_check <= $ne_lat)";
-#        $sql .= " OR ";
-#        $sql .= "(left_check >= $sw_lng AND left_check <= $ne_lng)";
-#        $sql .= " OR ";
-#        $sql .= "(right_check >= $sw_lng AND right_check <= $ne_lng)";
-#        $sql .= ")";
+        # a rough check to see whether they intersect as if the airway is a
+        # rectangle. This is not accurate, but much simplier and quicker query.
 
-        $sql .= "(";
-        $sql .= "($top_check >= $sw_lat AND $top_check <= $ne_lat)";
-        $sql .= " OR ";
-        $sql .= "($bot_check >= $sw_lat AND $bot_check <= $ne_lat)";
-        $sql .= " OR ";
-        $sql .= "($left_check >= $sw_lng AND $left_check <= $ne_lng)";
-        $sql .= " OR ";
-        $sql .= "($right_check >= $sw_lng AND $right_check <= $ne_lng)";
-        $sql .= ")";
+        if($ne_lng < $sw_lng)
+        {
+            # Wrapped viewport
 
-        $sql .= ")";
+            my($orig_lng) = $sw_lng;
+            $sw_lng += 360;
+
+            $sql .= "(";
+
+            $sql .= "(";
+            $sql .= "NOT (";
+            $sql .= "(rr < ${sw_lng})";
+            $sql .= " OR ";
+            $sql .= "(rt < ${sw_lat})";
+            $sql .= " OR ";
+            $sql .= "(rb > ${ne_lat})";
+            $sql .= ")";
+            $sql .= ")";
+            
+            $sql .= " OR ";
+            
+            $sql .= "(";
+
+            $sql .= "NOT (";
+            $sql .= "(rl > ${ne_lng})";
+            $sql .= " OR ";
+            $sql .= "(rt < ${sw_lat})";
+            $sql .= " OR ";
+            $sql .= "(rb > ${ne_lat})";
+            $sql .= ")";
+            $sql .= ")";
+            
+            $sql .= ")";
+
+            $sw_lng = $orig_lng;
+        }
+        else
+        {
+            $sql .= "NOT (";
+            $sql .= "(rl > ${ne_lng})";
+            $sql .= " OR ";
+            $sql .= "(rr < ${sw_lng})";
+            $sql .= " OR ";
+            $sql .= "(rt < ${sw_lat})";
+            $sql .= " OR ";
+            $sql .= "(rb > ${ne_lat})";
+            $sql .= ")";
+        }
     }
 
     $sql .= ";";
@@ -768,12 +797,10 @@ if($awy)
             my($name_start) = $row_hash{'name_start'};
             my($lat_start) = $row_hash{'lat_start'};
             my($lng_start) = $row_hash{'lng_start'};
-            my($abslng_start) = $row_hash{'abslng_start'};
 
             my($name_end) = $row_hash{'name_end'};
             my($lat_end) = $row_hash{'lat_end'};
             my($lng_end) = $row_hash{'lng_end'};
-            my($abslng_end) = $row_hash{'abslng_end'};
 
             my($enroute) = $row_hash{'enroute'};
             if($enroute eq '1') 
@@ -792,7 +819,7 @@ if($awy)
             my($seg_name) = $row_hash{'seg_name'};
 
             $xml .= <<XML;
-\t<awy awy_id="${awy_id}" name_start="${name_start}" lat_start="${lat_start}" lng_start="${lng_start}" abslng_start="${abslng_start}" name_end="${name_end}" lat_end="${lat_end}" lng_end="${lng_end}" abslng_end="${abslng_end}" m="${m}" b="${b}" enroute="${enroute}" base="${base}" top="${top}" seg_name="${seg_name}" />"
+\t<awy awy_id="${awy_id}" name_start="${name_start}" lat_start="${lat_start}" lng_start="${lng_start}" name_end="${name_end}" lat_end="${lat_end}" lng_end="${lng_end}" m="${m}" b="${b}" enroute="${enroute}" base="${base}" top="${top}" seg_name="${seg_name}" />"
 XML
         }
         $result_cnt += $sth->rows;
@@ -800,7 +827,7 @@ XML
 }
 
 
-print("<navaids cnt=\"${result_cnt}\">\n");
+print("<navaids cnt=\"${result_cnt}\" debug=\"${debug}\">\n");
 print($xml);
 print("</navaids>\n\n");
 

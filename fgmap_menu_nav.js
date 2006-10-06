@@ -3,7 +3,8 @@
  */
 
 
-var FGMAP_NAV_INVIEW_ZOOM_MAX = 10;
+//var FGMAP_NAV_INVIEW_ZOOM_MAX = 10;
+var FGMAP_NAV_INVIEW_ZOOM_MAX = -1;
 
 var FGMAP_RADIONAV_TYPES = new Object();
 FGMAP_RADIONAV_TYPES["DME"] = FGMAP_NAVAID_DME;
@@ -657,12 +658,10 @@ FGMapMenuNav.prototype.nav_awy_parse = function(xmldoc) {
         awy_hash['name_start'] = awys[i].getAttribute('name_start');
         awy_hash['lat_start'] = awys[i].getAttribute('lat_start');
         awy_hash['lng_start'] = awys[i].getAttribute('lng_start');
-        awy_hash['abslng_start'] = awys[i].getAttribute('abslng_start');
 
         awy_hash['name_end'] = awys[i].getAttribute('name_end');
         awy_hash['lat_end'] = awys[i].getAttribute('lat_end');
         awy_hash['lng_end'] = awys[i].getAttribute('lng_end');
-        awy_hash['abslng_end'] = awys[i].getAttribute('abslng_end');
 
         awy_hash['enroute'] = awys[i].getAttribute('enroute');
         awy_hash['base'] = awys[i].getAttribute('base');
@@ -703,6 +702,12 @@ FGMapMenuNav.prototype.nav_form_xml_request_cb = function() {
             return;
         }
 
+        var debug = xmldoc.documentElement.getAttribute("debug");
+
+        if(debug != "") {
+            dprint(this.fgmap, debug);
+        }
+
         var result_cnt = xmldoc.documentElement.getAttribute("cnt");
 
         if(result_cnt == 0) {
@@ -710,6 +715,7 @@ FGMapMenuNav.prototype.nav_form_xml_request_cb = function() {
             this.sbutton_enabled_set(true);
             this.cbutton_enabled_set(true);
             this.xml_request = null;
+            this.bounds = null;
             return;
         }
 

@@ -52,27 +52,45 @@ while(<STDIN>)
             $name_end, $lat_end, $lng_end,
             $route, $base, $top, $seg_name) = split(/[ \t]+/, $line, 10);
 
-        my($abslng_start, $abslng_end) = ($lng_start, $lng_end);
-        
-        if($abslng_start < 0)
+        my($tmp);
+        if($lng_start > $lng_end)
         {
-            $abslng_start += 360;
+            $tmp = $lng_start;
+            $lng_start = $lng_end;
+            $lng_end = $tmp;
+
+            $tmp = $lat_start;
+            $lat_start = $lat_end;
+            $lat_end = $tmp;
+
+            $tmp = $name_start;
+            $name_start = $name_end;
+            $name_end = $tmp;
         }
 
-        if($abslng_end < 0)
+        my($rl, $rr, $rt, $rb);
+
+        $rl = ($lng_start < $lng_end ? $lng_start : $lng_end);
+        $rr = ($lng_start > $lng_end ? $lng_start : $lng_end);
+        $rt = ($lat_start > $lat_end ? $lat_start : $lat_end);
+        $rb = ($lat_start < $lat_end ? $lat_start : $lat_end);
+
+        if($rl > $rr && $rr < 0)
         {
-            $abslng_end += 360;
+            # wrapped
+            $rr += 360;
         }
 
         my($m, $b);
 
-        if($abslng_start == $abslng_end)
+        if($lng_start == $lng_end)
         {
             $m = 'null';
             $b = 'null';
         }
         else
         {
+            my($abslng_start, $abslng_end) = ($lng_start, $lng_end);
             $m = ($lat_end - $lat_start) / ($abslng_end - $abslng_start);
             $b = $lat_end - $m * $abslng_end;
         }
@@ -83,14 +101,17 @@ while(<STDIN>)
 
         $sql .= <<SQL;
 INSERT INTO fg_awy
-    (awy_id, name_start, lat_start, lng_start, abslng_start,
-     name_end, lat_end, lng_end, abslng_end,
+    (awy_id, name_start, lat_start, lng_start,
+     name_end, lat_end, lng_end,
      m, b,
+     rl, rr, rt, rb,
      enroute, base, top, seg_name)
     VALUES
-    ($awy_id, '$name_start', $lat_start, $lng_start, $abslng_start,
-     '$name_end', $lat_end, $lng_end, $abslng_end,
+    ($awy_id,
+     '$name_start', $lat_start, $lng_start,
+     '$name_end', $lat_end, $lng_end,
      $m, $b,
+     $rl, $rr, $rt, $rb,
      $route, $base, $top, '$seg_name');
 SQL
 
