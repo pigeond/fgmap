@@ -257,6 +257,7 @@ if(!$ENV{'QUERY_STRING'})
     exit(0);
 }
 
+#&err_print("Database being updated, please try again later.");
 
 # search string
 my($sstr);
