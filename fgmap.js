@@ -1201,6 +1201,12 @@ FGPilot.prototype.trail_visible_set = function(visible) {
             //dprint(this.fgmap, "opacity " + opacity);
             //dprint(this.fgmap, "n " + n);
 
+            if(this.polylines[n]) {
+                this.fgmap.gmap.removeOverlay(this.polylines[n]);
+                this.polylines[n] = null;
+            }
+
+            /* TODO */
             if(!this.polylines[n]) {
                 //dprint(this.fgmap, "creating new polyline " + n);
                 var pl = new GPolyline([ this.trails[n], this.trails[(n + 1)] ],
@@ -1209,7 +1215,7 @@ FGPilot.prototype.trail_visible_set = function(visible) {
                 //dprint(this.fgmap, "created new polyline " + n);
                 this.fgmap.gmap.addOverlay(pl);
                 this.polylines[n] = pl;
-            } else {
+            } /* TODO else {
                 //dprint(this.fgmap, "updating polyline " + n);
 
                 //this.polylines[n].opacity = opacity;
@@ -1219,7 +1225,7 @@ FGPilot.prototype.trail_visible_set = function(visible) {
                 }
 
                 this.polylines[n].redraw(true);
-            }
+            } */
         }
 
     } else {
