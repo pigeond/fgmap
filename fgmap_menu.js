@@ -503,6 +503,20 @@ Pilots tab\
 </ul>\
 \
 <p style=\"text-align: center; font-weight: bold;\">\
+Nav tab\
+</p>\
+\
+<ul style=\"margin: 0px 0px 0px 0px; padding: 0px 0px 0px 8px;\">\
+    <li>You can search for navaids by string using the lookup input field. You could start the lookup by pressing Enter or clicking on the <img src=\"images/search.gif\" alt=\"\" title=\"\" border=0 align=\"middle\"> button after typing in the lookup string.</li>\
+    <li>Lookup results are shown in the lower part of the menu. You can view and pan to the navaid by clicking on each navaid result.</li>\
+    <li>You can search for all navaids visible in the current map view by clicking on the <img src=\"images/inview.gif\" alt=\"\" title=\"\" border=0 align=\"middle\"> button.</li>\
+    <li>For all the lookups, you can select the type of navaids to search for using the six checkboxes below the lookup input field.</li>\
+    <li>Both the string lookup and current map view lookup has a maximum number for returning navaids.</li>\
+    <li>You can toggle each type of shown navaid on or off by using the five checkboxes on the bottom right of the menu.</li>\
+    <li>You can clear all the navaids added from lookups by clicking on the <img src=\"images/trash.gif\" alt=\"\" title=\"\" border=0 align=\"middle\"> button.</li>\
+</ul>\
+\
+<p style=\"text-align: center; font-weight: bold;\">\
 Server tab\
 </p>\
 \

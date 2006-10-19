@@ -3424,6 +3424,7 @@ FGNavAirway.prototype.setup = function() {
 
     var div = element_create(null, 'div');
     div.className = 'fgmap_runway_info';
+    div.style.textAlign = 'center';
     attach_event(div, "mouseover",
         this.airway_mouseover_cb.bind_event(this));
 

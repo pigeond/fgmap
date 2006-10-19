@@ -127,7 +127,7 @@ FGMapMenuNav.prototype.setup = function() {
     but.src = "images/inview.gif";
     but.className = "fgmap_menu";
     but.style.verticalAlign = "middle";
-    but.title = "show selected types of navaids in current view (high zoom level only)";
+    but.title = "show selected types of navaids in current view (100 navaids max)";
     but.style.cursor = "pointer";
     attach_event(but, "mousedown", this.nav_inview_mouse_cb.bind_event(this));
     attach_event(but, "mouseup", this.nav_inview_mouse_cb.bind_event(this));
@@ -159,66 +159,66 @@ FGMapMenuNav.prototype.setup = function() {
     var base_span = element_create(null, 'span');
     base_span.style.cursor = 'pointer';
 
+    span = element_clone(base_span);
     this.aptname_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
-    element_attach(chbx, this.nav_form);
-    span = element_clone(base_span);
+    element_attach(chbx, span);
     attach_event(span, "mousedown",
             this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
     element_text_append(span, "apt name");
     element_attach(span, this.nav_form);
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
+    span = element_clone(base_span);
     this.aptcode_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
-    element_attach(chbx, this.nav_form);
-    span = element_clone(base_span);
+    element_attach(chbx, span);
     attach_event(span, "mousedown",
             this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
     element_text_append(span, "apt code");
     element_attach(span, this.nav_form);
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
+    span = element_clone(base_span);
     this.vor_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
-    element_attach(chbx, this.nav_form);
-    span = element_clone(base_span);
+    element_attach(chbx, span);
     attach_event(span, "mousedown",
             this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
     element_text_append(span, "vor");
     element_attach(span, this.nav_form);
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
+    span = element_clone(base_span);
     this.ndb_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
-    element_attach(chbx, this.nav_form);
-    span = element_clone(base_span);
+    element_attach(chbx, span);
     attach_event(span, "mousedown",
             this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
     element_text_append(span, "ndb");
     element_attach(span, this.nav_form);
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
+    span = element_clone(base_span);
     this.fix_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
-    element_attach(chbx, this.nav_form);
-    span = element_clone(base_span);
+    element_attach(chbx, span);
     attach_event(span, "mousedown",
             this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
     element_text_append(span, "fix");
     element_attach(span, this.nav_form);
     element_text_append(this.nav_form, "\u00a0\u00a0");
 
+    span = element_clone(base_span);
     this.awy_chbx = chbx = element_clone(base_chbx);
     chbx.checked = true;
     chbx.defaultChecked = true;
-    element_attach(chbx, this.nav_form);
-    span = element_clone(base_span);
+    element_attach(chbx, span);
     attach_event(span, "mousedown",
             this.nav_search_checkbox_text_toggle_cb.bind_event(this, chbx));
     element_text_append(span, "airway");
@@ -287,9 +287,9 @@ FGMapMenuNav.prototype.setup = function() {
     chbx = element_clone(base_chbx);
     chbx.value = FGMAP_NAVAID_APT;
     this.toggles[FGMAP_NAVAID_APT] = chbx;
-    element_attach(chbx, li);
-    attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     span = element_clone(base_span);
+    element_attach(chbx, span);
+    attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     span.value = FGMAP_NAVAID_APT;
     element_attach(span, li);
     attach_event(span, "mousedown",
@@ -301,9 +301,9 @@ FGMapMenuNav.prototype.setup = function() {
     chbx = element_clone(base_chbx);
     chbx.value = FGMAP_NAVAID_VOR;
     this.toggles[FGMAP_NAVAID_VOR] = chbx;
-    element_attach(chbx, li);
-    attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     span = element_clone(base_span);
+    element_attach(chbx, span);
+    attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     span.value = FGMAP_NAVAID_VOR;
     element_attach(span, li);
     attach_event(span, "mousedown",
@@ -315,9 +315,9 @@ FGMapMenuNav.prototype.setup = function() {
     chbx = element_clone(base_chbx);
     chbx.value = FGMAP_NAVAID_NDB;
     this.toggles[FGMAP_NAVAID_NDB] = chbx;
-    element_attach(chbx, li);
-    attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     span = element_clone(base_span);
+    element_attach(chbx, span);
+    attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     element_attach(span, li);
     span.value = FGMAP_NAVAID_NDB;
     attach_event(span, "mousedown",
@@ -329,9 +329,9 @@ FGMapMenuNav.prototype.setup = function() {
     chbx = element_clone(base_chbx);
     chbx.value = FGMAP_NAVAID_FIX;
     this.toggles[FGMAP_NAVAID_FIX] = chbx;
-    element_attach(chbx, li);
-    attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     span = element_clone(base_span);
+    element_attach(chbx, span);
+    attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     span.value = FGMAP_NAVAID_FIX;
     element_attach(span, li);
     attach_event(span, "mousedown",
@@ -343,9 +343,9 @@ FGMapMenuNav.prototype.setup = function() {
     chbx = element_clone(base_chbx);
     chbx.value = FGMAP_NAVAID_AWY;
     this.toggles[FGMAP_NAVAID_AWY] = chbx;
-    element_attach(chbx, li);
-    attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     span = element_clone(base_span);
+    element_attach(chbx, span);
+    attach_event(chbx, "click", this.toggle_click_cb.bind_event(this));
     span.value = FGMAP_NAVAID_AWY;
     element_attach(span, li);
     attach_event(span, "mousedown",
@@ -364,9 +364,14 @@ FGMapMenuNav.prototype.setup = function() {
 };
 
 FGMapMenuNav.prototype.nav_search_checkbox_text_toggle_cb =
-    function(event, chbx) {
-    if(chbx) {
-        chbx.checked = !chbx.checked;
+    function(e, chbx) {
+
+    e = e || window.event;
+
+    if(target_get(e) != chbx) {
+        if(chbx) {
+            chbx.checked = !chbx.checked;
+        }
     }
 };
 
@@ -397,6 +402,10 @@ FGMapMenuNav.prototype.toggle_click_cb = function(e, chbx) {
 
     var target = target_get(e || window.event);
     var checked;
+
+    if(target == chbx) {
+        return;
+    }
 
     if(chbx) {
         chbx.checked = !chbx.checked;
