@@ -5,9 +5,9 @@
  * All rights reserved, 2006.
  */
 
-function FGMapMenuPilots(fgmapmenu) {
-    this.fgmapmenu = fgmapmenu;
-    this.fgmap = fgmapmenu.fgmap;
+function FGMapMenuPilots(fgmap, tabdiv) {
+    this.fgmap = fgmap;
+    this.tabdiv = tabdiv;
     this.setup();
 
     /* A list of objects containing document elements for each pilot */
@@ -60,7 +60,7 @@ FGMapMenuPilots.prototype.setup = function() {
     */
 
 
-    this.fgmapmenu.tab_add("pilots", "pilots", elem, this);
+    this.tabdiv.tab_add("pilots", "pilots", elem, this);
 
     this.server_changed_cb(FGMAP_EVENT_SERVER_CHANGED, null);
     this.fgmap.event_callback_add(FGMAP_EVENT_SERVER_CHANGED,

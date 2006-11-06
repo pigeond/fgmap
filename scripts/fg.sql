@@ -10,6 +10,7 @@ create table fg_apt
     apt_code    varchar(4) not null,
     apt_name    varchar(128),
     heliport    boolean DEFAULT false,
+    seaport     boolean DEFAULT false,
     elevation   integer
 );
 

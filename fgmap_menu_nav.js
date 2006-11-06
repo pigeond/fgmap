@@ -35,17 +35,17 @@ function nav_type_generalize(type) {
         type == FGMAP_NAVAID_TACAN) {
         return FGMAP_NAVAID_VOR;
     }
-    if(type == FGMAP_NAVAID_HPT) {
+    if(type == FGMAP_NAVAID_HPT || type == FGMAP_NAVAID_SPT) {
         return FGMAP_NAVAID_APT;
     }
     return type;
 };
 
 
-function FGMapMenuNav(fgmapmenu) {
+function FGMapMenuNav(fgmap, tabdiv) {
 
-    this.fgmapmenu = fgmapmenu;
-    this.fgmap = fgmapmenu.fgmap;
+    this.fgmap = fgmap;
+    this.tabdiv = tabdiv;
     this.result_cnt = 0;
     this.setup();
     this.bounds = null;
@@ -243,6 +243,7 @@ FGMapMenuNav.prototype.setup = function() {
     result_box.style.left = "0px";
     result_box.style.margin = "0px";
     result_box.style.paddingTop = "4px";
+    result_box.style.paddingLeft = "4px";
     result_box.style.verticalAlign = "top";
 
     var panel = this.panel = element_create(box, "div");
@@ -359,7 +360,7 @@ FGMapMenuNav.prototype.setup = function() {
     this.gmap_zoomend_cb(-1, this.fgmap.gmap.getZoom());
 */
 
-    this.fgmapmenu.tab_add("nav", "nav", elem, this);
+    this.tabdiv.tab_add("nav", "nav", elem, this);
 
 };
 
@@ -755,7 +756,7 @@ FGMapMenuNav.prototype.nav_form_xml_request_cb = function() {
 
 
 FGMapMenuNav.prototype.remove = function() {
-    this.fgmapmenu.tab_remove("nav");
+    this.tabdiv.tab_remove("nav");
 };
 
 

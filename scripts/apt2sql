@@ -40,9 +40,10 @@ while(<STDIN>)
             ($line =~ m/^17\s+.*?$/))
 
     {
-        # airport/heliport
+        # airport/heliport/seaplane port
 
         my($heliport) = ($line =~ m/^17/ ? "true" : "false");
+        my($seaport) = ($line =~ m/^16/ ? "true" : "false");
 
         my($apt_ele, $apt_name);
 
@@ -61,8 +62,8 @@ while(<STDIN>)
 
             $sql .= <<SQL;
 
-INSERT INTO fg_apt (apt_id, apt_code, apt_name, elevation, heliport)
-    VALUES (${apt_id}, '${apt_code}', '${apt_name}', ${apt_ele}, ${heliport});
+INSERT INTO fg_apt (apt_id, apt_code, apt_name, elevation, heliport, seaport)
+    VALUES (${apt_id}, '${apt_code}', '${apt_name}', ${apt_ele}, ${heliport}, ${seaport});
 SQL
         }
     }

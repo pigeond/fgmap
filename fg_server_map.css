@@ -214,3 +214,5 @@ a:hover     { color: #ddf; }
 .fgmap_nav_result_normal { background-color: transparent; }
 .fgmap_nav_result_hover { background-color: #777; color: #000; }
 
+.fgmap_latlng_control { background-color: #fff; color: #000; }
+

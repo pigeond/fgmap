@@ -6,9 +6,9 @@
  */
 
 
-function FGMapMenuDebug(fgmapmenu) {
-    this.fgmapmenu = fgmapmenu;
-    this.fgmap = fgmapmenu.fgmap;
+function FGMapMenuDebug(fgmap, tabdiv) {
+    this.fgmap = fgmap;
+    this.tabdiv = tabdiv;
     this.setup();
 }
 
@@ -30,7 +30,7 @@ FGMapMenuDebug.prototype.setup = function() {
     debug.rows = 10;
     debug.readOnly = true;
 
-    this.fgmapmenu.tab_add("debug", "debug", elem, this, 100);
+    this.tabdiv.tab_add("debug", "debug", elem, this, 100);
 
     this.fgmap.debug_elem_set(this.debug);
 
@@ -41,6 +41,6 @@ FGMapMenuDebug.prototype.setup = function() {
 
 FGMapMenuDebug.prototype.remove = function() {
     this.fgmap.debug_elem_set(null);
-    this.fgmapmenu.tab_remove("debug");
+    this.tabdiv.tab_remove("debug");
 };
 

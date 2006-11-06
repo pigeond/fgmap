@@ -5,9 +5,9 @@
  * All rights reserved, 2006.
  */
 
-function FGMapMenuServer(fgmapmenu) {
-    this.fgmapmenu = fgmapmenu;
-    this.fgmap = fgmapmenu.fgmap;
+function FGMapMenuServer(fgmap, tabdiv) {
+    this.fgmap = fgmap;
+    this.tabdiv = tabdiv;
     this.setup();
 }
 
@@ -85,7 +85,7 @@ FGMapMenuServer.prototype.setup = function() {
     label.className = "fgmap_field_label";
     label.innerHTML = "&nbsp;secs";
 
-    this.fgmapmenu.tab_add("server", "server", elem, this);
+    this.tabdiv.tab_add("server", "server", elem, this);
 
     this.server_added_cb();
 

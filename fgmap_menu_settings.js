@@ -5,9 +5,9 @@
  * All rights reserved, 2006.
  */
 
-function FGMapMenuSettings(fgmapmenu) {
-    this.fgmapmenu = fgmapmenu;
-    this.fgmap = fgmapmenu.fgmap;
+function FGMapMenuSettings(fgmap, tabdiv) {
+    this.fgmap = fgmap;
+    this.tabdiv = tabdiv;
     this.setup();
 }
 
@@ -166,7 +166,7 @@ FGMapMenuSettings.prototype.setup = function() {
     attach_event(checkbox, "click",
             this.follows_always_center_checkbox_cb.bind_event(this));
 
-    this.fgmapmenu.tab_add("settings", "settings", elem, this);
+    this.tabdiv.tab_add("settings", "settings", elem, this);
 };
 
 
@@ -191,12 +191,12 @@ FGMapMenuSettings.prototype.debug_show = function(bool) {
         if(this.fgmap.debug_elem == null &&
             typeof(FGMapMenuDebug) == "function") {
 
-            new FGMapMenuDebug(this.fgmapmenu);
+            new FGMapMenuDebug(this.fgmap, this.tabdiv);
         }
 
     } else {
 
-        var debug = this.fgmapmenu.tab_data_get("debug");
+        var debug = this.tabdiv.tab_data_get("debug");
 
         if(debug) {
             debug.remove();

@@ -429,6 +429,7 @@ if($apt_code or $apt_name)
             my($apt_code) = $row_hash{'apt_code'};
             my($apt_name) = &htmlencode($row_hash{'apt_name'});
             my($apt_heli) = $row_hash{'heliport'};
+            my($apt_sea) = $row_hash{'seaport'};
             my($elevation) = $row_hash{'elevation'};
 
             if($apt_heli == 1)
@@ -437,7 +438,7 @@ if($apt_code or $apt_name)
             }
 
             $xml .= <<XML;
-	<airport id="${apt_id}" code="${apt_code}" name="${apt_name}" elevation="${elevation}" heliport="${apt_heli}">
+	<airport id="${apt_id}" code="${apt_code}" name="${apt_name}" elevation="${elevation}" heliport="${apt_heli}" seaport="${apt_sea}">
 XML
 
             # Get runway/taxiway
