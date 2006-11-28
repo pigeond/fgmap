@@ -64,7 +64,7 @@ function FGMapMenuNav(fgmap, tabdiv) {
 
 FGMapMenuNav.prototype.setup = function() {
 
-    var elem = this.div = element_create(null, "div");
+    var elem = this.div = element_create(null, 'div');
     elem.style.className = "fgmap_nav";
     elem.style.overflow = "hidden";
     elem.style.width = "95%";
@@ -248,7 +248,7 @@ FGMapMenuNav.prototype.setup = function() {
 
     var panel = this.panel = element_create(box, "div");
     panel.style.position = "absolute";
-    panel.style.overflow = "hidden";
+    panel.style.overflow = "auto";
     panel.style.width = "20%";
     panel.style.height = "85%";
     panel.style.right = "0px";

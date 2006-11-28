@@ -38,6 +38,7 @@ FGMapMenu.prototype.init = function() {
     //elem.style.backgroundColor = "transparent";
     elem.style.overflow = "hidden";
     element_opacity_set(elem, 0.8);
+    element_event_bubble_cancel(elem);
 
     html = "";
     html += "<b class=\"mh\">";
@@ -137,11 +138,10 @@ FGMapMenu.prototype.init = function() {
     elem.style.width = "100%";
     elem.style.height = menu_height;
     elem.style.maxHeight = menu_height;
-    elem.style.display = "none";
+    elem.style.display = "none";  // FIXME
     elem.style.paddingTop = "2px";
     elem.style.paddingBottom = "5px";
     elem.style.borderTop = "1px dotted #fff";
-
 
     this.tabdiv = new FGTabbedDiv(this.menu_body);
 

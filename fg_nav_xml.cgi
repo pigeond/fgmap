@@ -249,15 +249,16 @@ sub db_error
 }
 
 
-my($xml) = "";
-
-
 if(!$ENV{'QUERY_STRING'})
 {
     exit(0);
 }
 
 #&err_print("Database being updated, please try again later.");
+
+
+# The output xml
+my($xml) = "";
 
 # search string
 my($sstr);

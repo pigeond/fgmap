@@ -17,13 +17,16 @@ function FGMapMenuPilots(fgmap, tabdiv) {
 
 FGMapMenuPilots.prototype.setup = function() {
 
-    var elem = element_create(null, "div");
+    var elem = this.div = element_create(null, 'div');
     elem.style.width = "100%";
     elem.style.height = "100%";
     elem.style.overflow = "hidden";
     elem.style.paddingTop = "4px";
 
-    var list = this.list = element_create(elem, "div");
+    var list = this.list = element_create(this.div, "div");
+    list.style.position = 'absolute';
+    list.style.left = '0px';
+    list.style.top = '0px';
     list.style.width = "98%";
     list.style.height = "100%";
     list.style.overflow = "auto";
@@ -37,7 +40,10 @@ FGMapMenuPilots.prototype.setup = function() {
     ul.style.margin = "0px auto";
     ul.style.padding = "0px"
 
-    var msg = this.msg = element_create(elem, "div");
+    var msg = this.msg = element_create(this.div, "div");
+    msg.style.position = 'absolute';
+    msg.style.left = '0px';
+    msg.style.top = '0px';
     msg.className = "fgmap_pilot_tab_msg";
     msg.style.position = "relative";
     msg.style.textAlign = "center";
@@ -60,7 +66,7 @@ FGMapMenuPilots.prototype.setup = function() {
     */
 
 
-    this.tabdiv.tab_add("pilots", "pilots", elem, this);
+    this.tabdiv.tab_add("pilots", "pilots", this.div, this);
 
     this.server_changed_cb(FGMAP_EVENT_SERVER_CHANGED, null);
     this.fgmap.event_callback_add(FGMAP_EVENT_SERVER_CHANGED,

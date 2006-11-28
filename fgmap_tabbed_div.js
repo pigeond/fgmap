@@ -23,25 +23,36 @@ FGTabbedDiv.prototype.init = function() {
     var elem;
 
     /* menu body content part */
-    elem = this.menu_content = element_create(this.div, "div");
-    elem.className = "fgmap_menu";
-    elem.style.position = "relative";
-    elem.style.overflow = "hidden";
-    elem.style.width = "100%";
+    elem = this.menu_content = element_create(this.div, 'div');
+    elem.setAttribute('id', 'blah');
+    elem.className = 'fgmap_menu';
+    elem.style.position = 'relative';
+    elem.style.overflow = 'hidden';
+    //elem.style.width = '100%';
+    //elem.style.left = '0px';
+    //elem.style.top = '0px';
     elem.style.height = "90%";
+    //elem.style.height = "auto";
+    //elem.style.backgroundColor = 'green';
 
     /* menu body tabs */
-    elem = this.menu_tabs = element_create(this.div, "div");
-    elem.setAttribute("id", "fgmap_menu_tabs");
-    elem.className = "fgmap_menu";
-    elem.style.position = "relative";
-    elem.style.height = "auto";
-    elem.style.width = "100%";
-    elem.style.textAlign = "left";
-    elem.style.whiteSpace = "nowrap";
-    elem.style.overflow = "hidden";
-    elem.style.paddingTop = "1px";
-    elem.style.paddingBottom = "6px";
+    elem = this.menu_tabs = element_create(this.div, 'div');
+    elem.setAttribute('id', 'fgmap_menu_tabs');
+    elem.className = 'fgmap_menu';
+    elem.style.position = 'relative';
+    //elem.style.width = '100%';
+    elem.style.height = '16px';     // FIXME
+    elem.style.textAlign = 'left';
+    elem.style.whiteSpace = 'nowrap';
+    elem.style.overflow = 'hidden';
+    elem.style.paddingTop = '0px';
+    elem.style.paddingBottom = '4px';
+    //elem.style.backgroundColor = 'red';
+};
+
+
+FGTabbedDiv.prototype.tab_height_set = function(height) {
+    this.menu_tabs.style.height = height;
 };
 
 
@@ -77,6 +88,7 @@ FGTabbedDiv.prototype.tab_add = function(id, title, child, data,
     var elem;
     
     /* The actual content part of this tab */
+    /*
     elem = element_create(this.menu_content, "div");
     elem.style.position = "relative";
     elem.style.left = "0px";
@@ -86,10 +98,21 @@ FGTabbedDiv.prototype.tab_add = function(id, title, child, data,
 
     if(child) {
         elem.appendChild(child);
-        /* TODO: Should I do these? */
+        // TODO: Should I do these?
         child.style.width = '100%';
         child.style.height = '100%';
     }
+    */
+
+    this.menu_content.appendChild(child);
+
+    child.style.position = 'relative';
+    /*
+    child.style.position = 'absolute';
+    child.style.left = '0px';
+    child.style.top = '0px';
+    child.style.width = '100%';
+    */
 
     if(!this.menus) {
         this.menus = new Object();
@@ -98,9 +121,11 @@ FGTabbedDiv.prototype.tab_add = function(id, title, child, data,
 
     if(this.menu_current == null && !noautofocus) {
         this.menu_current = id;
-        element_show(elem);
+        //element_show(elem);
+        element_show(child);
     } else {
-        element_hide(elem);
+        //element_hide(elem);
+        element_hide(child);
     }
 
     // callback functions for the tab
@@ -136,8 +161,10 @@ FGTabbedDiv.prototype.tab_add = function(id, title, child, data,
 
     tab_span = element_create(null, 'span');
     tab_span.style.cursor = 'pointer';
-    tab_span.style.width = '1px';
+    //tab_span.style.width = '1px';
     tab_span.style.height = '100%';
+    tab_span.style.paddingLeft = '8px';
+    tab_span.style.paddingRight = '8px';
     tab_span.innerHTML = title;
 
     for(var i = 0; i < tmp_arr.length; i++) {
@@ -158,7 +185,7 @@ FGTabbedDiv.prototype.tab_add = function(id, title, child, data,
     this.menus[id] = new Object();
     this.menus[id].title = title;
     this.menus[id].data = data;
-    this.menus[id].tab_content = elem;
+    //this.menus[id].tab_content = elem;
     this.menus[id].tab_child = child;
     this.menus[id].tab_span = tab_span;
     this.menus[id].gravity = gravity;
@@ -171,7 +198,31 @@ FGTabbedDiv.prototype.tab_add = function(id, title, child, data,
     attach_event(tab_span, "mouseout", mouseout_func.bind_event(this, id));
     attach_event(tab_span, "click", mouseclick_func.bind_event(this, id));
 
+    this.reconfigure();
+
     return true;
+};
+
+
+FGTabbedDiv.prototype.reconfigure = function() {
+
+    if(this.menu_current == null) {
+        return;
+    }
+
+    var span = this.menus[this.menu_current].tab_span;
+    var h = parseInt(span.offsetHeight);
+    h += parseInt(this.menu_tabs.style.paddingBottom);
+
+    if(this.div.offsetHeight > h) {
+        this.menu_content.style.height = (this.div.offsetHeight - h) + 'px';
+
+        /* hmm */
+        for(var i in this.menus) {
+            this.menus[i].tab_child.style.height =
+                this.menu_content.style.height;
+        }
+    }
 };
 
 
@@ -182,7 +233,7 @@ FGTabbedDiv.prototype.tab_remove = function(id) {
 
     element_remove(this.menus[id].tab_span);
     element_remove(this.menus[id].tab_child);
-    element_remove(this.menus[id].tab_content);
+    //element_remove(this.menus[id].tab_content);
     delete(this.menus[id]);
 
     if(this.menu_current == id) {
@@ -212,10 +263,12 @@ FGTabbedDiv.prototype.tab_set = function(id) {
     if(!this.menus[id])
         return false;
 
-    element_hide(this.menus[this.menu_current].tab_content);
+    //element_hide(this.menus[this.menu_current].tab_content);
+    element_hide(this.menus[this.menu_current].tab_child);
     this.menus[this.menu_current].tab_span.className = "";
 
-    element_show(this.menus[id].tab_content);
+    //element_show(this.menus[id].tab_content);
+    element_show(this.menus[id].tab_child);
     this.menus[id].tab_span.className = "current";
 
     if(this.menus[this.menu_current].data &&
@@ -237,6 +290,40 @@ FGTabbedDiv.prototype.tab_set = function(id) {
 
     return true;
 };
+
+
+/*
+FGTabbedDiv.prototype.children_max_size_get = function() {
+
+    var w = null, h = null;
+
+    for(var i in this.menus) {
+
+        var child = this.menus[i].tab_child;
+        element_show(child);
+
+        if(w == null && w == null) {
+            w = child.clientWidth;
+            h = child.clientHeight;
+        } else {
+
+            if(w < child.clientWidth) {
+                w = child.clientWidth;
+            }
+
+            if(h < child.clientHeight) {
+                h = child.clientHeight;
+            }
+        }
+
+        if(this.menu_current != i) {
+            element_hide(child);
+        }
+    }
+
+    return { w:w, h:h };
+};
+*/
 
 
 /* vim: set sw=4 sts=4:*/
