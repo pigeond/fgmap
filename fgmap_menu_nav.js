@@ -628,7 +628,7 @@ FGMapMenuNav.prototype.nav_radio_parse = function(xmldoc) {
         type_name = navs[i].getAttribute('type_name');
 
         // An easy id / hash
-        id = 'radionav:' + ident + ':' + lat + ':' + lng;
+        id = 'radionav:' + type_name + ':' + ident + ':' + lat + ':' + lng;
 
         nav = new FGRadioNav(this.fgmap, id,
             FGMAP_RADIONAV_TYPES[type_name],
