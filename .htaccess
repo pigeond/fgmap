@@ -1,4 +1,4 @@
-Options +ExecCGI +Includes +SymLinksIfOwnerMatch
+Options +ExecCGI +Includes
 AddHandler server-parsed .html
 AddHandler cgi-script .cgi
 DirectoryIndex fg_server_map.html
