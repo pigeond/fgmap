@@ -807,8 +807,9 @@ GMapElement.prototype.remove = function() {
  * @tparam String model         The aircraft model of the pilot.
  * @tparam String server_ip     The server ip or host name which this pilot
  *                              connected to.
+ * @tparam Float heading        The heading
  */
-function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip) {
+function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip, heading) {
 
     this.fgmap = fgmap;
     this.callsign = callsign;
@@ -822,7 +823,6 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip) {
 
     this.latlng = new GLatLng(lat, lng);
 
-    this.hdg = "N/A";
     this.last_disp_hdg = -1;
 
     // Seems to be FGFS starting alt
@@ -835,6 +835,8 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip) {
 
     this.spd = "N/A";
     this.last_spd = "N/A";
+
+    this.hdg = this.last_hdg = heading;
 
     /* Arrays of GPolyline */
     this.polylines = new Array();
@@ -898,12 +900,12 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip) {
     // hdg
     span = this.hdg_elem = element_create(elem, "span");
     span.className = "fgmap_pilot_info_hdg";
-    span.innerHTML = this.hdg;
+    span.innerHTML = this.hdg.toFixed(2);
 
     span = this.hdg_unit = element_create(elem, "span");
     span.className = "fgmap_pilot_info_hdg";
     span.innerHTML = "\u00b0";
-    element_hide(span);
+    //element_hide(span);
 
     element_create(elem, "br");
 
@@ -955,7 +957,7 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip) {
  * @tparam Float lng            the new longitude of this pilot.
  * @tparam Float alt            the new altitude of this pilot.
  */
-FGPilot.prototype.position_update = function(lat, lng, alt) {
+FGPilot.prototype.position_update = function(lat, lng, alt, heading) {
 
     if(isNaN(lat))
         lat = 0;
@@ -963,15 +965,18 @@ FGPilot.prototype.position_update = function(lat, lng, alt) {
         lng = 0;
 
     this.alt = alt;
+    this.hdg = heading;
 
     if((this.latlng.lng() == lng) && (this.latlng.lat() == lat) &&
-        (this.alt == this.last_alt)) {
+        (this.alt == this.last_alt) && (this.hdg == this.last_hdg)) {
 
         dprint(this.fgmap, this.callsign + ": hasn't moved...");
         element_hide(this.alt_trend_elem);
         element_hide(this.spd_trend_elem);
         return;
     }
+
+    this.last_hdg = this.hdg;
 
     var last_x = this.latlng.lng();
     var last_y = this.latlng.lat();
@@ -990,10 +995,8 @@ FGPilot.prototype.position_update = function(lat, lng, alt) {
     }
 
 
-    // Calculate heading
     var o = lng - last_x;
     var a = lat - last_y;
-    var deg = rad_to_deg(Math.atan(o / a));
 
 
     /* Check if the differences is toooo big, it might be a reset, or
@@ -1003,30 +1006,17 @@ FGPilot.prototype.position_update = function(lat, lng, alt) {
         this.trail_visible_set(false);
         delete(this.trails);
         this.trails = new Array();
+
         this.hdg = 0;
         this.spd = 0;
+
         this.last_spd = 0;
         this.last_alt = alt;
+        this.last_hdg = 0;
 
         dprint(this.fgmap, this.callsign + ": possible reset, clearing points");
 
-    } else {
-
-        if(a < 0) {
-            deg += 180;
-        } else if(o < 0 && a > 0) {
-            deg += 360;
-        }
-
-        if(deg < 0) {
-            deg += 360;
-        } else if(deg >= 360) {
-            deg -= 360;
-        }
-        this.hdg = deg;
     }
-
-
 
     // Calculate speed
     if(this.trails.length > 0) {
@@ -1087,7 +1077,7 @@ FGPilot.prototype.position_update = function(lat, lng, alt) {
         this.hdg_elem.innerHTML = "N/A";
         element_hide(this.hdg_unit);
     } else {
-        this.hdg_elem.innerHTML = this.hdg.toFixed(0);
+        this.hdg_elem.innerHTML = this.hdg.toFixed(2);
         element_show(this.hdg_unit);
     }
 
@@ -1121,7 +1111,7 @@ FGPilot.prototype.marker_update = function(force) {
     if(isNaN(this.hdg)) {
         deg = 0;
     } else {
-        hdg = Math.round(this.hdg) + 7;
+        hdg = Math.round(this.hdg);
         deg = hdg - (hdg % pi_heading_scale);
     }
 
@@ -1867,6 +1857,7 @@ FGMap.prototype.xml_request_cb = function() {
             var alt = parseFloat(markers[i].getAttribute("alt"));
             var model = markers[i].getAttribute("model");
             var server_ip = markers[i].getAttribute("server_ip");
+            var heading = parseFloat(markers[i].getAttribute("heading"));
 
             onlines[callsign] = 1;
 
@@ -1875,7 +1866,7 @@ FGMap.prototype.xml_request_cb = function() {
             if(this.pilots[callsign] == null) {
 
                 p = new FGPilot(this, callsign,
-                            lat, lng, alt, model, server_ip);
+                            lat, lng, alt, model, server_ip, heading);
                 this.pilots[callsign] = p;
                 dprint(this, "added " + callsign + " " + lng + " " + lat);
                 this.pilots_cnt += 1;
@@ -1889,9 +1880,9 @@ FGMap.prototype.xml_request_cb = function() {
             } else {
 
                 p = this.pilots[callsign];
-                p.position_update(lat, lng, alt);
+                p.position_update(lat, lng, alt, heading);
 
-                dprint(this, "updated " + callsign + " " + lng + " " + lat);
+                dprint(this, "updated " + callsign + " " + lng + " " + lat + " " + heading);
             }
 
             if(!follows_need_update && (this.follows.indexOf(callsign) != -1)) {
