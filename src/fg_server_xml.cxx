@@ -10,12 +10,44 @@
 
 #define QS          "QUERY_STRING"
 
-#define HTTP_HEADER "Pragma: no-cache\r\nCache-Control: no-cache\r\nExpires: Sat, 17 Sep 1977 00:00:00 GMT\r\nContent-Type: text/xml\r\n\r\n"
+#define XML_HEADER "Pragma: no-cache\r\nCache-Control: no-cache\r\nExpires: Sat, 17 Sep 1977 00:00:00 GMT\r\nContent-Type: text/xml\r\n\r\n"
+
+#define FG_SERVER_KML   "fg_server_kml"
+
+#define KML_HEADER "Pragma: no-cache\r\nCache-Control: no-cache\r\nExpires: Sat, 17 Sep 1977 00:00:00 GMT\r\nContent-Type: application/vnd.google-earth.kml+xml\r\n\r\n"
+
+#define KML_DAE_FMTSTR "http://pigeond.net/flightgear/ge/daes/%s/%s.dae"
 
 
 /* From FG */
 #define MAX_CALLSIGN_LEN        8
 #define MAX_MODEL_NAME_LEN      96
+
+
+static void do_xml_header(int);
+static void do_xml_single(char *, char *, char *,
+        float, float, float, float, float, float);
+static void do_xml_tail();
+
+static void do_kml_header(int);
+static void do_kml_single(char *, char *, char *,
+        float, float, float, float, float, float);
+static void do_kml_tail();
+
+struct output_funcs
+{
+    void (*header_func) (int);
+    void (*single_func) (char *callsign, char *server_ip, char *model_file,
+            float lat, float lon, float alt,
+            float heading, float roll, float pitch);
+    void (*tail_func) (void);
+};
+
+static const struct output_funcs xml_funcs =
+{ do_xml_header, do_xml_single, do_xml_tail };
+
+static const struct output_funcs kml_funcs =
+{ do_kml_header, do_kml_single, do_kml_tail };
 
 
 
@@ -99,9 +131,13 @@ euler_get(float x, float y, float z, float ox, float oy, float oz,
 #endif
 
 
+
+
+
 int
 main(int argc, char **argv)
 {
+    struct output_funcs ocs = xml_funcs;
     char *qs = NULL;
     char host[256];
     int port = 0;
@@ -123,6 +159,12 @@ main(int argc, char **argv)
     float lat, lon, alt;
     float ox, oy, oz;
     float heading, pitch, roll;
+
+
+    if(strstr(argv[0], FG_SERVER_KML))
+    {
+        ocs = kml_funcs;
+    }
 
 
     if((qs = getenv(QS)) == NULL)
@@ -176,8 +218,6 @@ main(int argc, char **argv)
 
     f = fdopen(fd, "r");
 
-    printf("%s", HTTP_HEADER);
-
     while(!feof(f))
     {
         int s;
@@ -193,7 +233,7 @@ main(int argc, char **argv)
         {
             if(sscanf(buf, "# %d pilots(s) online", &npilots) == 1)
             {
-                printf("<fg_server pilot_cnt=\"%d\">\n", npilots);
+                ocs.header_func(npilots);
             }
         }
         else if((s = sscanf(buf, "%[^@]@%[^:]: %f %f %f %f %f %f %f %f %f %s",
@@ -218,11 +258,8 @@ main(int argc, char **argv)
                 }
             }
 
-            printf("\t<marker server_ip=\"%s\" callsign=\"%s\" lat=\"%f\" lng=\"%f\" alt=\"%f\" heading=\"%f\" pitch=\"%f\" roll=\"%f\" model=\"%s\" />\n",
-                    server_ip, callsign,
-                    lat, lon, alt,
-                    heading, roll, pitch,
-                    model_file);
+            ocs.single_func(callsign, server_ip, model_file,
+                    lat, lon, alt, heading, roll, pitch);
         }
         /*
         else
@@ -232,10 +269,107 @@ main(int argc, char **argv)
         */
     }
 
-    printf("</fg_server>\n\n");
+    ocs.tail_func();
 
     close(fd);
 
     return 0;
+}
+
+
+/* xml */
+static void
+do_xml_header(int npilots)
+{
+    printf(XML_HEADER);
+    printf("<fg_server pilot_cnt=\"%d\">\n", npilots);
+}
+
+
+static void
+do_xml_single(char *callsign, char *server_ip, char *model_file,
+        float lat, float lon, float alt,
+        float heading, float roll, float pitch)
+{
+    printf("\t<marker callsign=\"%s\" server_ip=\"%s\" model=\"%s\" lat=\"%f\" lng=\"%f\" alt=\"%f\" heading=\"%f\" roll=\"%f\" pitch=\"%f\" />\n",
+            callsign, server_ip, model_file,
+            lat, lon, alt,
+            heading, roll, pitch);
+}
+
+
+static void
+do_xml_tail()
+{
+    printf("</fg_server>\n\n");
+}
+
+
+/* kml */
+static void
+do_kml_header(int npilots)
+{
+    printf(KML_HEADER);
+
+    printf("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n\
+<kml xmlns=\"http://earth.google.com/kml/2.0\">\n\
+<Document>\n\
+<name>FlightGear MP server map</name>\n\
+<visibility>1</visibility>\n");
+}
+
+
+static void
+do_kml_single(char *callsign, char *server_ip, char *model_file,
+        float lat, float lon, float alt,
+        float heading, float roll, float pitch)
+{
+    char buf[BUFSIZ];
+
+    alt *= 0.3048;      /* feet to meter */
+
+    //snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, model_file, model_file);
+    snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, "c172p", "c172p");
+
+    printf("\n\
+    <Placemark id=\"%s\">\n\
+        <name>%s</name>\n\
+        <description>%s: %s</description>\n\
+        <Model>\n\
+            <altitudeMode>absolute</altitudeMode>\n\
+            <Location>\n\
+                <latitude>%f</latitude>\n\
+                <longitude>%f</longitude>\n\
+                <altitude>%f</altitude>\n\
+            </Location>\n\
+            <Orientation>\n\
+                <heading>%f</heading>\n\
+                <roll>%f</roll>\n\
+                <tilt>%f</tilt>\n\
+            </Orientation>\n\
+            <Scale>\n\
+                <x>150.0</x>\n\
+                <y>150.0</y>\n\
+                <z>150.0</z>\n\
+            </Scale>\n\
+            <Link>\n\
+                <href>%s</href>\n\
+                <refreshMode>onChange</refreshMode>\n\
+            </Link>\n\
+        </Model>\n\
+    </Placemark>\n\
+",
+        callsign, callsign, callsign, model_file,
+        lat, lon, alt,
+        heading, roll, pitch,
+        buf);
+
+}
+
+
+static void
+do_kml_tail()
+{
+    printf("</Document>\n</kml>\n");
 }
 
