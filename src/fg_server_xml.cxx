@@ -13,7 +13,6 @@
 #define XML_HEADER "Pragma: no-cache\r\nCache-Control: no-cache\r\nExpires: Sat, 17 Sep 1977 00:00:00 GMT\r\nContent-Type: text/xml\r\n\r\n"
 
 #define FG_SERVER_KML           "fg_server_kml"
-#define FG_SERVER_KML_UPDATE    "fg_server_kml_update"
 
 #define KML_HEADER "Pragma: no-cache\r\nCache-Control: no-cache\r\nExpires: Sat, 17 Sep 1977 00:00:00 GMT\r\nContent-Type: application/vnd.google-earth.kml+xml\r\n\r\n"
 
@@ -37,7 +36,7 @@ static void do_kml_tail();
 
 static int callsign_cnt = 0;
 static char **callsigns = NULL;
-static char *callsign_buf;
+static char *callsign_buf = NULL;
 
 static void do_kml_update_header(int);
 static void do_kml_update_single(char *, char *, char *,
@@ -153,9 +152,9 @@ main(int argc, char **argv)
 
     int s;
     char *qs = NULL;
-    char host[256];
+    char host[256] = "";
     int port = 0;
-    char in_callsigns[256];
+    char in_callsigns[256] = "";
     char *p;
 
     int fd = -1;
@@ -191,7 +190,7 @@ main(int argc, char **argv)
         return -1;
     }
 
-    if(s == 3 && strstr(argv[0], FG_SERVER_KML_UPDATE))
+    if(s == 3 || strstr(qs, "&callsigns="))
     {
         ocs = kml_update_funcs;
 
@@ -207,8 +206,6 @@ main(int argc, char **argv)
         ocs = kml_funcs;
     }
 
-    host[255] = '\0';
-
     if(!host || strlen(host) == 0)
     {
         return -1;
@@ -223,7 +220,9 @@ main(int argc, char **argv)
 
     if(h == NULL)
     {
-        return -1;
+        ocs.header_func(0);
+        ocs.tail_func();
+        return 0;
     }
     
     errno = 0;
@@ -243,7 +242,9 @@ main(int argc, char **argv)
     if(connect(fd, (struct sockaddr *) &sin, sizeof(sin)) < 0)
     {
         close(fd);
-        return -1;
+        ocs.header_func(0);
+        ocs.tail_func();
+        return 0;
     }
 
     f = fdopen(fd, "r");
@@ -411,7 +412,7 @@ do_kml_tail()
     <NetworkLink id=\"fgmap_update\">\n\
         <name>Update</name>\n\
         <Link>\n\
-            <href>http://pigeond.net/flightgear/fg_server_kml_update.cgi?pigeond.net:5001&amp;callsigns=");
+            <href>http://pigeond.net/flightgear/fg_server_kml.cgi?pigeond.net:5001&amp;callsigns=");
 
     for(n = 0; n < callsign_cnt; n++)
     {
@@ -426,7 +427,9 @@ do_kml_tail()
             <refreshMode>onInterval</refreshMode>\n\
             <refreshInterval>5</refreshInterval>\n");
 
-    printf("\n</Link>\n</NetworkLink>\n");
+    printf("\
+        </Link>\n\
+    </NetworkLink>\n");
 
     printf("</Document>\n</kml>\n");
 
@@ -448,7 +451,11 @@ do_kml_update_header(int npilots)
 <Update>\n\
     <targetHref>http://pigeond.net/flightgear/fg_server_kml.cgi?pigeond.net:5001</targetHref>");
 
-    callsign_buf = (char *) calloc(npilots * MAX_CALLSIGN_LEN, sizeof(char));
+    if(npilots > 0)
+    {
+        callsign_buf =
+            (char *) calloc(npilots * MAX_CALLSIGN_LEN, sizeof(char));
+    }
 }
 
 
@@ -474,8 +481,11 @@ do_kml_update_single(char *callsign, char *server_ip, char *model_file,
         }
     }
 
-    strcat(callsign_buf, callsign);
-    strcat(callsign_buf, ":");
+    if(callsign_buf)
+    {
+        strcat(callsign_buf, callsign);
+        strcat(callsign_buf, ":");
+    }
 
     if(found)
     {
@@ -571,10 +581,11 @@ do_kml_update_tail()
     <Change>\n\
         <NetworkLink targetId=\"fgmap_update\">\n\
             <Link>\n\
-                <href>http://pigeond.net/flightgear/fg_server_kml_update.cgi?pigeond.net:5001&amp;callsigns=%s</href>\n\
+                <href>http://pigeond.net/flightgear/fg_server_kml.cgi?pigeond.net:5001&amp;callsigns=%s</href>\n\
             </Link>\n\
         </NetworkLink>\n\
-    </Change>\n", callsign_buf);
+    </Change>\n",
+        (callsign_buf ? callsign_buf : ""));
 
     printf("\n</Update>\n</NetworkLinkControl>\n");
 
@@ -583,7 +594,7 @@ do_kml_update_tail()
     <NetworkLink>\n\
         <name>Update</name>\n\
         <Link>\n\
-            <href>http://pigeond.net/flightgear/fg_server_kml_update.cgi?pigeond.net:5001&amp;callsigns=%s</href>\n\
+            <href>http://pigeond.net/flightgear/fg_server_kml.cgi?pigeond.net:5001&amp;callsigns=%s</href>\n\
         </Link>\n\
     </NetworkLink>\n", callsign_buf);
 #endif

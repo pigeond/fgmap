@@ -1,1 +1,0 @@
-fg_server_xml.cgi
