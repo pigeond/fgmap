@@ -10,7 +10,8 @@
 
 #define QS              "QUERY_STRING"
 #define HTTP_HOST       "HTTP_HOST"
-#define DOCUMENT_URI    "DOCUMENT_URI"
+//#define DOCUMENT_URI    "DOCUMENT_URI"
+#define SCRIPT_NAME    "SCRIPT_NAME"
 
 #define XML_HEADER "Pragma: no-cache\r\nCache-Control: no-cache\r\nExpires: Sat, 17 Sep 1977 00:00:00 GMT\r\nContent-Type: text/xml\r\n\r\n"
 
@@ -18,9 +19,8 @@
 
 #define KML_HEADER "Pragma: no-cache\r\nCache-Control: no-cache\r\nExpires: Sat, 17 Sep 1977 00:00:00 GMT\r\nContent-Type: application/vnd.google-earth.kml+xml\r\n\r\n"
 
-//#define KML_DAE_FMTSTR "http://pigeond.net/flightgear/ge/daes/%s/%s.dae"
 // XXX: scary macro
-#define KML_DAE_FMTSTR "http://%s%s/ge/daes/%s/%s.dae", http_host, document_path
+#define KML_DAE_FMTSTR "http://%s/%s/ge/daes/%s/%s.dae", http_host, document_path
 
 
 /* From FG */
@@ -47,6 +47,7 @@ static char *callsign_buf = NULL;
 static char http_host[256] = "";
 static char document_uri[256] = "";
 static char document_path[256] = "";
+static char fg_server_port[256] = "";
 
 static void do_kml_update_header(int);
 static void do_kml_update_single(char *, char *, char *,
@@ -189,13 +190,15 @@ main(int argc, char **argv)
 
     if((env = getenv(HTTP_HOST)) == NULL)
     {
+        fprintf(stderr, "%s: HTTP_HOST\n", argv[0]);
         return -1;
     }
 
     strncpy(http_host, env, sizeof(http_host));
 
-    if((env = getenv(DOCUMENT_URI)) == NULL)
+    if((env = getenv(SCRIPT_NAME)) == NULL)
     {
+        fprintf(stderr, "%s: SCRIPT_NAME\n", argv[0]);
         return -1;
     }
 
@@ -213,6 +216,7 @@ main(int argc, char **argv)
 
     if((env = getenv(QS)) == NULL)
     {
+        fprintf(stderr, "%s: QUERY_STRING\n", argv[0]);
         return -1;
     }
 
@@ -257,6 +261,8 @@ main(int argc, char **argv)
         ocs.tail_func();
         return 0;
     }
+
+    snprintf(fg_server_port, sizeof(fg_server_port), "%s:%d", host, port);
     
     errno = 0;
     fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -445,7 +451,8 @@ do_kml_tail()
     <NetworkLink id=\"fgmap_update\">\n\
         <name>Update</name>\n\
         <Link>\n\
-            <href>%s%sfg_server_kml.cgi?pigeond.net:5001&amp;callsigns=");
+            <href>http://%s/%s/fg_server_kml.cgi?%s&amp;callsigns=",
+            http_host, document_path, fg_server_port);
 
     for(n = 0; n < callsign_cnt; n++)
     {
@@ -462,8 +469,7 @@ do_kml_tail()
 
     printf("\
         </Link>\n\
-    </NetworkLink>\n",
-        http_host, document_path);
+    </NetworkLink>\n");
 
     printf("</Document>\n</kml>\n");
 
@@ -483,8 +489,8 @@ do_kml_update_header(int npilots)
 <kml xmlns=\"http://earth.google.com/kml/2.0\">\n\
 <NetworkLinkControl>\n\
 <Update>\n\
-    <targetHref>%s%sfg_server_kml.cgi?pigeond.net:5001</targetHref>",
-        http_host, document_path);
+    <targetHref>http://%s/%sfg_server_kml.cgi?%s</targetHref>",
+        http_host, document_path, fg_server_port);
 
     if(npilots > 0)
     {
@@ -592,6 +598,7 @@ do_kml_update_single(char *callsign, char *server_ip, char *model_file,
 
 }
 
+
 static void
 do_kml_update_tail()
 {
@@ -616,31 +623,15 @@ do_kml_update_tail()
     <Change>\n\
         <NetworkLink targetId=\"fgmap_update\">\n\
             <Link>\n\
-                <href>%s%sfg_server_kml.cgi?pigeond.net:5001&amp;callsigns=%s</href>\n\
+                <href>http://%s/%s/fg_server_kml.cgi?%s&amp;callsigns=%s</href>\n\
             </Link>\n\
         </NetworkLink>\n\
     </Change>\n",
-        http_host, document_path,
+        http_host, document_path, fg_server_port,
         (callsign_buf ? callsign_buf : ""));
 
     printf("\n</Update>\n</NetworkLinkControl>\n");
 
-#if 0
-    printf("\n\
-    <NetworkLink>\n\
-        <name>Update</name>\n\
-        <Link>\n\
-            <href>http://pigeond.net/flightgear/fg_server_kml.cgi?pigeond.net:5001&amp;callsigns=%s</href>\n\
-        </Link>\n\
-    </NetworkLink>\n", callsign_buf);
-#endif
-
-    
-#if 0
-    <refreshMode>onInterval</refreshMode>\n\
-
-#endif
-    
     printf("</kml>\n");
 
     free(callsigns);
