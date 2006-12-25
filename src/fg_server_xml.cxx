@@ -8,7 +8,9 @@
 #include <simgear/math/SGMath.hxx>
 
 
-#define QS          "QUERY_STRING"
+#define QS              "QUERY_STRING"
+#define HTTP_HOST       "HTTP_HOST"
+#define DOCUMENT_URI    "DOCUMENT_URI"
 
 #define XML_HEADER "Pragma: no-cache\r\nCache-Control: no-cache\r\nExpires: Sat, 17 Sep 1977 00:00:00 GMT\r\nContent-Type: text/xml\r\n\r\n"
 
@@ -16,13 +18,17 @@
 
 #define KML_HEADER "Pragma: no-cache\r\nCache-Control: no-cache\r\nExpires: Sat, 17 Sep 1977 00:00:00 GMT\r\nContent-Type: application/vnd.google-earth.kml+xml\r\n\r\n"
 
-#define KML_DAE_FMTSTR "http://pigeond.net/flightgear/ge/daes/%s/%s.dae"
+//#define KML_DAE_FMTSTR "http://pigeond.net/flightgear/ge/daes/%s/%s.dae"
+// XXX: scary macro
+#define KML_DAE_FMTSTR "http://%s%s/ge/daes/%s/%s.dae", http_host, document_path
 
 
 /* From FG */
 #define MAX_CALLSIGN_LEN        8
 #define MAX_MODEL_NAME_LEN      96
 
+//#define DEFAULT_MODEL           "c172p"
+#define DEFAULT_MODEL           "ufo"
 
 static void do_xml_header(int);
 static void do_xml_single(char *, char *, char *,
@@ -37,6 +43,10 @@ static void do_kml_tail();
 static int callsign_cnt = 0;
 static char **callsigns = NULL;
 static char *callsign_buf = NULL;
+
+static char http_host[256] = "";
+static char document_uri[256] = "";
+static char document_path[256] = "";
 
 static void do_kml_update_header(int);
 static void do_kml_update_single(char *, char *, char *,
@@ -151,7 +161,7 @@ main(int argc, char **argv)
     struct output_funcs ocs = xml_funcs;
 
     int s;
-    char *qs = NULL;
+    char *env = NULL;
     char host[256] = "";
     int port = 0;
     char in_callsigns[256] = "";
@@ -177,20 +187,43 @@ main(int argc, char **argv)
     float heading, pitch, roll;
 
 
-
-    if((qs = getenv(QS)) == NULL)
+    if((env = getenv(HTTP_HOST)) == NULL)
     {
         return -1;
     }
 
-    s = sscanf(qs, "%255[^:]:%d&callsigns=%255s", host, &port, in_callsigns);
+    strncpy(http_host, env, sizeof(http_host));
+
+    if((env = getenv(DOCUMENT_URI)) == NULL)
+    {
+        return -1;
+    }
+
+    strncpy(document_uri, env, sizeof(document_uri));
+
+    if(env[0] == '/')
+    {
+        env++;
+    }
+    strncpy(document_path, env, sizeof(document_path));
+    if((p = rindex(document_path, '/')))
+    {
+        *p = '\0';
+    }
+
+    if((env = getenv(QS)) == NULL)
+    {
+        return -1;
+    }
+
+    s = sscanf(env, "%255[^:]:%d&callsigns=%255s", host, &port, in_callsigns);
 
     if(s < 2)
     {
         return -1;
     }
 
-    if(s == 3 || strstr(qs, "&callsigns="))
+    if(s == 3 || strstr(env, "&callsigns="))
     {
         ocs = kml_update_funcs;
 
@@ -365,7 +398,7 @@ do_kml_single(char *callsign, char *server_ip, char *model_file,
 
     /* TODO */
     //snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, model_file, model_file);
-    snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, "c172p", "c172p");
+    snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, DEFAULT_MODEL, DEFAULT_MODEL);
 
     printf("\n\
     <Placemark id=\"%s\">\n\
@@ -412,7 +445,7 @@ do_kml_tail()
     <NetworkLink id=\"fgmap_update\">\n\
         <name>Update</name>\n\
         <Link>\n\
-            <href>http://pigeond.net/flightgear/fg_server_kml.cgi?pigeond.net:5001&amp;callsigns=");
+            <href>%s%sfg_server_kml.cgi?pigeond.net:5001&amp;callsigns=");
 
     for(n = 0; n < callsign_cnt; n++)
     {
@@ -429,7 +462,8 @@ do_kml_tail()
 
     printf("\
         </Link>\n\
-    </NetworkLink>\n");
+    </NetworkLink>\n",
+        http_host, document_path);
 
     printf("</Document>\n</kml>\n");
 
@@ -449,7 +483,8 @@ do_kml_update_header(int npilots)
 <kml xmlns=\"http://earth.google.com/kml/2.0\">\n\
 <NetworkLinkControl>\n\
 <Update>\n\
-    <targetHref>http://pigeond.net/flightgear/fg_server_kml.cgi?pigeond.net:5001</targetHref>");
+    <targetHref>%s%sfg_server_kml.cgi?pigeond.net:5001</targetHref>",
+        http_host, document_path);
 
     if(npilots > 0)
     {
@@ -515,7 +550,7 @@ do_kml_update_single(char *callsign, char *server_ip, char *model_file,
     {
         /* TODO */
         //snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, model_file, model_file);
-        snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, "c172p", "c172p");
+        snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, DEFAULT_MODEL, DEFAULT_MODEL);
 
         printf("\n\
     <Create>\n\
@@ -581,10 +616,11 @@ do_kml_update_tail()
     <Change>\n\
         <NetworkLink targetId=\"fgmap_update\">\n\
             <Link>\n\
-                <href>http://pigeond.net/flightgear/fg_server_kml.cgi?pigeond.net:5001&amp;callsigns=%s</href>\n\
+                <href>%s%sfg_server_kml.cgi?pigeond.net:5001&amp;callsigns=%s</href>\n\
             </Link>\n\
         </NetworkLink>\n\
     </Change>\n",
+        http_host, document_path,
         (callsign_buf ? callsign_buf : ""));
 
     printf("\n</Update>\n</NetworkLinkControl>\n");
