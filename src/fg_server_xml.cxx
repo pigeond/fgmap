@@ -27,8 +27,16 @@
 #define MAX_CALLSIGN_LEN        8
 #define MAX_MODEL_NAME_LEN      96
 
-//#define DEFAULT_MODEL           "c172p"
-#define DEFAULT_MODEL           "ufo"
+#define DEFAULT_MODEL           "c172p"
+//#define DEFAULT_MODEL           "ufo"
+//#define DEFAULT_MODEL           "737-300"
+
+
+static const char *models[] =
+{
+    "c172p", "ufo", "737-300",
+};
+
 
 static void do_xml_header(int);
 static void do_xml_single(char *, char *, char *,
@@ -154,6 +162,23 @@ euler_get(float x, float y, float z, float ox, float oy, float oz,
 
 
 
+
+static const char *
+model_get(const char *model)
+{
+    int n;
+    int m = sizeof(models) / sizeof(models[0]);
+
+    for(n = 0; n < m; n++)
+    {
+        if(strcmp(model, models[n]) == 0)
+        {
+            return model;
+        }
+    }
+
+    return DEFAULT_MODEL;
+}
 
 
 int
@@ -397,14 +422,15 @@ do_kml_single(char *callsign, char *server_ip, char *model_file,
         float heading, float roll, float pitch)
 {
     char buf[BUFSIZ];
+    const char *model;
 
     callsigns[callsign_cnt++] = strdup(callsign);
 
     alt *= 0.3048;      /* feet to meter */
 
     /* TODO */
-    //snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, model_file, model_file);
-    snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, DEFAULT_MODEL, DEFAULT_MODEL);
+    model = model_get(model_file);
+    snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, model, model);
 
     printf("\n\
     <Placemark id=\"%s\">\n\
@@ -489,7 +515,7 @@ do_kml_update_header(int npilots)
 <kml xmlns=\"http://earth.google.com/kml/2.0\">\n\
 <NetworkLinkControl>\n\
 <Update>\n\
-    <targetHref>http://%s/%sfg_server_kml.cgi?%s</targetHref>",
+    <targetHref>http://%s/%s/fg_server_kml.cgi?%s</targetHref>",
         http_host, document_path, fg_server_port);
 
     if(npilots > 0)
@@ -554,9 +580,12 @@ do_kml_update_single(char *callsign, char *server_ip, char *model_file,
     }
     else
     {
+        const char *model;
+
+        model = model_get(model_file);
+
         /* TODO */
-        //snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, model_file, model_file);
-        snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, DEFAULT_MODEL, DEFAULT_MODEL);
+        snprintf(buf, sizeof(buf), KML_DAE_FMTSTR, model, model);
 
         printf("\n\
     <Create>\n\
