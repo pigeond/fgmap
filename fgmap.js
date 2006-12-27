@@ -660,9 +660,9 @@ function element_event_bubble_cancel_cb(event) {
 function element_event_bubble_cancel(elem) {
     attach_event(elem, "mousedown", element_event_bubble_cancel_cb);
     attach_event(elem, "mouseup", element_event_bubble_cancel_cb);
-    attach_event(elem, "mousemove", element_event_bubble_cancel_cb);
-    attach_event(elem, "mouseover", element_event_bubble_cancel_cb);
-    attach_event(elem, "mouseout", element_event_bubble_cancel_cb);
+    //attach_event(elem, "mousemove", element_event_bubble_cancel_cb);
+    //attach_event(elem, "mouseover", element_event_bubble_cancel_cb);
+    //attach_event(elem, "mouseout", element_event_bubble_cancel_cb);
     attach_event(elem, "click", element_event_bubble_cancel_cb);
     attach_event(elem, "dblclick", element_event_bubble_cancel_cb);
 }
