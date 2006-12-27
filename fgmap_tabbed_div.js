@@ -24,7 +24,6 @@ FGTabbedDiv.prototype.init = function() {
 
     /* menu body content part */
     elem = this.menu_content = element_create(this.div, 'div');
-    elem.setAttribute('id', 'blah');
     elem.className = 'fgmap_menu';
     elem.style.position = 'relative';
     elem.style.overflow = 'hidden';
