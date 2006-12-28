@@ -2572,7 +2572,13 @@ FGAirport.prototype.ils_setup = function(runway) {
 
     // ILS toggle icon
     img = runway.ils_toggle_img = element_create(elem, "img");
-    img.src = "images/nav_icons/ils-off.png";
+
+    if(USER_AGENT.is_ie) {
+        img.src = "images/nav_icons/ils-off.ie.png";
+    } else {
+        img.src = "images/nav_icons/ils-off.png";
+    }
+
     img.style.cursor = "pointer";
     img.style.width = "20px";
     img.style.height = "20px";
@@ -3356,8 +3362,11 @@ FGAirport.prototype.ils_toggle = function(runway) {
     }
 
     if(runway.ils_toggle) {
-        //runway.ils_toggle_img.src = "images/arrow_up.gif";
-        runway.ils_toggle_img.src = "images/nav_icons/ils-on.png";
+        if(USER_AGENT.is_ie) {
+            runway.ils_toggle_img.src = "images/nav_icons/ils-on.ie.png";
+        } else {
+            runway.ils_toggle_img.src = "images/nav_icons/ils-on.png";
+        }
         if(runway.ils_detail) {
             element_show(runway.ils_detail);
         }
@@ -3373,8 +3382,11 @@ FGAirport.prototype.ils_toggle = function(runway) {
         this.runway_raise(runway);
 
     } else {
-        //runway.ils_toggle_img.src = "images/arrow_down.gif";
-        runway.ils_toggle_img.src = "images/nav_icons/ils-off.png";
+        if(USER_AGENT.is_ie) {
+            runway.ils_toggle_img.src = "images/nav_icons/ils-off.ie.png";
+        } else {
+            runway.ils_toggle_img.src = "images/nav_icons/ils-off.png";
+        }
         if(runway.ils_detail) {
             element_hide(runway.ils_detail);
         }
