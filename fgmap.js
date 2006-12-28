@@ -482,6 +482,9 @@ function attach_event(elem, event_str, bind_func) {
 
 
 /* Inspired by http://www.phpied.com/javascript-include/ */
+/* TODO: Doesn't work well under m$ shitty crappy IE, they sure are the dumbest
+ * software company */
+/*
 function include_js(file) {
 
     var head;
@@ -509,6 +512,7 @@ include_js("fgmap_menu_server.js");
 include_js("fgmap_menu_settings.js");
 include_js("fgmap_menu_debug.js");
 include_js("fgmap_menu_nav.js");
+*/
 
 
 // Browser stuff
