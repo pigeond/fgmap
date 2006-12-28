@@ -294,6 +294,7 @@ FGMapMenu.prototype.help_tab_setup = function() {
     elem.style.overflow = "auto";
     elem.style.margin = "0px auto";
     //elem.style.padding = "8px 16px 4px 16px";
+    elem.style.paddingLeft = '12px';
     elem.style.height = "90%";
 
     elem.innerHTML = "\
