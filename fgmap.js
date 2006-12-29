@@ -274,11 +274,6 @@ var FGMAP_PILOT_OPACITY = 0.75;
 var FGMAP_NAV_OPACITY = 0.80;
 
 
-// TODO
-var pi_size = new GSize(40, 40);
-var pi_anchor = new GPoint(20, 20);
-var pi_heading_scale = 10;
-
 
 /* Helper functions */
 
@@ -443,6 +438,22 @@ function arr_remove_first(args) {
 
 function arr_cons(element, sequence) {
     return arr_concat([element], sequence);
+}
+
+
+/* Call the callback until the image is loaded */
+function bind_img_complete(img, func, data) {
+
+    if(img.complete == true) {
+        func(img, data);
+        return;
+    }
+
+    var timeout_func = function() {
+        bind_img_complete(img, func, data);
+    }
+
+    setTimeout(timeout_func, 500);
 }
 
 
@@ -941,9 +952,7 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip, heading) {
         this.marker_mouse_event_cb.bind_event(this));
 
 
-    this.marker = new GMapElement(this.latlng,
-                                    new GPoint(-(pi_anchor.x), -(pi_anchor.y)),
-                                    this.icon_elem);
+    this.marker = new GMapElement(this.latlng, null, this.icon_elem);
     fgmap.gmap.addOverlay(this.marker);
 
     this.marker_update(true);
@@ -1109,6 +1118,8 @@ FGPilot.prototype.position_update = function(lat, lng, alt, heading) {
 
 FGPilot.prototype.marker_update = function(force) {
 
+    var pi_heading_scale = 10;
+
     var deg;
     var hdg;
 
@@ -1182,10 +1193,20 @@ FGPilot.prototype.marker_update = function(force) {
         img += deg + FGMAP_CRAFT_ICON_SUFFIX;
 
         this.icon_elem.src = img;
+        bind_img_complete(this.icon_elem,
+            this.icon_elem_complete_cb.bind_event(this), null);
         this.marker.update(this.latlng);
-        img_ie_fix(this.icon_elem);
     }
 };
+
+
+FGPilot.prototype.icon_elem_complete_cb = function(img, data) {
+    if(this.icon_elem != img) {
+        return;
+    }
+    img_ie_fix(this.icon_elem);
+    this.marker.update(null, new GPoint(-img.width / 2, -img.height / 2));
+}
 
 
 /**
