@@ -19,7 +19,7 @@ FGMapMenuPilots.prototype.setup = function() {
 
     var elem = this.div = element_create(null, 'div');
     elem.style.width = "100%";
-    elem.style.height = "100%";
+    elem.style.height = "95%";
     elem.style.overflow = "hidden";
     //elem.style.overflow = "auto";
     elem.style.paddingTop = "4px";
