@@ -21,6 +21,7 @@ FGMapMenuPilots.prototype.setup = function() {
     elem.style.width = "100%";
     elem.style.height = "100%";
     elem.style.overflow = "hidden";
+    //elem.style.overflow = "auto";
     elem.style.paddingTop = "4px";
 
     var list = this.list = element_create(this.div, "div");
@@ -256,11 +257,12 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
     div.style.position = 'relative';
     div.style.cssFloat = 'left';
     div.style.styleFloat = 'left';
+    div.style.zIndex = 1;   /* Hmm */
 
-    var checkbox = pilot.checkbox = element_create(div, "input", "checkbox");
+    var checkbox = pilot.checkbox = element_create(div, 'input', 'checkbox');
     checkbox.className = "fgmap_menu";
-    checkbox.style.cssFloat = "left";
-    checkbox.style.styleFloat = "left";
+    //checkbox.style.cssFloat = "left";
+    //checkbox.style.styleFloat = "left";
     checkbox.title = "Tick to make this pilot always visible";
     checkbox.name = "follow_checkbox";
     attach_event(checkbox, "click",
@@ -270,7 +272,7 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
         checkbox.checked = true;
         checkbox.defaultChecked = true;
     }
-
+6
     // Add some blank lines so that it has a roughly same height of the div on
     // the right, a bit of a hack
     element_create(div, 'br');
@@ -280,6 +282,7 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
 
     div = element_create(li, 'div');
     div.style.position = 'relative';
+    div.style.overflow = 'auto';
 
     span = element_create(div, 'span');
     span.className = "fgmap_pilot_callsign";
@@ -297,15 +300,21 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
     attach_event(span, "mouseout",
         this.pilot_callsign_mouse_event_cb.bind_event(this, callsign));
 
-    element_text_append(div, "@");
+    element_create(div, 'br');
+
+    element_text_append(div, "\u00a0");
+
+    span = element_create(div, "span");
+    span.className = "fgmap_pilot_tab_model";
+    element_text_append(span, p.model);
+
+    element_text_append(div, "\u00a0");
+    element_text_append(div, "\u00a0");
+    element_text_append(div, "\u00a0");
 
     span = element_create(div, "span");
     span.className = "fgmap_pilot_tab_server";
     span.innerHTML = p.server_ip;
-    element_create(div, "br");
-
-    element_text_append(div, "\u00a0");
-    element_text_append(div, p.model);
     element_create(div, "br");
 
     element_text_append(div, "\u00a0");

@@ -128,13 +128,13 @@ a:hover     { color: #ddf; }
 
 .fgmap_pilot_tab_msg { color: #fff; }
 
-.fgmap_pilot_tab_callsign { color: #fff; }
-.fgmap_pilot_tab_server { color: #fff; }
+.fgmap_pilot_tab_callsign { color: white; }
+.fgmap_pilot_tab_server { color: white; }
+.fgmap_pilot_tab_model { color: gold; }
 .fgmap_pilot_tab_lng { color: #f55; }
 .fgmap_pilot_tab_lat { color: #fdb; }
-.fgmap_pilot_tab_model { color: #fff; }
-.fgmap_pilot_tab_alt { color: #fff; }
-.fgmap_pilot_tab_hdg { color: #fff; }
+.fgmap_pilot_tab_alt { color: white; }
+.fgmap_pilot_tab_hdg { color: white; }
 
 
 /* map info box */
