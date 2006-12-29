@@ -38,7 +38,7 @@ FGMapMenu.prototype.init = function() {
     //elem.style.backgroundColor = "transparent";
     elem.style.overflow = "hidden";
     element_opacity_set(elem, 0.8);
-    element_event_bubble_cancel(elem);
+    //element_event_bubble_cancel(elem);
 
     html = "";
     html += "<b class=\"mh\">";
