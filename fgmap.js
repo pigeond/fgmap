@@ -2908,6 +2908,7 @@ FGAirport.prototype.runway_setup = function() {
         var elem = runway.label_elem = element_create(null, "div");
         elem.className = "fgmap_runway_info";
         element_text_append(elem, num);
+        element_text_append(elem, " (" + heading + "\u00b0)");
 
 
         // Calculating/Adjusting the position for the runway label
