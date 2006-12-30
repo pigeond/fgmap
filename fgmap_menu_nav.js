@@ -454,7 +454,17 @@ FGMapMenuNav.prototype.nav_form_submit_cb = function(e) {
         return false;
     }
 
-    var url = "fg_nav_xml.cgi?";
+    var url;
+    var loc = window.location;
+
+    // TODO
+    if(loc.hostname.match(/^mpmap02\./i) ||
+            loc.hostname.match(/^pigeond\.net/i) ||
+            loc.hostname.match(/^localhost/i)) {
+        url = "fg_nav_xml.cgi?";
+    } else {
+        url = "fg_nav_xml_proxy.cgi?";
+    }
     
     if(this.bounds) {
         /* This override search string */

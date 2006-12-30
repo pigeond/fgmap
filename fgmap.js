@@ -1206,7 +1206,7 @@ FGPilot.prototype.icon_elem_complete_cb = function(img, data) {
     }
     img_ie_fix(this.icon_elem);
     this.marker.update(null, new GPoint(-img.width / 2, -img.height / 2));
-}
+};
 
 
 /**
@@ -3243,7 +3243,21 @@ FGAirport.prototype.metar_update = function() {
     this.metar_div.innerHTML = "";
     element_create(this.metar_div, 'br');
     element_text_append(this.metar_div, 'Loading METAR...');
-    var url = "fg_metar_xml.cgi?" + this.code;
+
+    var url;
+    var loc = window.location;
+    
+    // TODO
+    if(loc.hostname.match(/^mpmap02\./i) ||
+            loc.hostname.match(/^pigeond\.net/i) ||
+            loc.hostname.match(/^localhost/i)) {
+        url = "fg_metar_xml.cgi";
+    } else {
+        url = "fg_metar_xml_proxy.cgi";
+    }
+
+    url += "?" + this.code;
+
     this.metar_request = GXmlHttp.create();
     this.metar_request.open('GET', url, true);
     this.metar_request.onreadystatechange = this.metar_xml_cb.bind_event(this);
