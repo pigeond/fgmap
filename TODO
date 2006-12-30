@@ -2,12 +2,12 @@
 - Implement unload to cleanup
 - Don't add visibility: visible; by default
 - Get rid of all extra and useless div in div
-- Fix trail lines, they don't line up with all different plane icons...
 - Weird bug with fg_server= and server change
 - Why am I putting the server list to be inside the map?
 - Scale icons according to zoom level
 - Optimization: pilot count should only be updated if there's an actual change.
 - Expose more GMap stuff (disable panning/zoom, etc)
   
+- Fix trail lines, they don't line up with all different plane icons...
 - Seems to be fixed along with GMap v2: Auto zoom/pan padding mechanism doesn't work well in all cases...
 
