@@ -1659,6 +1659,11 @@ FGMap.prototype.server_add = function(name, longname, host, port, ip) {
 
 
 FGMap.prototype.server_get_by_ip = function(ip) {
+
+    if(ip == null) {
+        return null;
+    }
+
     for(var k in this.fg_servers) {
         if(this.fg_servers[k].ip == ip) {
             return this.fg_servers[k];
