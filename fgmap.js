@@ -1354,10 +1354,11 @@ FGPilot.prototype.raise = function() {
 
 /* fg_server ******************************************************************/
 
-function fg_server(name, longname, host, port, group) {
+function fg_server(name, longname, host, ip, port, group) {
     this.name = name;
     this.longname = longname;
     this.host = host;
+    this.ip = ip;
     this.port = port;
     this.group = group;
 }
@@ -1624,7 +1625,7 @@ FGMap.prototype.server_group_add = function(group) {
  * @tparam Integer port     the port to connect to (FG server admin port)
  * @treturn Boolean         true on success, false on failure
  */
-FGMap.prototype.server_add = function(name, longname, host, port) {
+FGMap.prototype.server_add = function(name, longname, host, port, ip) {
 
     var server;
 
@@ -1639,7 +1640,7 @@ FGMap.prototype.server_add = function(name, longname, host, port) {
     if(name == null || host == null || port <= 0)
         return false;
 
-    this.fg_servers[name] = new fg_server(name, longname, host, port,
+    this.fg_servers[name] = new fg_server(name, longname, host, ip, port,
         this.fg_server_group);
 
     this.event_callback_call(FGMAP_EVENT_SERVER_ADDED,
@@ -1654,6 +1655,16 @@ FGMap.prototype.server_add = function(name, longname, host, port) {
     }
 
     return true;
+};
+
+
+FGMap.prototype.server_get_by_ip = function(ip) {
+    for(var k in this.fg_servers) {
+        if(this.fg_servers[k].ip == ip) {
+            return this.fg_servers[k];
+        }
+    }
+    return null;
 };
 
 

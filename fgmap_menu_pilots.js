@@ -36,10 +36,17 @@ FGMapMenuPilots.prototype.setup = function() {
     element_hide(list);
 
     var ul = this.list_ul = element_create(this.list, "ul");
-    ul.style.width = "98%";
+
+    // TODO
+    if(USER_AGENT.is_ie) {
+        ul.style.width = "94%";
+    } else {
+        ul.style.width = "98%";
+    }
+
     ul.style.listStyle = "none inside none";
-    ul.style.margin = "0px auto";
-    ul.style.padding = "0px 0px 0px 6px";
+    ul.style.margin = '0px';
+    ul.style.padding = '0px 0px 0px 6px';
 
     var msg = this.msg = element_create(this.div, "div");
     msg.style.position = 'absolute';
@@ -113,8 +120,8 @@ FGMapMenuPilots.prototype.update = function() {
         var lat = p.latlng.lat();
         var lng = p.latlng.lng();
         
-        pilot.lat_span.innerHTML = lat;
-        pilot.lng_span.innerHTML = lng;
+        pilot.lat_span.innerHTML = lat.toFixed(4);
+        pilot.lng_span.innerHTML = lng.toFixed(4);
     }
     
     if(cnt == 0) {
@@ -275,20 +282,21 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
 6
     // Add some blank lines so that it has a roughly same height of the div on
     // the right, a bit of a hack
-    element_create(div, 'br');
-    element_create(div, 'br');
-    element_create(div, 'br');
+    //element_create(div, 'br');
+    //element_create(div, 'br');
 
 
     div = element_create(li, 'div');
     div.style.position = 'relative';
     div.style.overflow = 'auto';
+    div.style.cssFloat = 'left';
+    div.style.styleFloat = 'left';
 
     span = element_create(div, 'span');
     span.className = "fgmap_pilot_callsign";
     span.style.cssFloat = "left";
     span.style.styleFloat = "left";
-    span.style.paddingLeft = "4px";
+    span.style.marginLeft = "4px";
     span.style.textDecoration = "underline";
     span.style.cursor = "pointer";
     span.title = "Click to pan to this pilot";
@@ -314,7 +322,22 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
 
     span = element_create(div, "span");
     span.className = "fgmap_pilot_tab_server";
-    span.innerHTML = p.server_ip;
+
+    var fgserver;
+    var n;
+
+    if(p.server_ip == 'LOCAL') {
+        fgserver = this.fgmap.fg_server_current;
+    } else {
+        fgserver = this.fgmap.server_get_by_ip(p.server_ip);
+    }
+
+    if(fgserver == null) {
+        span.innerHTML = p.server_ip;
+    } else {
+        span.innerHTML = fgserver.name.replace(/:[0-9]+/, '');
+    }
+
     element_create(div, "br");
 
     element_text_append(div, "\u00a0");

@@ -84,31 +84,48 @@
             // 50.026388889N 8.543055556E
             fgmap.server_add("mpserver01:5000",
                 "mpserver01.flightgear.org:5000 (Germany)",
-                "mpserver01.flightgear.org", 5001);
+                "mpserver01.flightgear.org", 5001,
+                "85.214.36.1");
 
             // 22.266133,114.246467
             fgmap.server_add("mpserver02:5000",
                 "mpserver02.flightgear.org:5000 (Hong Kong)",
-                "mpserver02.flightgear.org", 5001);
+                "mpserver02.flightgear.org", 5001,
+                "202.65.223.218");
 
             // 37.2285 -80.4239
             fgmap.server_add("mpserver03:5000",
                 "mpserver03.flightgear.org:5000 (East Coast US)",
-                "mpserver03.flightgear.org", 5001);
+                "mpserver03.flightgear.org", 5001,
+                "");
+
+            fgmap.server_add("mpserver04:5000",
+                "mpserver04.flightgear.org:5000 (UK)",
+                "mpserver04.flightgear.org", 5001,
+                "195.137.79.11");
 
             fgmap.server_group_add("-- For FG CVS --");
 
             fgmap.server_add("mpserver01:5002",
                 "mpserver01.flightgear.org:5002 (Germany)",
-                "mpserver01.flightgear.org", 5003);
+                "mpserver01.flightgear.org", 5003,
+                "85.214.36.1");
 
             fgmap.server_add("mpserver02:5002",
                 "mpserver02.flightgear.org:5002 (Hong Kong)",
-                "mpserver02.flightgear.org", 5003);
+                "mpserver02.flightgear.org", 5003,
+                "202.65.223.218");
 
             fgmap.server_add("mpserver03:5002",
                 "mpserver03.flightgear.org:5002 (East Coast US)",
-                "mpserver03.flightgear.org", 5003);
+                "mpserver03.flightgear.org", 5003,
+                "");
+
+            fgmap.server_add("mpserver04:500w",
+                "mpserver04.flightgear.org:5002 (UK)",
+                "mpserver04.flightgear.org", 5003,
+                "195.137.79.11");
+
 
             //fgmap.debug_set(true);
             fgmap.server_update_set(false);
