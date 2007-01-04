@@ -1208,8 +1208,10 @@ FGPilot.prototype.marker_update = function(force) {
 
         if(this.fgmap.aircraft_icon_mode != FGMAP_ICON_MODE_DOT) {
             img += "-";
-            img += deg + FGMAP_CRAFT_ICON_SUFFIX;
+            img += deg;
         }
+        
+        img += FGMAP_CRAFT_ICON_SUFFIX;
 
         this.icon_elem.src = img;
         element_hide(this.icon_elem);
