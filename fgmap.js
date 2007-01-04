@@ -104,6 +104,14 @@ var FGMAP_PILOT_INFO_FOLLOWS = 2;
 var FGMAP_PILOT_INFO_MOUSEOVER = 3;
 
 
+
+/** @see FGMap.aircraft_icon_mode_set */
+var FGMAP_ICON_MODE_NORMAL = 0;
+var FGMAP_ICON_MODE_PHOTO = 1;
+var FGMAP_ICON_MODE_DOT = 2;
+
+var FGMAP_CRAFT_DOT = "aircraft_dot";
+
 var FGMAP_PILOT_INFO_ZINDEX = 10;
 
 
@@ -441,19 +449,24 @@ function arr_cons(element, sequence) {
 }
 
 
-/* Call the callback until the image is loaded */
-function bind_img_complete(img, func, data) {
 
+function bind_img_complete_cb(img, func, data) {
     if(img.complete == true) {
         func(img, data);
         return;
-    }
-
-    var timeout_func = function() {
+    } else {
         bind_img_complete(img, func, data);
     }
+}
 
-    setTimeout(timeout_func, 500);
+/* Call the callback until the image is loaded */
+function bind_img_complete(img, func, data) {
+
+    var timeout_func = function() {
+        bind_img_complete_cb(img, func, data);
+    }
+
+    setTimeout(timeout_func, 100);
 }
 
 
@@ -1152,11 +1165,15 @@ FGPilot.prototype.marker_update = function(force) {
         
         // TODO
 
-        if(this.fgmap.model_icon &&
-            (this.fgmap.aircraft_model_icons[this.model] != null)) {
+        if(this.fgmap.aircraft_icon_mode == FGMAP_ICON_MODE_PHOTO &&
+            (this.fgmap.aircraft_photo_icons[this.model] != null)) {
 
             // specific model icon
-            img += this.fgmap.aircraft_model_icons[this.model];
+            img += this.fgmap.aircraft_photo_icons[this.model];
+
+        } else if(this.fgmap.aircraft_icon_mode == FGMAP_ICON_MODE_DOT) {
+
+            img += FGMAP_CRAFT_DOT;
 
         } else {
 
@@ -1189,10 +1206,13 @@ FGPilot.prototype.marker_update = function(force) {
             }
         }
 
-        img += "-";
-        img += deg + FGMAP_CRAFT_ICON_SUFFIX;
+        if(this.fgmap.aircraft_icon_mode != FGMAP_ICON_MODE_DOT) {
+            img += "-";
+            img += deg + FGMAP_CRAFT_ICON_SUFFIX;
+        }
 
         this.icon_elem.src = img;
+        element_hide(this.icon_elem);
         bind_img_complete(this.icon_elem,
             this.icon_elem_complete_cb.bind_event(this), null);
         this.marker.update(this.latlng);
@@ -1204,8 +1224,9 @@ FGPilot.prototype.icon_elem_complete_cb = function(img, data) {
     if(this.icon_elem != img) {
         return;
     }
-    img_ie_fix(this.icon_elem);
     this.marker.update(null, new GPoint(-img.width / 2, -img.height / 2));
+    img_ie_fix(this.icon_elem);
+    element_show(this.icon_elem);
 };
 
 
@@ -1403,7 +1424,7 @@ function FGMap(id)
     this.trail_visible = false;
     this.info_type = FGMAP_PILOT_INFO_ALWAYS;
     this.menu_visible = true;
-    this.model_icon = false;
+    this.aircraft_icon_mode = FGMAP_ICON_MODE_NORMAL;
     this.debug = false;
     this.pantoall = false;
     this.latlng_visible = false;
@@ -1505,11 +1526,11 @@ FGMap.prototype.init = function(force) {
 
 
     // TODO: Put this somewhere else better?
-    this.aircraft_model_icons = new Object();
-    this.aircraft_model_icons["c172p"] = "c172p/c172p";
-    this.aircraft_model_icons["boeing733"] = "boeing733/boeing733";
-    this.aircraft_model_icons["ufo"] = "ufo/ufo";
-    this.aircraft_model_icons["KC135"] = "kc135/kc135-model";
+    this.aircraft_photo_icons = new Object();
+    this.aircraft_photo_icons["c172p"] = "c172p/c172p";
+    this.aircraft_photo_icons["boeing733"] = "boeing733/boeing733";
+    this.aircraft_photo_icons["ufo"] = "ufo/ufo";
+    this.aircraft_photo_icons["KC135"] = "kc135/kc135-model";
 
 
     this.linktomap_update();
@@ -2197,6 +2218,18 @@ FGMap.prototype.info_type_set = function(type) {
 
     }
 
+};
+
+
+FGMap.prototype.aircraft_icon_mode_set = function(mode) {
+    if(this.aircraft_icon_mode == mode) {
+        return;
+    }
+    this.aircraft_icon_mode = mode;
+    
+    for(var p in this.pilots) {
+        this.pilots[p].marker_update(true);
+    }
 };
 
 

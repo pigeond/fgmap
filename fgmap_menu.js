@@ -346,15 +346,20 @@ Settings tab\
 </p>\
 \
 <ul style=\"margin: 0px 0px 0px 0px; padding: 0px 0px 0px 8px;\">\
-    <li><a name=\"pilot_label\"></a>You can choose how the pilot label will be shown on the map. Currently there are 3 modes:<br>\
+    <li><a name=\"pilot_label\"></a>You can choose how the pilot label will be shown on the map. Currently there are 4 modes:<br>\
         <ul style=\"margin: 0px 0px 0px 0px; padding: 0px 0px 0px 16px;\">\
             <li style=\"line-height: 150%;\"><code>off</code> - labels are always off.</li>\
             <li style=\"line-height: 150%;\"><code>always</code> - labels will be shown for all pilots at any time.</li>\
             <li style=\"line-height: 150%;\"><code>follow always</code> - labels will only be shown for pilots which are selected for \"follow\" in the pilot tab.</li>\
             <li style=\"line-height: 150%;\"><code>mouse over only</code> - labels will only be shown when you move your mouse over the icon of a pilot.</li>\
         </ul>\
+    <li><a name=\"aircraft_icon_mode\"></a>You can choose how the icon is displayed for each pilot on the map. Currently there are 3 modes:<br>\
+        <ul style=\"margin: 0px 0px 0px 0px; padding: 0px 0px 0px 16px;\">\
+            <li style=\"line-height: 150%;\"><code>normal</code> - a normal red aircraft icon.</li>\
+            <li style=\"line-height: 150%;\"><code>photo</code> - a photographic icon, not available for all aircraft.</li>\
+            <li style=\"line-height: 150%;\"><code>dot</code> - a simple red dot, similiar to a ATC radar.</li>\
+        </ul>\
     <li>You can turn on or off the trails of pilots with the \"Pilot trails\" checkbox.</li>\
-    <li>You can turn on or off photographic icon for pilots with the \"Model icon\" checkbox. Currently this only works for c172p, 737 and the ufo.</li>\
     <li>You can turn on or off the \"Zoom/Pan to all pilots\" mode with the corresponding checkbox. When this mode is enabled, all pilots will be \"followed\" automatically at all time. That also means any new pilots joining will be followed automatically too.</li>\
     <li>You can turn on debug mode of the map with the \"Debug\" checkbox. When it is turned on a debug tab will be added, showing debugging messages of the map.</li>\
 </ul>\

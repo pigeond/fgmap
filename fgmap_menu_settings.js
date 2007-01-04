@@ -79,69 +79,128 @@ FGMapMenuSettings.prototype.setup = function() {
     }
 
 
-    // Pilot trail
+    // Icon mode
     li = element_clone(li, false);
     li.className = "fgmap_field_label";
     element_attach(li, ul);
-    this.trail_checkbox = checkbox = element_create(li, "input", "checkbox");
-    checkbox.className = "fgmap_menu";
-    if(this.trail_visible) {
-        checkbox.checked = true;
-        checkbox.defaultChecked = true;
-    }
-    element_text_append(li, "\u00a0");
-    element_text_append(li, "Pilot trails");
-    attach_event(checkbox, "click", this.trail_checkbox_cb.bind_event(this));
 
-
-    // Model icon
-    li = element_clone(li, false);
+    element_text_append(li, "Aircraft icon mode");
     li.className = "fgmap_field_label";
-    element_attach(li, ul);
-    this.model_icon_checkbox = checkbox =
-        element_create(li, "input", "checkbox");
-    checkbox.className = "fgmap_menu";
-    if(this.fgmap.model_icon) {
-        checkbox.checked = true;
-        checkbox.defaultChecked = true;
-    }
-    element_text_append(li, "\u00a0");
-    element_text_append(li, "Model icon");
-    attach_event(checkbox, "click",
-        this.model_icon_checkbox_cb.bind_event(this));
+    element_create(li, "br");
 
+    element_text_append(li, "\u00a0\u00a0\u00a0");
+
+    var select = this.info_select = element_create(li, "select");
+    select.className = "fgmap_menu";
+    select.size = 1;
+    attach_event(select, "change",
+                    this.aircraft_icon_mode_changed_cb.bind_event(this));
+
+    var option;
+    option = element_create(select, "option");
+    option.text = "normal";
+    option.value = FGMAP_ICON_MODE_NORMAL;
+    if(this.fgmap.aircraft_icon_mode == FGMAP_ICON_MODE_NORMAL) {
+        option.selected = true;
+    }
+
+    option = element_create(select, "option");
+    option.text = "photo (if available)";
+    option.value = FGMAP_ICON_MODE_PHOTO;
+    if(this.fgmap.aircraft_icon_mode == FGMAP_ICON_MODE_PHOTO) {
+        option.selected = true;
+    }
+
+    option = element_create(select, "option");
+    option.text = "dot";
+    option.value = FGMAP_ICON_MODE_DOT;
+    if(this.fgmap.aircraft_icon_mode == FGMAP_ICON_MODE_DOT) {
+        option.selected = true;
+    }
+
+
+
+    var span;
+    var base_span;
+
+    base_span = element_create(null, 'span');
+    base_span.style.cursor = 'pointer';
 
 
     // Debug
     li = element_clone(li, false);
     li.className = "fgmap_field_label";
     element_attach(li, ul);
-    this.debug_checkbox = checkbox = element_create(li, "input", "checkbox");
+
+    span = element_clone(base_span);
+    element_attach(span, li);
+
+    this.debug_checkbox = checkbox = element_create(span, "input", "checkbox");
     checkbox.className = "fgmap_menu";
+    checkbox.style.cursor = 'pointer';
     if(this.fgmap.debug) {
         checkbox.checked = true;
         checkbox.defaultChecked = true;
         this.debug_show(true);
     }
-    element_text_append(li, "\u00a0");
-    element_text_append(li, "Debug");
+    element_text_append(span, "\u00a0");
+    element_text_append(span, "Debug");
     attach_event(checkbox, "click", this.debug_checkbox_cb.bind_event(this));
+    attach_event(span, "click",
+            this.debug_checkbox_cb.bind_event(this, checkbox));
+
+
+
+    // Pilot trail
+    li = element_clone(li, false);
+    li.className = "fgmap_field_label";
+    element_attach(li, ul);
+
+    span = element_clone(base_span);
+    element_attach(span, li);
+
+    this.trail_checkbox = checkbox = element_create(span, "input", "checkbox");
+    checkbox.className = "fgmap_menu";
+    checkbox.style.cursor = 'pointer';
+    if(this.trail_visible) {
+        checkbox.checked = true;
+        checkbox.defaultChecked = true;
+    }
+    element_text_append(span, "\u00a0");
+    element_text_append(span, "Pilot trails");
+    attach_event(checkbox, "click", this.trail_checkbox_cb.bind_event(this));
+    attach_event(span, "click", this.trail_checkbox_cb.bind_event(this, checkbox));
+
+
+
+    // Placeholder
+    li = element_clone(li, false);
+    li.className = "fgmap_field_label";
+    element_attach(li, ul);
+    element_text_append(li, "\u00a0");
 
 
     // Zoom all
     li = element_clone(li, false);
     li.className = "fgmap_field_label";
     element_attach(li, ul);
-    this.debug_checkbox = checkbox = element_create(li, "input", "checkbox");
+
+    span = element_clone(base_span);
+    element_attach(span, li);
+
+    this.debug_checkbox = checkbox = element_create(span, "input", "checkbox");
     checkbox.className = "fgmap_menu";
+    checkbox.style.cursor = 'pointer';
     if(this.fgmap.pantoall) {
         checkbox.checked = true;
         checkbox.defaultChecked = true;
         this.debug_show(true);
     }
-    element_text_append(li, "\u00a0");
-    element_text_append(li, "Zoom/Pan to all pilots");
+    element_text_append(span, "\u00a0");
+    element_text_append(span, "Zoom/Pan to all pilots");
     attach_event(checkbox, "click", this.pantoall_checkbox_cb.bind_event(this));
+    attach_event(span, "click",
+            this.pantoall_checkbox_cb.bind_event(this, checkbox));
 
 
     // Placeholder
@@ -155,16 +214,24 @@ FGMapMenuSettings.prototype.setup = function() {
     li = element_clone(li, false);
     li.className = "fgmap_field_label";
     element_attach(li, ul);
-    this.debug_checkbox = checkbox = element_create(li, "input", "checkbox");
+
+    span = element_clone(base_span);
+    element_attach(span, li);
+
+    this.debug_checkbox = checkbox = element_create(span, "input", "checkbox");
     checkbox.className = "fgmap_menu";
+    checkbox.style.cursor = 'pointer';
     if(this.fgmap.follow_always_center) {
         checkbox.checked = true;
         checkbox.defaultChecked = true;
     }
-    element_text_append(li, "\u00a0");
-    element_text_append(li, "Always center follows");
+    element_text_append(span, "\u00a0");
+    element_text_append(span, "Always center follows");
     attach_event(checkbox, "click",
             this.follows_always_center_checkbox_cb.bind_event(this));
+    attach_event(span, "click",
+            this.follows_always_center_checkbox_cb.bind_event(this, checkbox));
+
 
     this.tabdiv.tab_add("settings", "settings", elem, this);
 };
@@ -176,9 +243,29 @@ FGMapMenuSettings.prototype.info_type_changed_cb = function(e) {
 };
 
 
-FGMapMenuSettings.prototype.trail_checkbox_cb = function(e) {
+FGMapMenuSettings.prototype.aircraft_icon_mode_changed_cb = function(e) {
     var target = target_get(e || window.event);
-    this.fgmap.trail_visible_set(target.checked);
+    this.fgmap.aircraft_icon_mode_set(target.value);
+};
+
+
+FGMapMenuSettings.prototype.trail_checkbox_cb = function(e, chkbox) {
+
+    var target = target_get(e || window.event);
+    var checked;
+
+    if(target == chkbox) {
+        return;
+    }
+
+    if(chkbox) {
+        chkbox.checked = !chkbox.checked;
+        checked = chkbox.checked;
+    } else {
+        checked = target.checked;
+    }
+
+    this.fgmap.trail_visible_set(checked);
 };
 
 
@@ -206,29 +293,60 @@ FGMapMenuSettings.prototype.debug_show = function(bool) {
 };
 
 
-FGMapMenuSettings.prototype.debug_checkbox_cb = function(e) {
+FGMapMenuSettings.prototype.debug_checkbox_cb = function(e, chkbox) {
     var target = target_get(e || window.event);
-    this.debug_show(target.checked);
-};
+    var checked;
 
-
-FGMapMenuSettings.prototype.pantoall_checkbox_cb = function(e) {
-    var target = target_get(e || window.event);
-    this.fgmap.pantoall_set(target.checked);
-};
-
-
-FGMapMenuSettings.prototype.follows_always_center_checkbox_cb = function(e) {
-    var target = target_get(e || window.event);
-    this.fgmap.follows_always_center_set(target.checked);
-};
-
-FGMapMenuSettings.prototype.model_icon_checkbox_cb = function(e) {
-    this.fgmap.model_icon = (target_get(e || window.event)).checked;
-    for(var p in this.fgmap.pilots) {
-        // TODO
-        this.fgmap.pilots[p].marker_update(true);
+    if(target == chkbox) {
+        return;
     }
+
+    if(chkbox) {
+        chkbox.checked = !chkbox.checked;
+        checked = chkbox.checked;
+    } else {
+        checked = target.checked;
+    }
+
+    this.debug_show(checked);
+};
+
+
+FGMapMenuSettings.prototype.pantoall_checkbox_cb = function(e, chkbox) {
+    var target = target_get(e || window.event);
+    var checked;
+
+    if(target == chkbox) {
+        return;
+    }
+
+    if(chkbox) {
+        chkbox.checked = !chkbox.checked;
+        checked = chkbox.checked;
+    } else {
+        checked = target.checked;
+    }
+
+    this.fgmap.pantoall_set(checked);
+};
+
+
+FGMapMenuSettings.prototype.follows_always_center_checkbox_cb = function(e, chkbox) {
+    var target = target_get(e || window.event);
+    var checked;
+
+    if(target == chkbox) {
+        return;
+    }
+
+    if(chkbox) {
+        chkbox.checked = !chkbox.checked;
+        checked = chkbox.checked;
+    } else {
+        checked = target.checked;
+    }
+
+    this.fgmap.follows_always_center_set(checked);
 };
 
 
