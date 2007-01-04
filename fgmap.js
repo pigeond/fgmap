@@ -1447,6 +1447,15 @@ function FGMap(id)
         this.div.style.overflow = "hidden";
     }
 
+
+    /* Precache some images */
+    var img;
+    this.img_precache = new Array();
+    img = new Image();
+    img.src = FGMAP_CRAFT_ICON_PREFIX +
+        FGMAP_CRAFT_DOT + FGMAP_CRAFT_ICON_SUFFIX;
+    this.img_precache.push(img);
+
     this.init(true);
 
 }
