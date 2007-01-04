@@ -1838,7 +1838,6 @@ FGMap.prototype.query_string_parse = function() {
 
         } else if(pair[0] == "pilot_label") {
 
-            /* TODO: Update linktomap with this too */
             if(pair[1] == "off") {
                 this.info_type = FGMAP_PILOT_INFO_OFF;
             } else if(pair[1] == "always") {
@@ -1853,6 +1852,15 @@ FGMap.prototype.query_string_parse = function() {
         
             this.start_tab = pair[1];
 
+        } else if(pair[0] == "icon_mode") {
+        
+            if(pair[1] == "normal") {
+                this.aircraft_icon_mode = FGMAP_ICON_MODE_NORMAL;
+            } else if(pair[1] == "photo") {
+                this.aircraft_icon_mode = FGMAP_ICON_MODE_PHOTO;
+            } else if(pair[1] == "dot") {
+                this.aircraft_icon_mode = FGMAP_ICON_MODE_DOT;
+            }
         }
     }
 
@@ -2218,6 +2226,7 @@ FGMap.prototype.info_type_set = function(type) {
 
     }
 
+    this.linktomap_update();
 };
 
 
@@ -2230,6 +2239,8 @@ FGMap.prototype.aircraft_icon_mode_set = function(mode) {
     for(var p in this.pilots) {
         this.pilots[p].marker_update(true);
     }
+
+    this.linktomap_update();
 };
 
 
@@ -2293,6 +2304,28 @@ FGMap.prototype.linktomap_update = function() {
         href += "&fg_server=" + this.fg_server_current.name + "," +
             this.fg_server_current.host + "," +
             this.fg_server_current.port;
+    }
+
+    // Pilot label mode
+    href += '&pilot_label=';
+    if(this.info_type == FGMAP_PILOT_INFO_OFF) {
+        href += 'off';
+    } else if(this.info_type == FGMAP_PILOT_INFO_ALWAYS) {
+        href += 'always';
+    } else if(this.info_type == FGMAP_PILOT_INFO_FOLLOWS) {
+        href += 'follows';
+    } else if(this.info_type == FGMAP_PILOT_INFO_MOUSEOVER) {
+        href += 'mouseover';
+    }
+
+    // Icon mode
+    href += '&icon_mode=';
+    if(this.aircraft_icon_mode == FGMAP_ICON_MODE_NORMAL) {
+        href += 'normal';
+    } else if(this.aircraft_icon_mode == FGMAP_ICON_MODE_PHOTO) {
+        href += 'photo';
+    } else if(this.aircraft_icon_mode == FGMAP_ICON_MODE_DOT) {
+        href += 'dot';
     }
 
     this.linktomap = href;

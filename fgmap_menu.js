@@ -400,6 +400,10 @@ Currently valid keys and values are:<br>\
     example: <code>pilot_label=off</code>\
     </li>\
     <li style=\"line-height: 150%;\">\
+    <code>icon_mode</code> - Set the startup pilot aircraft icon mode. Valid values are <code>normal</code>, <code>photo</code>, and <code>dot</code>. See the help of the settings tab more info.<br>\
+    example: <code>icon_mode=dot</code>\
+    </li>\
+    <li style=\"line-height: 150%;\">\
     <code>menu</code> - menu tab to display at startup.<br>\
     example: <code>menu=nav</code>\
     </li>\
