@@ -450,26 +450,6 @@ function arr_cons(element, sequence) {
 
 
 
-function bind_img_complete_cb(img, func, data) {
-    if(img.complete == true) {
-        func(img, data);
-        return;
-    } else {
-        bind_img_complete(img, func, data);
-    }
-}
-
-/* Call the callback until the image is loaded */
-function bind_img_complete(img, func, data) {
-
-    var timeout_func = function() {
-        bind_img_complete_cb(img, func, data);
-    }
-
-    setTimeout(timeout_func, 100);
-}
-
-
 /*
 Function.prototype.bind_event = function(obj) {
     var func = this;
@@ -746,8 +726,11 @@ GMapElement.prototype.initialize = function(gmap) {
 
 GMapElement.prototype.child_set = function(child) {
     if(child) {
+        if(this.child) {
+            element_remove(this.child);
+        }
         this.child = child;
-        this.elem.appendChild(child);
+        element_attach(child, this.elem);
     }
 };
 
@@ -814,6 +797,66 @@ GMapElement.prototype.remove = function() {
     this.latlng = null;
     delete(this.align);
     this.align = null;
+};
+
+
+/*****/
+
+var IMG_CHECK_INTERVAL = 200;
+
+function GMapImageElement(latlng, src) {
+    GMapElement.apply(this, [ latlng, null, null, null, null ]);
+    this.img = null;
+    this.pending = null;
+    this.src_set(src);
+}
+GMapImageElement.prototype = new GMapElement();
+
+
+GMapImageElement.prototype.img_complete_cb = function() {
+
+    if(this.pending.complete == true) {
+
+        this.img = this.pending;
+        this.pending = null;
+
+        this.child_set(this.img);
+
+        // TODO: check those magic numbers...
+        var align = new GPoint(-this.img.width / 2 + 1,
+                -this.img.height / 2 - 6);
+        this.update(null, align);
+
+        img_ie_fix(this.img);
+        element_show(this.img);
+    } else {
+        setTimeout(this.img_complete_cb.bind_event(this), IMG_CHECK_INTERVAL);
+    }
+};
+
+
+GMapImageElement.prototype.src_set = function(src) {
+
+    if(src == this.src) {
+        return;
+    }
+
+    this.src = src;
+
+    if(this.pending) {
+        element_hide(this.pending);
+        delete(this.pending);
+    }
+
+    if(src == null) {
+        element_hide(this.img);
+        return;
+    }
+
+    this.pending = element_create(null, 'img');
+    element_hide(this.pending);
+    this.pending.src = src;
+    this.img_complete_cb();
 };
 
 
@@ -956,17 +999,15 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip, heading) {
 
 
     /* pilot icon */
-    elem = this.icon_elem = element_create(null, "img");
-    elem.className = "fgmap_pilot_icon";
-    //elem.style.zIndex = FGMAP_CRAFT_ICON_ZINDEX;
-    attach_event(elem, "mouseover",
-        this.marker_mouse_event_cb.bind_event(this));
-    attach_event(elem, "mouseout",
-        this.marker_mouse_event_cb.bind_event(this));
-
-
-    this.marker = new GMapElement(this.latlng, null, this.icon_elem);
+    this.marker = new GMapImageElement(this.latlng, null);
     fgmap.gmap.addOverlay(this.marker);
+
+    // TODO
+    attach_event(this.marker.elem, "mouseover",
+        this.marker_mouse_event_cb.bind_event(this));
+    attach_event(this.marker.elem, "mouseout",
+        this.marker_mouse_event_cb.bind_event(this));
+
 
     this.marker_update(true);
 }
@@ -1213,23 +1254,11 @@ FGPilot.prototype.marker_update = function(force) {
         
         img += FGMAP_CRAFT_ICON_SUFFIX;
 
-        this.icon_elem.src = img;
-        element_hide(this.icon_elem);
-        bind_img_complete(this.icon_elem,
-            this.icon_elem_complete_cb.bind_event(this), null);
+        this.marker.src_set(img);
         this.marker.update(this.latlng);
     }
 };
 
-
-FGPilot.prototype.icon_elem_complete_cb = function(img, data) {
-    if(this.icon_elem != img) {
-        return;
-    }
-    this.marker.update(null, new GPoint(-img.width / 2, -img.height / 2));
-    img_ie_fix(this.icon_elem);
-    element_show(this.icon_elem);
-};
 
 
 /**
@@ -1411,7 +1440,7 @@ function FGMap(id)
 
     /* pilots related */
     this.pilots = new Object();
-    this.pilots_cnt = 0;
+    this.pilots_cnt = 0;        // TODO: get rid of it
     this.follows = new Array();
 
     /* menus */
@@ -1446,15 +1475,6 @@ function FGMap(id)
         //this.div.style.position = "absolute";
         this.div.style.overflow = "hidden";
     }
-
-
-    /* Precache some images */
-    var img;
-    this.img_precache = new Array();
-    img = new Image();
-    img.src = FGMAP_CRAFT_ICON_PREFIX +
-        FGMAP_CRAFT_DOT + FGMAP_CRAFT_ICON_SUFFIX;
-    this.img_precache.push(img);
 
     this.init(true);
 
@@ -1778,9 +1798,10 @@ FGMap.prototype.pilot_test = function() {
         var p = new FGPilot(this, "testpilot" + (n + 1),
                 this.gmap_start_point.lat() + (n * 0.01),
                 this.gmap_start_point.lng() + (n * 0.01),
-                (n + 1) * 100, "test", "test");
+                (n + 1) * 100, "test", "test", n * 10.0);
         this.pilots["testpilot" + (n + 1)] = p;
         //p.info_visible_set(true);
+        this.pilots_cnt++;
     }
 
     //this.pilots_tab_update();

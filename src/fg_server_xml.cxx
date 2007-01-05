@@ -213,6 +213,30 @@ main(int argc, char **argv)
     float heading, pitch, roll;
 
 
+#if 0
+    if(1)
+    {
+        int n;
+        lat = 37.613545;
+        lon = -122.357237;
+
+        srand(time(NULL));
+
+        ocs.header_func(0);
+        for(n = 0; n < 10; n++)
+        {
+            lat += (n * 0.01);
+            lon += (n * 0.01);
+            sprintf(buf, "testpilot%d", n + 1);
+            ocs.single_func(buf, "testi", "testmodel",
+                    lat, lon, (n + 1) * 100, 1 + rand() % 360, 0.0, 0.0);
+        }
+        ocs.tail_func();
+    }
+    return 0;
+#endif
+
+
     if((env = getenv(HTTP_HOST)) == NULL)
     {
         fprintf(stderr, "%s: HTTP_HOST\n", argv[0]);
