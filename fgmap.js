@@ -817,6 +817,8 @@ GMapImageElement.prototype.img_complete_cb = function() {
 
     if(this.pending.complete == true) {
 
+        var oldimg = this.img;
+
         this.img = this.pending;
         this.pending = null;
 
@@ -829,6 +831,12 @@ GMapImageElement.prototype.img_complete_cb = function() {
 
         img_ie_fix(this.img);
         element_show(this.img);
+
+        if(oldimg) {
+            element_hide(oldimg);
+            delete(oldimg);
+            oldimg = null;
+        }
     } else {
         setTimeout(this.img_complete_cb.bind_event(this), IMG_CHECK_INTERVAL);
     }
