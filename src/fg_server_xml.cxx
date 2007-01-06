@@ -355,7 +355,8 @@ main(int argc, char **argv)
                 ocs.header_func(npilots);
             }
         }
-        else if((s = sscanf(buf, "%[^@]@%[^:]: %f %f %f %f %f %f %f %f %f %s",
+        else if((s = sscanf(buf,
+                        "%7[^@]@%15[^:]: %f %f %f %f %f %f %f %f %f %95s",
                     callsign, server_ip,
                     &x, &y, &z,
                     &lat, &lon, &alt,
@@ -375,6 +376,18 @@ main(int argc, char **argv)
                 {
                     strtok(model_file, ".");
                 }
+            }
+
+            p = callsign;
+
+            while(*p)
+            {
+                if(*p == '"')
+                {
+                    /* Damn, quick hack */
+                    *p = '_';
+                }
+                p++;
             }
 
             ocs.single_func(callsign, server_ip, model_file,
