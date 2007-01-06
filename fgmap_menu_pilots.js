@@ -305,7 +305,7 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
 
     span = element_create(td, "span");
     span.className = "fgmap_pilot_tab_model";
-    element_text_append(span, p.model);
+    element_text_append(span, p.model.replace(/-model$/, ''));
 
     element_text_append(td, "\u00a0");
     element_text_append(td, "\u00a0");
