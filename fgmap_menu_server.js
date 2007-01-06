@@ -49,7 +49,7 @@ FGMapMenuServer.prototype.setup = function() {
 
     var checkbox = this.update_checkbox =
         element_create(li, "input", "checkbox");
-    checkbox.className = "fgmap_menu";
+    //checkbox.className = "fgmap_menu";
     if(this.fgmap.update) {
         checkbox.checked = true;
         checkbox.defaultChecked = true;
@@ -72,7 +72,7 @@ FGMapMenuServer.prototype.setup = function() {
     label.innerHTML = "every&nbsp;";
 
     var textfield = this.update_interval = element_create(li, "input", "text");
-    textfield.className = "fgmap_menu";
+    //textfield.className = "fgmap_menu";
     textfield.size = 3;
     textfield.maxLength = 3;
     textfield.style.textAlign = "right";

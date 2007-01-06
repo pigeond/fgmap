@@ -136,7 +136,7 @@ FGMapMenuSettings.prototype.setup = function() {
     element_attach(span, li);
 
     this.debug_checkbox = checkbox = element_create(span, "input", "checkbox");
-    checkbox.className = "fgmap_menu";
+    //checkbox.className = "fgmap_menu";
     checkbox.style.cursor = 'pointer';
     if(this.fgmap.debug) {
         checkbox.checked = true;
@@ -160,7 +160,7 @@ FGMapMenuSettings.prototype.setup = function() {
     element_attach(span, li);
 
     this.trail_checkbox = checkbox = element_create(span, "input", "checkbox");
-    checkbox.className = "fgmap_menu";
+    //checkbox.className = "fgmap_menu";
     checkbox.style.cursor = 'pointer';
     if(this.trail_visible) {
         checkbox.checked = true;
@@ -189,7 +189,7 @@ FGMapMenuSettings.prototype.setup = function() {
     element_attach(span, li);
 
     this.debug_checkbox = checkbox = element_create(span, "input", "checkbox");
-    checkbox.className = "fgmap_menu";
+    //checkbox.className = "fgmap_menu";
     checkbox.style.cursor = 'pointer';
     if(this.fgmap.pantoall) {
         checkbox.checked = true;
@@ -219,7 +219,7 @@ FGMapMenuSettings.prototype.setup = function() {
     element_attach(span, li);
 
     this.debug_checkbox = checkbox = element_create(span, "input", "checkbox");
-    checkbox.className = "fgmap_menu";
+    //checkbox.className = "fgmap_menu";
     checkbox.style.cursor = 'pointer';
     if(this.fgmap.follow_always_center) {
         checkbox.checked = true;

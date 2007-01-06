@@ -267,7 +267,7 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
     div.style.zIndex = 1;   /* Hmm */
 
     var checkbox = pilot.checkbox = element_create(div, 'input', 'checkbox');
-    checkbox.className = "fgmap_menu";
+    //checkbox.className = "fgmap_menu";
     //checkbox.style.cssFloat = "left";
     //checkbox.style.styleFloat = "left";
     checkbox.title = "Tick to make this pilot always visible";
