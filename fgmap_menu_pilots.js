@@ -258,15 +258,14 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
 
     element_attach(li, this.list_ul);
 
-    var div;
+    var table, tbody, tr, td;
     
-    div = element_create(li, 'div');
-    div.style.position = 'relative';
-    div.style.cssFloat = 'left';
-    div.style.styleFloat = 'left';
-    div.style.zIndex = 1;   /* Hmm */
+    tr = element_create(element_create(element_create(li, 'table'), 'tbody'), 'tr');
+    td = element_create(tr, 'td');
+    td.style.verticalAlign = 'top';
+    td.style.textAlign = 'left';
 
-    var checkbox = pilot.checkbox = element_create(div, 'input', 'checkbox');
+    var checkbox = pilot.checkbox = element_create(td, 'input', 'checkbox');
     //checkbox.className = "fgmap_menu";
     //checkbox.style.cssFloat = "left";
     //checkbox.style.styleFloat = "left";
@@ -279,23 +278,15 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
         checkbox.checked = true;
         checkbox.defaultChecked = true;
     }
-6
-    // Add some blank lines so that it has a roughly same height of the div on
-    // the right, a bit of a hack
-    //element_create(div, 'br');
-    //element_create(div, 'br');
 
+    td = element_create(tr, 'td');
+    td.style.verticalAlign = 'top';
+    td.style.textAlign = 'left';
 
-    div = element_create(li, 'div');
-    div.style.position = 'relative';
-    div.style.overflow = 'auto';
-    div.style.cssFloat = 'left';
-    div.style.styleFloat = 'left';
-
-    span = element_create(div, 'span');
+    span = element_create(td, 'span');
     span.className = "fgmap_pilot_callsign";
-    span.style.cssFloat = "left";
-    span.style.styleFloat = "left";
+    //span.style.cssFloat = "left";
+    //span.style.styleFloat = "left";
     span.style.marginLeft = "4px";
     span.style.textDecoration = "underline";
     span.style.cursor = "pointer";
@@ -308,19 +299,19 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
     attach_event(span, "mouseout",
         this.pilot_callsign_mouse_event_cb.bind_event(this, callsign));
 
-    element_create(div, 'br');
+    element_create(td, 'br');
 
-    element_text_append(div, "\u00a0");
+    element_text_append(td, "\u00a0");
 
-    span = element_create(div, "span");
+    span = element_create(td, "span");
     span.className = "fgmap_pilot_tab_model";
     element_text_append(span, p.model);
 
-    element_text_append(div, "\u00a0");
-    element_text_append(div, "\u00a0");
-    element_text_append(div, "\u00a0");
+    element_text_append(td, "\u00a0");
+    element_text_append(td, "\u00a0");
+    element_text_append(td, "\u00a0");
 
-    span = element_create(div, "span");
+    span = element_create(td, "span");
     span.className = "fgmap_pilot_tab_server";
 
     var fgserver;
@@ -338,22 +329,22 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
         span.innerHTML = fgserver.name.replace(/:[0-9]+/, '');
     }
 
-    element_create(div, "br");
+    element_create(td, "br");
 
-    element_text_append(div, "\u00a0");
-    element_text_append(div, "(");
+    element_text_append(td, "\u00a0");
+    element_text_append(td, "(");
 
-    span = pilot.lat_span = element_create(div, "span");
+    span = pilot.lat_span = element_create(td, "span");
     span.className = "fgmap_pilot_tab_lat";
     span.innerHTML = lat.toFixed(4);
 
-    element_text_append(div, " , ");
+    element_text_append(td, " , ");
 
-    span = pilot.lng_span = element_create(div, "span");
+    span = pilot.lng_span = element_create(td, "span");
     span.className = "fgmap_pilot_tab_lng";
     span.innerHTML = lng.toFixed(4);
 
-    element_text_append(div, ")");
+    element_text_append(td, ")");
 
     this.pilots[callsign] = pilot;
 };
