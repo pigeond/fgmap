@@ -815,6 +815,10 @@ GMapImageElement.prototype = new GMapElement();
 
 GMapImageElement.prototype.img_complete_cb = function() {
 
+    if(!this.pending) {
+        return;
+    }
+
     if(this.pending.complete == true) {
 
         var oldimg = this.img;
