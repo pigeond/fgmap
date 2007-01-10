@@ -283,6 +283,29 @@ var FGMAP_NAV_OPACITY = 0.80;
 
 
 
+// Browser stuff
+
+var USER_AGENT = new Object();
+var agent_str = navigator.userAgent.toLowerCase();
+
+if(agent_str.indexOf("msie") != -1) {
+    USER_AGENT.is_ie = true;
+}
+if(agent_str.indexOf("mozilla") != -1) {
+    USER_AGENT.is_mozilla = true;
+}
+if(agent_str.indexOf("gecko") != -1) {
+    USER_AGENT.is_gecko = true;
+}
+if(agent_str.indexOf("opera") != -1) {
+    USER_AGENT.is_opera = true;
+}
+if(agent_str.indexOf("safari") != -1) {
+    USER_AGENT.is_safari = true;
+}
+
+
+
 /* Helper functions */
 
 function deg_to_rad(deg) {
@@ -517,25 +540,6 @@ include_js("fgmap_menu_settings.js");
 include_js("fgmap_menu_debug.js");
 include_js("fgmap_menu_nav.js");
 */
-
-
-// Browser stuff
-
-var USER_AGENT = new Object();
-var agent_str = navigator.userAgent.toLowerCase();
-
-if(agent_str.indexOf("msie") != -1) {
-    USER_AGENT.is_ie = true;
-}
-if(agent_str.indexOf("mozilla") != -1) {
-    USER_AGENT.is_mozilla = true;
-}
-if(agent_str.indexOf("gecko") != -1) {
-    USER_AGENT.is_gecko = true;
-}
-if(agent_str.indexOf("opera") != -1) {
-    USER_AGENT.is_opera = true;
-}
 
 
 
@@ -819,7 +823,9 @@ GMapImageElement.prototype.img_complete_cb = function() {
         return;
     }
 
-    if(this.pending.complete == true) {
+    if((this.pending.complete == true) ||
+            ((this.pending.old_width != this.pending.offsetWidth) ||
+             (this.pending.old_height != this.pending.offsetHeight))) {
 
         var oldimg = this.img;
 
@@ -867,6 +873,8 @@ GMapImageElement.prototype.src_set = function(src) {
 
     this.pending = element_create(null, 'img');
     element_hide(this.pending);
+    this.pending.old_width = this.pending.offsetWidth;
+    this.pending.old_height = this.pending.offsetHeight;
     this.pending.src = src;
     this.img_complete_cb();
 };
