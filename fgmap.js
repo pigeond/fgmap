@@ -966,7 +966,9 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip, heading) {
     span.className = "fgmap_pilot_info_model";
 
     // TODO: one day when FG can switch craft
-    span.innerHTML = model.replace(/-model$/, '');
+    var model_dis = model.replace(/-model$/, '');
+    model_dis = model_dis.replace(/-anim$/, '');
+    span.innerHTML = model_dis;
 
     element_text_append(elem, ")");
     element_create(elem, "br");
