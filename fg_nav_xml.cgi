@@ -347,9 +347,9 @@ if($sstr)
     $sstr =~ s/%([a-fA-F0-9][a-f-A-F0-9])/pack("C", hex($1))/ge;
     $sstr =~ s/[\%\*\.\?\_]//g;
 
-    if(length($sstr) < 3 && $ENV{'HTTP_HOST'})
+    if(length($sstr) < 2 && $ENV{'HTTP_HOST'})
     {
-        &err_print("Search string too short, minimum length 3.");
+        &err_print("Search string too short, minimum length 2.");
     }
 }
 

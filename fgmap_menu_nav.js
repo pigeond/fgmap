@@ -442,10 +442,10 @@ FGMapMenuNav.prototype.cbutton_enabled_set = function(enabled) {
 
 FGMapMenuNav.prototype.nav_form_submit_cb = function(e) {
 
-    if((this.nav_lookup.value == "" || this.nav_lookup.value.length < 3)
+    if((this.nav_lookup.value == "" || this.nav_lookup.value.length < 2)
         && this.bounds == null) {
 
-        this.result_box_msg_set("Search string too short, minimum length 3.");
+        this.result_box_msg_set("Search string too short, minimum length 2.");
         return false;
     }
 
