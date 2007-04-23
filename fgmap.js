@@ -2941,6 +2941,9 @@ FGAirport.prototype.ils_setup = function(runway) {
             imgsrc = FGMAP_ILS_MARKER_ICON;
             hdg = Math.round(ils.heading);
             hdg = hdg - (hdg % ils_marker_step);
+            if(hdg == 360) {
+                hdg = 0;
+            }
             imgsrc += '-' + hdg + FGMAP_ILS_MARKER_ICON_SUFFIX;
             imgdimen = FGMAP_ILS_MARKER_ICON_DIMEN;
 
