@@ -3,7 +3,7 @@
 <NetworkLink>
     <name>FlightGear MP server map</name>
     <Link>
-        <href>http://pigeond.net/flightgear/fg_server_kml.cgi?pigeond.net:5001</href>
+        <href>http://pigeond.net/flightgear/fgmap/fg_server_kml.cgi?pigeond.net:5001</href>
     </Link>
 </NetworkLink>
 </kml>
