@@ -4,41 +4,7 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <title>FlightGear server online map</title>
 
-<!--#if expr="\"${HTTP_HOST}\" = \"localhost\"" -->
-
-    <script src="http://localgoogle.com/localgm.js"></script>
-
-    <!-- <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBQsnjKtmoBcGM7Hr46AB7vQ9RgJehStikuzXFq1JhXNmGuz2srLpjo-WQ" type="text/javascript"></script> -->
-
-<!--
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBSSDzLYxvyashWcRaKE0aRFfeXqiBT-k8HQ3MAYQqUw2bKJcU1Dwcb-kA" type="text/javascript"></script>
--->
-
-<!--#elif expr="\"${HTTP_HOST}\" = \"pikkoro\"" -->
-
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBQHXQQzrYH0bJO7DJTBa_3107bfvBT834N06Y7Md-TeMuaz25EY8nBQEw" type="text/javascript"></script>
-    
-<!--#elif expr="\"${HTTP_HOST}\" = \"buu\"" -->
-
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBRkwzIIXfe7RfZVQUzIcrxmZs2-yRRZSqhviGTyUiFf6h1JTpNmR_rTug" type="text/javascript"></script>
-
-<!--#elif expr="\"${HTTP_HOST}\" = \"buu:8080\"" -->
-
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBRiWEQYXWeWjBRrQ6bfZoZCmGCz-hQ_lLpt3X1kTrhvbBXYdMIOKJLkJA" type="text/javascript"></script>
-
-<!--#elif expr="\"${HTTP_HOST}\" = \"mpmap02.flightgear.org\"" -->
-
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBRG77dGRhGm-4jBcEKVK_TcS9THYxQ6SxiPE4mzyPWv_KfNfV1m51X4bw" type="text/javascript"></script>
-
-<!--#elif expr="\"${HTTP_HOST}\" = \"mpserver02.flightgear.org\"" -->
-
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBS8aK78ktysByvbs9SnjAFZvM8R5BTQX1fiiSw5VY0ozdZ-1C9isuKl6w" type="text/javascript"></script>
-
-<!--#else -->
-
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBTuVNkUjJsSLgxO_mO4bdtL0EB06xS8NVUrVk2drnESv2I3ZmTI2shkGA" type="text/javascript"></script>
-
-<!--#endif -->
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBSy05YjvC8Zhv8ZFMfYU7HA_HPkIhR7l9sfJqIBC4kgmAICutShCr3ZlQ" type="text/javascript"></script>
 
     <script>
     // FIXME Temporary workaround for browsers that GM doesn't think it will
@@ -86,19 +52,16 @@
 
             fgmap.server_group_add("-- For FG 0.9.10 --");
 
-            // 50.026388889N 8.543055556E
             fgmap.server_add("mpserver01:5000",
                 "mpserver01.flightgear.org:5000 (Germany)",
                 "mpserver01.flightgear.org", 5001,
                 "85.214.36.1");
 
-            // 22.266133,114.246467
             fgmap.server_add("mpserver02:5000",
                 "mpserver02.flightgear.org:5000 (Hong Kong)",
                 "mpserver02.flightgear.org", 5001,
                 "202.65.223.218");
 
-            // 37.2285 -80.4239
             fgmap.server_add("mpserver03:5000",
                 "mpserver03.flightgear.org:5000 (East Coast US)",
                 "mpserver03.flightgear.org", 5001,
@@ -118,7 +81,6 @@
                 "hugin.gidenstam.org:5000 (Sweden)",
                 "hugin.gidenstam.org", 5001,
                 "83.254.84.138");
-
 
             fgmap.server_group_add("-- For FG CVS --");
 
@@ -146,6 +108,7 @@
                 "hugin.gidenstam.org:5002 (Sweden)",
                 "hugin.gidenstam.org", 5001,
                 "83.254.84.138");
+
 
 
             //fgmap.debug_set(true);
