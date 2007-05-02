@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>FlightGear server online map</title>
+
+<!-- ### fgmap.keys ### -->
+
+    <script>
+    // FIXME Temporary workaround for browsers that GM doesn't think it will
+    // work. It should now load in gpe-mini-browser (add ?t=m) and minimo
+    if(typeof(GMap) == "undefined") {
+        GLoadMapsScript();
+    }
+    </script>
+
+    <script src="fgmap.js"></script>
+    <script src="fgmap_tabbed_div.js"></script>
+    <script src="fgmap_model_lookup.js"></script>
+    <script src="fgmap_menu.js"></script>
+    <script src="fgmap_menu_pilots.js"></script>
+    <script src="fgmap_menu_server.js"></script>
+    <script src="fgmap_menu_settings.js"></script>
+    <script src="fgmap_menu_debug.js"></script>
+    <script src="fgmap_menu_nav.js"></script>
+
+    <style type="text/css">
+
+    v\:* { behavior:url(#default#VML); }
+
+    html, body { width: 100%; height: 100%; }
+
+    body
+    {
+        color: #000000;
+        background-color: #ffffff;
+        padding: 0px 0px 0px 0px;
+        margin-top: 0px;
+        margin-right: 0px;
+        margin-left: 0px;
+        margin-bottom: 0px;
+        overflow: hidden;
+    }
+
+    </style>
+
+    <script lang="JavaScript">
+
+        function fgmap_load()
+        {
+            var fgmap = new FGMap("fgmap");
+
+// ### fgmap.servers ###
+
+            //fgmap.debug_set(true);
+            //fgmap.server_update_set(false);
+        }
+
+
+    </script>
+
+    <link rel="stylesheet" type="text/css" href="fg_server_map.css">
+
+  </head>
+
+  <body onLoad="fgmap_load();" onUnload="GUnload();">
+    <div id="fgmap" style="width: 100%; height: 100%;"></div>
+  </body>
+</html>
+

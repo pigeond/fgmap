@@ -1,0 +1,23 @@
+#
+# Specify your Google Map API key(s) here
+#
+# Blank lines and lines starting with # are ignored
+#
+# Syntax:
+# hostname::key
+#
+# Example:
+#
+# If the URL to your FGMap is http://mpmap02.flightgear.org/, then you put:
+#
+# mpmap02.flightgear.org::ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBS8aK78ktysByvbs9SnjAFZvM8R5BTQX1fiiSw5VY0ozdZ-1C9isuKl6w
+#
+
+mpmap02.flightgear.org::ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBRG77dGRhGm-4jBcEKVK_TcS9THYxQ6SxiPE4mzyPWv_KfNfV1m51X4bw
+
+mpserver02.flightgear.org::ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBS8aK78ktysByvbs9SnjAFZvM8R5BTQX1fiiSw5VY0ozdZ-1C9isuKl6w
+
+pigeond.net::ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBTuVNkUjJsSLgxO_mO4bdtL0EB06xS8NVUrVk2drnESv2I3ZmTI2shkGA
+
+vejitto::ABQIAAAA1BTgxTzKI7pnrfPzp4v8CBSy05YjvC8Zhv8ZFMfYU7HA_HPkIhR7l9sfJqIBC4kgmAICutShCr3ZlQ
+
