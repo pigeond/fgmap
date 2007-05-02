@@ -1697,11 +1697,19 @@ FGMap.prototype.server_group_add = function(group) {
  * 
  * @tparam String name      a short name to be appeared for this server, must be
  *                          unique
+
  * @tparam String longname  a long name, possibly with description of this
  *                          server
+
  * @tparam String host      the host of the server to connect to (ip or host
  *                          name)
+
  * @tparam Integer port     the port to connect to (FG server admin port)
+
+ * @tparam String ip        the IP of the server. This is used for looking up
+ *			    which server a pilot is connected directly to, as
+ *			    the server output uses only IP
+
  * @treturn Boolean         true on success, false on failure
  */
 FGMap.prototype.server_add = function(name, longname, host, port, ip) {
