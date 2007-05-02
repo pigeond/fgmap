@@ -104,16 +104,23 @@ want any cosmetic changes such as colors, hack it. Most people won't need to
 touch this file.
 
 
-"Installation"
---------------
+Example steps
+-------------
 
 - Put the entire FGMap tree somewhere which is accessible via your web server.
 
+  For example, if your DocumentRoot is /var/www/
+  $ cd /var/www/
+  $ git clone git://pigeond.net/flightgear/fgmap
+
+  Now the FGMap tree is at /var/www/git/
+
 - Either edit fgmap.keys and fgmap.servers, 'make', which generates
   fg_server_map.html, or manually change fg_server_map.html to use the
-  appropriate GMAPI key and servers list.
+  appropriate GMAPI key and servers list. Alternatively, edit
+  fg_server_map.html yourself to add GMAPI key and update the server list.
 
-- test it
+- Test it
 
 
 Additional notes
