@@ -15,7 +15,8 @@
 # A line with no field seperators (::) will be used as a group name
 #
 # The very first server line will be the startup default server used when the
-# map page is loaded.
+# map page is loaded. It probably should be your local server, if you're
+# running one.
 
 -- For FG 0.9.10 --
 
