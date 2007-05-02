@@ -1,0 +1,15 @@
+
+This is a very tiny Perl binding which has one single function call which uses
+a few functions in SimGear. It is mainly by fg_server_xml.cgi to convert the
+orientation values from the FG server into heading/pitch/roll.
+
+For convenience the binary for x86 is included in the tree.
+
+If you need to, say, host FGMap on a platform other than x86, you'll want to
+build this yourself. You'll need swig to rebuild this. A 'make clean' followed
+by a 'make' should do it,
+
+
+Pigeon
+pigeon at pigeond dot net
+
