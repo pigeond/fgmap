@@ -1,0 +1,149 @@
+
+============
+FGMap README
+============
+
+
+
+Brief description
+=================
+
+FGMap (0.1) started off as a simple web page that shows, on the Google Map
+(GM), where all the FlightGear Multiplayer server users are. Shortly after, the
+interface was redesigned to be a full web window map, with a proper menu, and
+some whistles and bells.  The current version (0.2) now also has navaids lookup
+support, which can display information of airports, VORs/NDBs, fixes and
+airways.
+
+You can see some more details and screenshots at
+
+http://pigeond.net/flightgear/fgmap.html
+
+This is also a beta version of FGMap using Google Earth as well, see below.
+
+
+
+How it works
+============
+
+At the moment it is pretty simple. The FlightGear server listens on a port for
+TCP connections, known as the "admin" port. When there's an incoming connection
+it answers in plain text who's online and their data, including locations and
+aircraft being used. FGMap uses AJAX to poll the server via a CGI, which
+translate the server admin port output into XML, and then presented onto the
+map.
+
+In short:
+
+Browser/JavaScript/AJAX <---> HTTP server/CGI <---> FlightGear server
+
+
+This will definitely change in the future, to provide more information on the
+pilots and the environment.
+
+As for the navaids, they are imported into a database (running PostgreSQL) from
+FlightGear's data. The map talks to it using AJAX via a CGI which does queries
+on the database and returns the result in XML.
+
+
+
+Web browser requirements
+========================
+
+You simply need a web browser that supports Javascript, AJAX and DHTML. FGMap
+has been tested under Mozilla/Firefox, Opera, Konqueror, and IE6. It also works
+on Safari, though there has been a few known bugs reported.
+
+
+
+Hosting FGMap
+=============
+
+Requirements
+------------
+
+- A web server with Perl CGI support. This document assumes you use Apache.
+  Optionally you can enable server-side-include (SSI) in apache for .html
+  files. See the description of fgmap.keys below.
+
+- A Google Map API (GMAPI) key. You have to get it at
+  http://www.google.com/apis/maps/ . You also need a Google/GMail account.
+
+
+Files to tune/edit
+------------------
+
+fgmap.keys:
+
+You should put the Google Map API key(s) for your site into this file. See the
+comments in the file for more details. This assumes you have enabled
+server-side-include (SSI) in your Apache.
+
+After adding your keys(s), you can run 'make', which will update
+fg_server_map.html for you.
+
+If you don't want or don't need to use SSI, you can manually edit
+fg_server_map.html to have the appropriate GMAPI keys. See
+fg_server_map.sample.html for example.
+
+
+fgmap.servers:
+
+This file contains a list of servers which will appear in the FGMap server
+list. See the comments in the file for more details.
+
+The first server in this file will be the default startup server used for the
+map page. So you probably want to at least re-order some of the servers listed
+in the file provided.
+
+
+fg_server_map.css:
+
+The CSS for FGMap, referenced from fg_server_map.html at the moment. If you
+want any cosmetic changes such as colors, hack it. Most people won't need to
+touch this file.
+
+
+"Installation"
+--------------
+
+- Put the entire FGMap tree somewhere which is accessible via your web server.
+
+- Either edit fgmap.keys and fgmap.servers, 'make', which generates
+  fg_server_map.html, or manually change fg_server_map.html to use the
+  appropriate GMAPI key and servers list.
+
+- test it
+
+
+Additional notes
+----------------
+
+- At the moment, FGMap will always request navaids and metar lookup via
+  pigeond.net/mpserver02. This is done to so that not everyone will have the
+  trouble of setting up a database and installing metar packages. If you really
+  really want to host those things yourself, contact Pigeon.
+
+- The CGI that talks to FG server, namely fg_server_xml.cgi, written in Perl,
+  uses a function in a very tiny SimGear Perl binding. The binary for this
+  binding is included for convenience. However if you'd like to rebuild this
+  for whatever reasons (hosting FGMap on a platform other than x86), please
+  read the README in sg_perl/.
+
+
+
+FGMap on Google Earth
+=====================
+
+This feature is still in its beta, and might be beta for a little while.
+
+You can try it out by opening fg_server_map.kml in Google Earth.
+
+
+
+Everything else
+===============
+
+Bug me (Pigeon), which can be reached either on irc.flightgear.org #flightgear, or via e-mail pigeon at pigeond dot net
+
+
