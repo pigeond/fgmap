@@ -111,7 +111,7 @@ Example steps
 
   For example, if your DocumentRoot is /var/www/
   $ cd /var/www/
-  $ git clone git://pigeond.net/flightgear/fgmap
+  $ git clone git://pigeond.net/flightgear/fgmap.git
 
   Now the FGMap tree is at /var/www/git/
 
