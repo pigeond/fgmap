@@ -1,0 +1,7 @@
+
+Scripts for converting apt.dat.gz, nav.dat.gz, awy.dat.gz, fix.dat.gz,
+TACAN_freq.dat into SQL statements.
+
+You shouldn't need any worry about these unless you want to host your own
+database for the FGMap navaids lookup.
+
