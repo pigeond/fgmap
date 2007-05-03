@@ -23,10 +23,16 @@ open($fh, ${FGMAP_KEYS}) or die("${FGMAP_KEYS} does not exist...");
 @lines = grep(!/(^#|^$)/, <$fh>);
 close($fh);
 
+print("Reading [${FGMAP_KEYS}]\n");
+
 foreach my $l (@lines)
 {
     chomp($l);
+
     my($host, $key) = split(/::/, $l);
+
+    print("Adding key for host [${host}]\n");
+
     $ssis .= <<SSI;
 <!--#if expr="\\"\${HTTP_HOST}\\" = \\"${host}\\"" -->
     <!-- Using HTTP_HOST ${host} -->
@@ -43,13 +49,18 @@ open($fh, ${FGMAP_SERVERS}) or die("${FGMAP_SERVERS} does not exist...");
 @lines = grep(!/(^#|^$)/, <$fh>);
 close($fh);
 
+print("Reading [${FGMAP_SERVERS}]\n");
+
 foreach my $l (@lines)
 {
     chomp($l);
+
     my($id, $desc, $host, $port, $ip) = split(/::/, $l, 5);
 
     if($id && $desc && $host && $port)
     {
+	print("Adding server [${id}]\n");
+
         $js .= <<JS;
             fgmap.server_add("${id}",
                 "${desc}",
@@ -60,6 +71,8 @@ JS
     }
     elsif($id)
     {
+	print("Adding server group [${id}]\n");
+
         $js .= <<JS;
             fgmap.server_group_add("${id}");
 
@@ -76,10 +89,12 @@ close($fh);
 $lines =~ s/${FGMAP_KEYS_TAG}/${ssis}/;
 $lines =~ s/${FGMAP_SERVERS_TAG}/${js}/;
 
+print("Generating [${OUTPUT}]\n");
 open($fh, ">${OUTPUT}");
 print($fh $lines);
 close($fh);
 
+print("Done.\n");
 exit(0);
 
 
