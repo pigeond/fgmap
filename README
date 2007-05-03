@@ -86,8 +86,10 @@ Requirements
   http://www.google.com/apis/maps/ . You also need a Google/GMail account.
 
 - A web server with Perl CGI support. This document assumes you use Apache.
-  Optionally you can enable server-side-include (SSI) in apache for .html
-  files. See the description of fgmap.keys below.
+  Optionally you can enable server-side-include (SSI) in Apache. In Apache2 the
+  module is mod_include. The .htaccess shipped with FGMap enables SSI for .html
+  file, and hence fg_server_map.html. See the description of fgmap.keys below
+  too.
 
 - Also you probably want to install libwww-perl (under Debian) for the navaids
   and metar lookup proxy. See the 'Additional notes' below for details.
@@ -125,6 +127,13 @@ fg_server_map.css:
 The CSS for FGMap, referenced from fg_server_map.html at the moment. If you
 want any cosmetic changes such as colors, hack it. Most people won't need to
 touch this file.
+
+
+.htaccess:
+
+The Apache configuration file for FGMap. You might not want these in your web
+server configuration. Or you might prefer to have these options specified in
+the Apache main config. Tune this file as you like.
 
 
 Example steps
