@@ -58,7 +58,12 @@ For example at the command line you do
 
 $ git clone git://pigeond.net/flightgear/fgmap.git
 
-which will checkout FGMap into a directory called fgmap/
+which will checkout FGMap into a directory called fgmap/. The next time you
+want to update to the latest you can simply do a:
+
+$ git pull
+
+To learn more about git, visit http://git.or.cz/
 
 
 
