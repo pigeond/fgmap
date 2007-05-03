@@ -142,7 +142,7 @@ var FGMAP_CRAFT_ICON_GLIDER = "glider/glider";
 var FGMAP_CRAFT_MODELS_GLIDER = [ "hgldr-cs-model", "paraglider_model", "colditz-model", "sgs233" ];
 
 
-/* Specific aircraft icons */
+/* Specific aircraft (non-photo) icons */
 var FGMAP_CRAFT_ICON_OV10 = "ov10/ov10";
 var FGMAP_CRAFT_MODELS_OV10 = [ "OV10", "OV10_USAFE" ];
 
@@ -1589,6 +1589,7 @@ FGMap.prototype.init = function(force) {
     this.aircraft_photo_icons["boeing733"] = "boeing733/boeing733";
     this.aircraft_photo_icons["ufo"] = "ufo/ufo";
     this.aircraft_photo_icons["KC135"] = "kc135/kc135-model";
+    this.aircraft_photo_icons["A-10-model"] = "a10/a10-model";
 
 
     this.linktomap_update();
