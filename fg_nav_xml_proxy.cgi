@@ -1,5 +1,7 @@
 #!/usr/bin/perl -wT
 
+# Under debian, you need libwww-perl
+
 use strict;
 use Net::HTTP;
 use HTTP::Status;
