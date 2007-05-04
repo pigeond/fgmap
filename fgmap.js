@@ -5,7 +5,8 @@
  *
  * An extension on top of Google Map API.
  * Pigeon &lt;pigeon at pigeond dot net&gt;
- * All rights reserved, 2006.
+ *
+ * GPLv2, see LICENSE file for details
  */
 
 /*
