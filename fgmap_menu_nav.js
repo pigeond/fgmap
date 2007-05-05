@@ -1,5 +1,9 @@
 /*
  * Nav menu
+ *
+ * Pigeon <pigeon at pigeond dot net>
+ *
+ * GPLv2, see LICENSE file for details
  */
 
 

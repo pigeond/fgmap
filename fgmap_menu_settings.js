@@ -2,7 +2,8 @@
  * Settings menu
  *
  * Pigeon <pigeon at pigeond dot net>
- * All rights reserved, 2006.
+ *
+ * GPLv2, see LICENSE file for details
  */
 
 function FGMapMenuSettings(fgmap, tabdiv) {
