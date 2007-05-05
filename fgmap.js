@@ -3323,6 +3323,12 @@ FGAirport.prototype.metar_xml_cb = function() {
 
         this.metar_div.innerHTML = "";
         var xmldoc = this.metar_request.responseXML;
+
+        if(xmldoc.documentElement == null) {
+            this.metar_div.innerHTML = "No METAR info available";
+            return;
+        }
+
         var metars = xmldoc.documentElement.getElementsByTagName('metar');
         var fields = metars[0].getElementsByTagName('field');
 
