@@ -326,5 +326,4 @@ FGTabbedDiv.prototype.children_max_size_get = function() {
 */
 
 
-/* vim: set sw=4 sts=4:*/
-
+/* vim: set sw=4 sts=4 expandtab: */

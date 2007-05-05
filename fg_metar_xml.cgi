@@ -92,27 +92,28 @@ my(@metar_order) = ('Day', 'Time', 'Raw', 'Temperature', 'Dewpoint', 'Pressure',
 foreach $k (@metar_order)
 {
     print <<XML;
-	<field name="${k}" value="$h{${k}}" />
+        <field name="${k}" value="$h{${k}}" />
 XML
 }
 
 #print <<TEST;
-#		<field name="Dewpoint" value="8 C" />
-#		<field name="Time" value="10" />
-#		<field name="Clouds" value="FEW at 1300 ft, SCT at 2600 ft" />
-#		<field name="Station" value="KSFO" />
-#		<field name="Wind gust" value="9 KT" />
-#		<field name="Wind speed" value="9 KT" />
-#		<field name="Wind direction" value="260 (W)" />
-#		<field name="Temperature" value="11 C" />
-#		<field name="Phenomena" value="" />
-#		<field name="Visibility" value="10 SM" />
-#		<field name="Pressure" value="29.96 Hg" />
-#		<field name="Raw" value="KSFO 271056Z 26009KT 10SM FEW013 SCT026 11/08 A2996 RMK AO2 SLP144 T01060083" />
-#		<field name="Day" value="27" />
+#                <field name="Dewpoint" value="8 C" />
+#                <field name="Time" value="10" />
+#                <field name="Clouds" value="FEW at 1300 ft, SCT at 2600 ft" />
+#                <field name="Station" value="KSFO" />
+#                <field name="Wind gust" value="9 KT" />
+#                <field name="Wind speed" value="9 KT" />
+#                <field name="Wind direction" value="260 (W)" />
+#                <field name="Temperature" value="11 C" />
+#                <field name="Phenomena" value="" />
+#                <field name="Visibility" value="10 SM" />
+#                <field name="Pressure" value="29.96 Hg" />
+#                <field name="Raw" value="KSFO 271056Z 26009KT 10SM FEW013 SCT026 11/08 A2996 RMK AO2 SLP144 T01060083" />
+#                <field name="Day" value="27" />
 #TEST
 
 print("\t</metar>\n</metar>\n");
 
 exit(0);
 
+# vim: set sw=4 sts=4 expandtab: #

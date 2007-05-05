@@ -448,5 +448,4 @@ FGMapMenu.prototype.map_view_changed_cb = function(event, cb_data) {
 };
 
 
-/* vim: set sw=4 sts=4:*/
-
+/* vim: set sw=4 sts=4 expandtab: */

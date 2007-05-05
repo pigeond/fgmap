@@ -958,3 +958,4 @@ FGMapMenuNav.prototype.gmap_zoomend_cb = function(oldLevel, newLevel) {
 */
 
 
+/* vim: set sw=4 sts=4 expandtab: */

@@ -351,3 +351,4 @@ FGMapMenuSettings.prototype.follows_always_center_checkbox_cb = function(e, chkb
 };
 
 
+/* vim: set sw=4 sts=4 expandtab: */

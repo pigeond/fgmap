@@ -198,3 +198,4 @@ FGMapMenuServer.prototype.server_changed_cb = function(event, name) {
     this.update();
 };
 
+/* vim: set sw=4 sts=4 expandtab: */

@@ -45,3 +45,4 @@ FGMapMenuDebug.prototype.remove = function() {
     this.tabdiv.tab_remove("debug");
 };
 
+/* vim: set sw=4 sts=4 expandtab: */

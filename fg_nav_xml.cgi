@@ -439,7 +439,7 @@ if($apt_code or $apt_name)
             }
 
             $xml .= <<XML;
-	<airport id="${apt_id}" code="${apt_code}" name="${apt_name}" elevation="${elevation}" heliport="${apt_heli}" seaport="${apt_sea}">
+        <airport id="${apt_id}" code="${apt_code}" name="${apt_name}" elevation="${elevation}" heliport="${apt_heli}" seaport="${apt_sea}">
 XML
 
             # Get runway/taxiway
@@ -836,3 +836,4 @@ print("</navaids>\n\n");
 
 exit(0);
 
+# vim: set sw=4 sts=4 expandtab: #

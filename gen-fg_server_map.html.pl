@@ -59,7 +59,7 @@ foreach my $l (@lines)
 
     if($id && $desc && $host && $port)
     {
-	print("Adding server [${id}]\n");
+        print("Adding server [${id}]\n");
 
         $js .= <<JS;
             fgmap.server_add("${id}",
@@ -71,7 +71,7 @@ JS
     }
     elsif($id)
     {
-	print("Adding server group [${id}]\n");
+        print("Adding server group [${id}]\n");
 
         $js .= <<JS;
             fgmap.server_group_add("${id}");
@@ -99,3 +99,4 @@ exit(0);
 
 
 
+# vim: set sw=4 sts=4 expandtab: #

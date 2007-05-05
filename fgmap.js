@@ -4266,5 +4266,5 @@ FGHeliport.prototype.remove = function() {
 
 
 
-/* vim: set sw=4 sts=4:*/
+/* vim: set sw=4 sts=4 expandtab: */
 

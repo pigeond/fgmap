@@ -368,3 +368,4 @@ FGMapMenuPilots.prototype.pilot_part_cb = function(event, cb_data, callsign) {
     }
 };
 
+/* vim: set sw=4 sts=4 expandtab: */

@@ -46,7 +46,7 @@ sub do_xml_header
 sub do_xml_single
 {
     my($callsign, $server_ip, $model, $lat, $lon, $alt, $head, $pitch, $roll) =
-	@_;
+        @_;
     return <<XML;
     <marker callsign="${callsign}" server_ip="${server_ip}" model="${model}" lat="${lat}" lng="${lon}" alt="${alt}" heading="${head}" pitch="${pitch}" roll="${roll}" />
 XML
@@ -84,7 +84,7 @@ sub kml_model_url_get
     my(@GE_MODELS) = ( 'c172p', 'ufo', '737-300', );
     if(!grep(/^${model}$/, @GE_MODELS))
     {
-	$model = $GE_MODELS[0];
+        $model = $GE_MODELS[0];
     }
     return "http://${HTTP_HOST}/${DOCUMENT_PATH}/ge/daes/${model}/${model}.dae";
 }
@@ -107,7 +107,7 @@ KML
 sub do_kml_single
 {
     my($callsign, $server_ip, $model, $lat, $lon, $alt, $head, $pitch, $roll) =
-	@_;
+        @_;
 
     push(@this_callsigns, $callsign);
 
@@ -152,12 +152,12 @@ sub do_kml_tail
     my($callsigns_str) = join(';', @this_callsigns);
     return <<KML;
     <NetworkLink id="fgmap_update">
-	<name>Update</name>
-	<Link>
-	    <href>http://${HTTP_HOST}/${DOCUMENT_PATH}/fg_server_kml.cgi?${server}:${port}&amp;callsigns=${callsigns_str}</href>
-	    <refreshMode>onInterval</refreshMode>
-	    <refreshInterval>${KML_REFRESH_INTERVAL}</refreshInterval>
-	</Link>
+        <name>Update</name>
+        <Link>
+            <href>http://${HTTP_HOST}/${DOCUMENT_PATH}/fg_server_kml.cgi?${server}:${port}&amp;callsigns=${callsigns_str}</href>
+            <refreshMode>onInterval</refreshMode>
+            <refreshInterval>${KML_REFRESH_INTERVAL}</refreshInterval>
+        </Link>
     </NetworkLink>
 </Document>
 </kml>
@@ -188,7 +188,7 @@ KML
 sub do_kml_update_single
 {
     my($callsign, $server_ip, $model, $lat, $lon, $alt, $head, $pitch, $roll) =
-	@_;
+        @_;
 
     # simple feet to meter
     $alt *= 0.3048;
@@ -199,9 +199,9 @@ sub do_kml_update_single
 
     if(grep(/^${callsign}$/, @last_callsigns))
     {
-	# We have it before, <Change> it
+        # We have it before, <Change> it
 
-	return <<KML;
+        return <<KML;
     <Change>
         <Placemark targetId="${callsign}">
             <Model>
@@ -222,8 +222,8 @@ KML
     }
     else
     {
-	# New one, <Create> it
-	return <<KML;
+        # New one, <Create> it
+        return <<KML;
     <Create>
         <Document targetId="mpmap">
             <Placemark id="${callsign}">
@@ -266,23 +266,23 @@ sub do_kml_update_tail
 
     foreach $callsign (@last_callsigns)
     {
-	if(!grep(/^${callsign}$/, @this_callsigns))
-	{
-	    $kml .= <<KML;
+        if(!grep(/^${callsign}$/, @this_callsigns))
+        {
+            $kml .= <<KML;
     <Delete>
-	<Placemark targetId="${callsign}" />
+        <Placemark targetId="${callsign}" />
     </Delete>
 KML
-	}
+        }
     }
 
     $kml .= <<KML;
     <Change>
-	<NetworkLink targetId="fgmap_update">
-	    <Link>
-		<href>http://${HTTP_HOST}/${DOCUMENT_PATH}/fg_server_kml.cgi?${server}:${port}&amp;callsigns=${callsigns_str}</href>
-	    </Link>
-	</NetworkLink>
+        <NetworkLink targetId="fgmap_update">
+            <Link>
+                <href>http://${HTTP_HOST}/${DOCUMENT_PATH}/fg_server_kml.cgi?${server}:${port}&amp;callsigns=${callsigns_str}</href>
+            </Link>
+        </NetworkLink>
     </Change>
 </Update>
 </NetworkLinkControl>
@@ -337,13 +337,13 @@ if($0 =~ m/fg_server_kml.cgi$/)
 {
     if($in_callsigns =~ m/^callsigns=(.*)$/)
     {
-	$in_callsigns = $1;
-	@last_callsigns = split(/;/, $in_callsigns);
-	%ocs = %kml_update_output;
+        $in_callsigns = $1;
+        @last_callsigns = split(/;/, $in_callsigns);
+        %ocs = %kml_update_output;
     }
     else
     {
-	%ocs = %kml_normal_output;
+        %ocs = %kml_normal_output;
     }
 }
 else
@@ -371,41 +371,41 @@ if($socket)
             if($l =~ /^# (\d+) .*? online/)
             {
                 $pilot_total = $1;
-		$output .= $ocs{'header'}->($pilot_total);
+                $output .= $ocs{'header'}->($pilot_total);
             }
         }
-	elsif($l =~ m/^(.*)@(.*?): (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?)$/)
-	{
-	    my($callsign, $server_ip,
-		    $x, $y, $z,
-		    $lat, $lon, $alt,
-		    $ox, $oy, $oz,
-		    $model) =
-		($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
+        elsif($l =~ m/^(.*)@(.*?): (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?)$/)
+        {
+            my($callsign, $server_ip,
+                    $x, $y, $z,
+                    $lat, $lon, $alt,
+                    $ox, $oy, $oz,
+                    $model) =
+                ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
 
-	    if($callsign and $model)
-	    {
-		#$model =~ s#.*/(.*?)\..*?$#$1#;
-		$model =~ s#.*/(.*?)#$1#;
-		$model =~ s#\..*?$##;
+            if($callsign and $model)
+            {
+                #$model =~ s#.*/(.*?)\..*?$#$1#;
+                $model =~ s#.*/(.*?)#$1#;
+                $model =~ s#\..*?$##;
 
-		my($head, $pitch, $roll) = &sgmath::euler_get($lat, $lon,
-			$ox, $oy, $oz);
+                my($head, $pitch, $roll) = &sgmath::euler_get($lat, $lon,
+                        $ox, $oy, $oz);
 
-		$output .= $ocs{'single'}->($callsign, $server_ip, $model,
-			$lat, $lon, $alt,
-			$head, $pitch, $roll);
+                $output .= $ocs{'single'}->($callsign, $server_ip, $model,
+                        $lat, $lon, $alt,
+                        $head, $pitch, $roll);
 
-		$pilot_cnt++;
+                $pilot_cnt++;
 
-		if($pilot_cnt >= $pilot_total)
-		{
-		    close($socket);
-		    undef($socket);
-		    last;
-		}
-	    }
-	}
+                if($pilot_cnt >= $pilot_total)
+                {
+                    close($socket);
+                    undef($socket);
+                    last;
+                }
+            }
+        }
 
     }
 
@@ -443,3 +443,4 @@ print($output);
 
 exit(0);
 
+# vim: set sw=4 sts=4 expandtab: #
