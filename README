@@ -172,6 +172,46 @@ Additional notes
   read the README in sg_perl/.
 
 
+Troubleshooting
+---------------
+
+* Map not loading, all I got is a blank page:
+
+  - You have an invalid or malformed line for the Google Map API script code.
+    
+  - Javascript errors, check the Javascript error console to see if there's
+    anything.
+    
+  - Javascript turned off maybe?
+
+
+* "The Google Maps API key used on this web site was registered for a different
+  web site.":
+
+  - You need to get a GMAPI key for the hostname in the URL you're getting to
+    the map.
+
+
+* Map loaded, but it's stuck at "Loading pilots" for a long time:
+
+  - Make sure the hostname and port are correct in your fgmap.servers
+  
+  - Make sure the machine hosting FGMap can access the hostname and port for the
+    fg server. An easy way is to 'telnet hostname port' on the machine hosting
+    FGMap. You should see something like:
+  
+    # This is pigeond.net
+    # FlightGear Multiplayer Server v0.9.10 using protocol version v1.1
+    # 1 pilots(s) online
+    mpdummy@LOCAL: -2707665.104931 -4273364.498832 3871246.876475 37.610037 -122.358934 4.384606 -2.053077 -1.094549 -1.121333 Aircraft/c172p/Models/c172p.xml
+  
+  - Goto http://yourfgmaphost/fg_server_xml.cgi?hostname:port
+    If you see some XML output, then it should be ok.
+    If you see the actual perl script source code, that means your web server
+    is somehow not configured to run the script as a CGI. You might want to
+    have a look at the server configuration.
+
+
 
 FGMap on Google Earth
 =====================
