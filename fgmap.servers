@@ -45,6 +45,6 @@ mpserver03:5002::mpserver03.flightgear.org:5002 (East Coast US)::mpserver03.flig
 
 mpserver04:5002::mpserver04.flightgear.org:5002 (UK)::mpserver04.flightgear.org::5003::195.137.79.11
 
-#hugin:5002::hugin.gidenstam.org:5002 (Sweden)::hugin.gidenstam.org::5001::83.254.84.138
-mpserver06:5002::mpserver06.flightgear.org:5002 (Sweden)::mpserver06.flightgear.org::5001::83.254.84.138
+#hugin:5002::hugin.gidenstam.org:5002 (Sweden)::hugin.gidenstam.org::5003::83.254.84.138
+mpserver06:5002::mpserver06.flightgear.org:5002 (Sweden)::mpserver06.flightgear.org::5003::83.254.84.138
 
