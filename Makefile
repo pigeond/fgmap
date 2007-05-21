@@ -8,7 +8,7 @@
 
 all: fg_server_map.html
 
-fg_server_map.html: fg_server_map.html.in fgmap.keys fgmap.servers
+fg_server_map.html: fg_server_map.html.in fgmap.keys fgmap.servers gen-fg_server_map.html.pl
 	./gen-fg_server_map.html.pl
 
 clean:
