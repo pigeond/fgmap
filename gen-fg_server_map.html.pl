@@ -14,6 +14,7 @@ my $FGMAP_SERVERS_TAG = '// ### fgmap.servers ###';
 my $TEMPLATE = 'fg_server_map.html.in';
 my $OUTPUT = 'fg_server_map.html';
 
+my $GMAPI_VERSION = '2.66';
 
 my $ssis = "";
 my @lines;
@@ -36,7 +37,7 @@ foreach my $l (@lines)
     $ssis .= <<SSI;
 <!--#if expr="\\"\${HTTP_HOST}\\" = \\"${host}\\"" -->
     <!-- Using HTTP_HOST ${host} -->
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=${key}" type="text/javascript"></script>
+    <script src="http://maps.google.com/maps?file=api&amp;v=${GMAPI_VERSION}&amp;key=${key}" type="text/javascript"></script>
 <!--#endif -->
 
 SSI
