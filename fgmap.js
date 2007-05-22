@@ -595,7 +595,7 @@ function element_raise(elem) {
 
 
 function element_remove(elem) {
-    if(elem.parentNode) {
+    if(elem && elem.parentNode) {
         elem.parentNode.removeChild(elem);
     } else {
         // Err?
