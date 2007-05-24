@@ -9,6 +9,7 @@
 
 use strict;
 use DBIx::Easy;
+require Encode;
 
 
 my($APT_TABLE) = "fg_apt";
@@ -28,6 +29,7 @@ if(!$SQL_LIMIT)
     $SQL_LIMIT = 100;
 }
 
+binmode(STDOUT, ":utf8");
 
 print("Pragma: no-cache\r\n");
 print("Cache-Control: no-cache\r\n");
@@ -273,7 +275,7 @@ my($ne, $sw, $ne_lat, $ne_lng, $sw_lat, $sw_lng);
 
 my($p);
 
-my($query_string) = $ENV{'QUERY_STRING'};
+my($query_string) = Encode::decode_utf8($ENV{'QUERY_STRING'});
 
 # The easy workaround for now
 $query_string =~ s/[\#\%\*\'\;\\]/\\$&/g;

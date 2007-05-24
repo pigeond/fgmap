@@ -439,6 +439,9 @@ else
 #print($xml);
 #print("</fg_server>\n\n");
 
+
+binmode(STDOUT, ":utf8");
+
 print($output);
 
 exit(0);

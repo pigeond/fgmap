@@ -16,6 +16,8 @@ if(!defined($ENV{'QUERY_STRING'}))
     exit(-1);
 }
 
+binmode(STDOUT, ":utf8");
+
 my($req) = Net::HTTP->new(Host => $host, PeerPort => $port, Timeout => 30);
 
 if($req)

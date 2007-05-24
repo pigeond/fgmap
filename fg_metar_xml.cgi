@@ -25,6 +25,8 @@ if(!$id || $id eq "")
     exit(0);
 }
 
+binmode(STDOUT, ":utf8");
+
 print("Pragma: no-cache\r\n");
 print("Cache-Control: no-cache\r\n");
 print("Expires: Sat, 17 Sep 1977 00:00:00 GMT\r\n");

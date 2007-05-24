@@ -11,6 +11,8 @@ my($port) = 80;
 my($url) = '/flightgear/fg_nav_xml.cgi';
 my($buf);
 
+binmode(STDOUT, ":utf8");
+
 if(!defined($ENV{'QUERY_STRING'}))
 {
     exit(-1);
