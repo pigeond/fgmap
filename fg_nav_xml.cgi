@@ -272,7 +272,13 @@ my($apt_code, $apt_name, $vor, $ndb, $fix, $awy, $taxiway, $bounds);
 my($ne, $sw, $ne_lat, $ne_lng, $sw_lat, $sw_lng);
 
 my($p);
-my(@a) = split(/\&/, $ENV{'QUERY_STRING'});
+
+my($query_string) = $ENV{'QUERY_STRING'};
+
+# The easy workaround for now
+$query_string =~ s/[\#\%\*\'\;\\]/\\$&/g;
+
+my(@a) = split(/\&/, ${query_string});
 
 foreach $p (@a)
 {
@@ -345,7 +351,6 @@ if(!$sstr and !($ne and $sw))
 if($sstr)
 {
     $sstr =~ s/%([a-fA-F0-9][a-f-A-F0-9])/pack("C", hex($1))/ge;
-    $sstr =~ s/[\%\*\.\?\_]//g;
 
     if(length($sstr) < 2 && $ENV{'HTTP_HOST'})
     {
