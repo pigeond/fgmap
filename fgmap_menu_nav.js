@@ -463,6 +463,7 @@ FGMapMenuNav.prototype.nav_form_submit_cb = function(e) {
 
     // TODO
     if(loc.hostname.match(/^mpmap02\./i) ||
+            loc.hostname.match(/^mpserver02\./i) ||
             loc.hostname.match(/^pigeond\.net/i) ||
             loc.hostname.match(/^localhost/i)) {
         url = "fg_nav_xml.cgi?";

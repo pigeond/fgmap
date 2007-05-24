@@ -3409,6 +3409,7 @@ FGAirport.prototype.metar_update = function() {
     
     // TODO
     if(loc.hostname.match(/^mpmap02\./i) ||
+            loc.hostname.match(/^mpserver02\./i) ||
             loc.hostname.match(/^pigeond\.net/i) ||
             loc.hostname.match(/^localhost/i)) {
         url = "fg_metar_xml.cgi";
