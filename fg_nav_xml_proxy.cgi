@@ -8,7 +8,7 @@ use HTTP::Status;
 
 my($host) = 'pigeond.net';
 my($port) = 80;
-my($url) = '/flightgear/fg_nav_xml.cgi';
+my($url) = '/flightgear/fgmap/fg_nav_xml.cgi';
 my($buf);
 
 binmode(STDOUT, ":utf8");

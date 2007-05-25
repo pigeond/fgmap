@@ -8,7 +8,7 @@ use HTTP::Status;
 
 my($host) = 'pigeond.net';
 my($port) = 80;
-my($url) = '/flightgear/fg_metar_xml.cgi';
+my($url) = '/flightgear/fgmap/fg_metar_xml.cgi';
 my($buf);
 
 if(!defined($ENV{'QUERY_STRING'}))
