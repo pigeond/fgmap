@@ -1102,12 +1102,13 @@ FGPilot.prototype.position_update = function(lat, lng, alt, heading) {
         delete(this.trails);
         this.trails = new Array();
 
-        this.hdg = 0;
         this.spd = 0;
-
         this.last_spd = 0;
         this.last_alt = alt;
-        this.last_hdg = 0;
+
+        /* Now we have real headings */
+        //this.hdg = 0;
+        //this.last_hdg = 0;
 
         dprint(this.fgmap, this.callsign + ": possible reset, clearing points");
 
