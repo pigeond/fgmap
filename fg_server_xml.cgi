@@ -299,6 +299,18 @@ my(%kml_update_output) =
 
 
 
+sub escape_strs
+{
+    my($str) = @_;
+    $str =~ s/"/\&quot;/g;
+    $str =~ s/'/\&apos;/g;
+    $str =~ s/\&/\&amp;/g;
+    $str =~ s/>/\&gt;/g;
+    $str =~ s/</\&lt;/g;
+    return $str;
+}
+
+
 
 # Main starts here
 
@@ -382,6 +394,8 @@ if($socket)
                     $ox, $oy, $oz,
                     $model) =
                 ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
+
+            $callsign = &escape_strs(${callsign});
 
             if($callsign and $model)
             {
