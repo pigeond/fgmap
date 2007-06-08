@@ -156,6 +156,8 @@ var FGMAP_CRAFT_MODELS_CH53E = [ "ch53e-model" ];
 var FGMAP_CRAFT_ICON_E3B = "e3b/e3b";
 var FGMAP_CRAFT_MODELS_E3B = [ "E3B" ];
 
+var FGMAP_CRAFT_ICON_ATC = "atc/atc";
+var FGMAP_CRAFT_MODELS_ATC = [ "atc-tower" ];
 
 var dummy_cnt = 1;
 
@@ -1269,6 +1271,8 @@ FGPilot.prototype.marker_update = function(force) {
                 img += FGMAP_CRAFT_ICON_CH53E;
             } else if(FGMAP_CRAFT_MODELS_E3B.indexOf(this.model) != -1) {
                 img += FGMAP_CRAFT_ICON_E3B;
+            } else if(FGMAP_CRAFT_MODELS_ATC.indexOf(this.model) != -1) {
+                img += FGMAP_CRAFT_ICON_ATC;
 
             } else {
                 // TODO
