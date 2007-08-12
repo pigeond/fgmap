@@ -51,7 +51,7 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.nexttarget_elem = element_create(this.cam_control, 'img');
     this.nexttarget_elem.src = 'images/next.png';
     this.nexttarget_elem.title = 'Next target';
-    attach_event(this.prevtarget_elem, 'mousedown',
+    attach_event(this.nexttarget_elem, 'mousedown',
             this.camera_control.bind_event(this, 'next_target'));
 
     this.zoomin_elem = element_create(this.cam_control, 'img');
@@ -63,7 +63,7 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.zoomout_elem = element_create(this.cam_control, 'img');
     this.zoomout_elem.src = 'images/zoom_out.png';
     this.zoomout_elem.title = 'Zoom out';
-    attach_event(this.zoomin_elem, 'mousedown',
+    attach_event(this.zoomout_elem, 'mousedown',
             this.camera_control.bind_event(this, 'zoom_out'));
 
 
