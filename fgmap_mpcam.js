@@ -226,7 +226,7 @@ FGMapMPCamControl.prototype.cam_img_mouseout_timeout_cb = function() {
 };
 
 
-FGMapMPCamControl.prototype.camera_control = function(action) {
+FGMapMPCamControl.prototype.camera_control = function(e, action) {
 
     if(this.control_request) {
         this.control_request.abort();
