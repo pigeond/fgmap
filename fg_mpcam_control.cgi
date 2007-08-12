@@ -89,7 +89,7 @@ if ($qstr ne '') {
         $target_name = fg_prop('/sim/cam/target-name');
         $target_name =~ s/"/\\"/g;
 
-        my $xml = <<XML;
+        $xml = <<XML;
 <mpcam targetname="${target_name}" />
 XML
 
