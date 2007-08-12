@@ -47,8 +47,6 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
 
     this.targetname_elem = element_create(this.cam_control, 'span');
     this.targetname_elem.className = 'fgmap_mpcam_targetname';
-    this.targetname_elem.style.paddingLeft = '8px';
-    this.targetname_elem.style.paddingRight = '8px';
     this.targetname_elem.style.verticalAlign = 'top';
     this.targetname_elem.innerHTML = 'loading...';
 

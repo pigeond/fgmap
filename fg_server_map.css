@@ -221,6 +221,16 @@ a:hover     { color: #ddf; }
 
 .fgmap_latlng_control { background-color: #fff; color: #000; }
 
-.fgmap_mpcam_targetname { font-family: sans-serif; font-size: 11px; }
+.fgmap_mpcam_targetname
+{
+    font-family: sans-serif;
+    font-size: 11px;
+    background-color: #777;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 3px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
 
 /* vim: set sw=4 sts=4 expandtab: */
