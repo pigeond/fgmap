@@ -511,6 +511,14 @@ function attach_event(elem, event_str, bind_func) {
 }
 
 
+function detach_event(elem, event_str, bind_func) {
+    if(elem.detachEvent) { 
+        elem.detachEvent("on" + event_str, bind_func);
+    } else if(elem.removeEventListener) {
+        elem.removeEventListener(event_str, bind_func, false);
+    }
+}
+
 /* Inspired by http://www.phpied.com/javascript-include/ */
 /* TODO: Doesn't work well under m$ shitty crappy IE, they sure are the dumbest
  * software company */
@@ -643,6 +651,11 @@ function element_visible_toggle(elem) {
     } else {
         element_show(elem);
     }
+}
+
+
+function element_is_visible(elem) {
+    return (elem.style.display == 'block' || elem.style.visibility == 'visible');
 }
 
 
@@ -1492,6 +1505,7 @@ function FGMap(id)
     this.debug = false;
     this.pantoall = false;
     this.latlng_visible = false;
+    this.mpcam_visible = false;
 
     /* gmap initial settings */
     this.gmap = null;
@@ -1606,6 +1620,9 @@ FGMap.prototype.init = function(force) {
 
     /* TODO */
     this.latlng_visible_set(true);
+
+    /* TODO */
+    this.mpcam_visible_set(true);
 };
 
 
@@ -1661,6 +1678,24 @@ FGMap.prototype.latlng_visible_set = function(visible) {
         this.gmap.removeControl(this.latlng_control);
     }
 }
+
+
+FGMap.prototype.mpcam_visible_set = function(visible) {
+    if(this.mpcam_visible == visible)
+        return;
+
+    this.mpcam_visible = visible;
+
+    if(this.mpcam_visible) {
+        if(this.mpcam_control == null) {
+            this.mpcam_control = new FGMapMPCamControl();
+        }
+        this.gmap.addControl(this.mpcam_control);
+    } else {
+        this.gmap.removeControl(this.mpcam_control);
+    }
+}
+
 
 FGMap.prototype.maptypechanged_cb = function() {
 

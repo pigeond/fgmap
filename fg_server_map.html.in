@@ -23,6 +23,7 @@
     <script src="fgmap_menu_settings.js"></script>
     <script src="fgmap_menu_debug.js"></script>
     <script src="fgmap_menu_nav.js"></script>
+    <script src="fgmap_mpcam.js"></script>
 
     <style type="text/css">
 
