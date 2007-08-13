@@ -18,12 +18,10 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.gmap = gmap;
     this.div = element_create(gmap.getContainer(), 'div');
     this.div.className = 'fgmap_mpcam_control';
-    //element_opacity_set(this.div, 0.6);
 
 
-    this.div.style.width = FGMPCAM_WIDTH + 'px';
-    this.div.style.height = (FGMPCAM_HEIGHT + 36) + 'px';
-    //this.div.style.border = '1px solid red';
+    this.div.style.width = (FGMPCAM_WIDTH + 2) + 'px';
+    this.div.style.height = (FGMPCAM_HEIGHT + 24) + 'px';
 
 
     this.cam_div = element_create(this.div, 'div');
@@ -40,7 +38,8 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_div_bg.style.backgroundColor = 'white';
     this.cam_div_bg.style.width = this.div.style.width;
     this.cam_div_bg.style.height = this.div.style.height;
-    element_opacity_set(this.cam_div_bg, 0.3);
+    this.cam_div_bg.style.zIndex = -10;
+    element_opacity_set(this.cam_div_bg, 0.2);
 
 
     this.cam_img_div = element_create(this.cam_div, 'div');
@@ -54,7 +53,6 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_img.style.border = '0px';
     this.cam_img.style.margin = '0px';
     this.cam_img.title = 'Loading camera...';
-
 
     this.cam_control = element_create(this.cam_div, 'div');
 
@@ -104,9 +102,9 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     attach_event(this.toggle_img, "mouseout",
             this.toggle_img_mouseout_cb.bind_event(this));
 
-    attach_event(this.cam_div, "mouseover",
+    attach_event(this.cam_img, "mouseover",
             this.cam_img_mouseover_cb.bind_event(this));
-    attach_event(this.cam_div, "mouseout",
+    attach_event(this.cam_img, "mouseout",
             this.cam_img_mouseout_cb.bind_event(this));
 
     return this.div;
