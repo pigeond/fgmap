@@ -4,7 +4,7 @@ var FGMPCAM_URL = 'http://pigeond.net:8001/mpcam';
 var FGMPCAM_WIDTH = 240;
 var FGMPCAM_HEIGHT = 180;
 var FGMPCAM_CONTROL_URL = 'fg_mpcam_control.cgi';
-var FGMPCAM_POLL_INTERVAL = 5000;
+var FGMPCAM_POLL_INTERVAL = 2000;
 
 
 function FGMapMPCamControl() {
