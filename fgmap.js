@@ -1621,8 +1621,11 @@ FGMap.prototype.init = function(force) {
     /* TODO */
     this.latlng_visible_set(true);
 
-    /* TODO */
-    this.mpcam_visible_set(true);
+
+    if(this.mpcam_visible) {
+        this.mpcam_visible = false;
+        this.mpcam_visible_set(true);
+    }
 };
 
 
@@ -1970,6 +1973,10 @@ FGMap.prototype.query_string_parse = function() {
             } else if(pair[1] == "dot") {
                 this.aircraft_icon_mode = FGMAP_ICON_MODE_DOT;
             }
+
+        } else if(pair[0] == "mpcam") {
+
+            this.mpcam_visible = true;
         }
     }
 
