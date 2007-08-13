@@ -29,15 +29,35 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_div = element_create(this.div, 'div');
     this.cam_div.style.position = 'absolute';
     this.cam_div.style.top = '0px';
-    this.cam_div.style.left = '0px';
+    this.cam_div.style.right = '0px';
     this.cam_div.style.textAlign = 'right';
 
-    this.cam_img = element_create(this.cam_div, 'img');
+
+    this.cam_div_bg = element_create(this.cam_div, 'div');
+    this.cam_div_bg.style.position = 'absolute';
+    this.cam_div_bg.style.top = '0px';
+    this.cam_div_bg.style.right = '0px';
+    this.cam_div_bg.style.backgroundColor = 'white';
+    this.cam_div_bg.style.width = this.div.style.width;
+    this.cam_div_bg.style.height = this.div.style.height;
+    element_opacity_set(this.cam_div_bg, 0.3);
+
+
+    this.cam_img_div = element_create(this.cam_div, 'div');
+    this.cam_img_div.style.width = FGMPCAM_WIDTH + 'px';
+    this.cam_img_div.style.height = FGMPCAM_HEIGHT + 'px';
+    this.cam_img_div.style.border = '1px solid grey';
+
+    this.cam_img = element_create(this.cam_img_div, 'img');
     this.cam_img.style.width = FGMPCAM_WIDTH + 'px';
     this.cam_img.style.height = FGMPCAM_HEIGHT + 'px';
-    this.cam_img.style.border = '1px solid grey';
+    this.cam_img.style.border = '0px';
+    this.cam_img.style.margin = '0px';
+    this.cam_img.title = 'Loading camera...';
+
 
     this.cam_control = element_create(this.cam_div, 'div');
+
 
     this.prevtarget_elem = element_create(this.cam_control, 'img');
     this.prevtarget_elem.src = 'images/prev.png';
@@ -48,7 +68,6 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.targetname_elem = element_create(this.cam_control, 'span');
     this.targetname_elem.className = 'fgmap_mpcam_targetname';
     this.targetname_elem.style.verticalAlign = 'top';
-    this.targetname_elem.innerHTML = 'loading...';
 
     this.nexttarget_elem = element_create(this.cam_control, 'img');
     this.nexttarget_elem.src = 'images/next.png';
@@ -85,9 +104,9 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     attach_event(this.toggle_img, "mouseout",
             this.toggle_img_mouseout_cb.bind_event(this));
 
-    attach_event(this.cam_img, "mouseover",
+    attach_event(this.cam_div, "mouseover",
             this.cam_img_mouseover_cb.bind_event(this));
-    attach_event(this.cam_img, "mouseout",
+    attach_event(this.cam_div, "mouseout",
             this.cam_img_mouseout_cb.bind_event(this));
 
     return this.div;
@@ -161,7 +180,7 @@ FGMapMPCamControl.prototype.camera_poll_cb = function() {
 
     var url = FGMPCAM_CONTROL_URL + '?poll';
     this.poll_request = GXmlHttp.create();
-    this.poll_request.open("GET", url, true);
+    this.poll_request.open('GET', url, true);
     this.poll_request.onreadystatechange =
         this.poll_request_cb.bind_event(this);
     this.poll_request.send(null);
@@ -238,7 +257,7 @@ FGMapMPCamControl.prototype.camera_control = function(e, action) {
 
     var url = FGMPCAM_CONTROL_URL + '?' + action;
     this.control_request = GXmlHttp.create();
-    this.control_request.open("GET", url, true);
+    this.control_request.open('GET', url, true);
     this.control_request.onreadystatechange =
         this.control_request_cb.bind_event(this);
     this.control_request.send(null);
