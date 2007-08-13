@@ -39,7 +39,7 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_div_bg.style.width = this.div.style.width;
     this.cam_div_bg.style.height = this.div.style.height;
     this.cam_div_bg.style.zIndex = -10;
-    element_opacity_set(this.cam_div_bg, 0.2);
+    element_opacity_set(this.cam_div_bg, 0.3);
 
 
     this.cam_img_div = element_create(this.cam_div, 'div');
