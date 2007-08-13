@@ -213,11 +213,15 @@ FGMapMenuPilots.prototype.pilot_follow_cb = function(event, cb_data, callsign) {
 
     if(event == FGMAP_EVENT_PILOT_FOLLOW_ADD) {
 
-        this.pilots[callsign].checkbox.checked = true;
+        if(this.pilots[callsign]) {
+            this.pilots[callsign].checkbox.checked = true;
+        }
 
     } else if(event == FGMAP_EVENT_PILOT_FOLLOW_REMOVE) {
 
-        this.pilots[callsign].checkbox.checked = false;
+        if(this.pilots[callsign]) {
+            this.pilots[callsign].checkbox.checked = false;
+        }
 
     } else if(event == FGMAP_EVENT_PILOT_FOLLOWS_CLEAR) {
 
