@@ -1692,6 +1692,7 @@ FGMap.prototype.mpcam_visible_set = function(visible) {
     if(this.mpcam_visible) {
         if(this.mpcam_control == null) {
             this.mpcam_control = new FGMapMPCamControl();
+            this.mpcam_control.setFGMap(this);
         }
         this.gmap.addControl(this.mpcam_control);
     } else {

@@ -13,6 +13,11 @@ function FGMapMPCamControl() {
 FGMapMPCamControl.prototype = new GControl();
 
 
+FGMapMPCamControl.prototype.setFGMap = function(fgmap) {
+    this.fgmap = fgmap;
+};
+
+
 FGMapMPCamControl.prototype.initialize = function(gmap) {
 
     this.gmap = gmap;
@@ -29,18 +34,6 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_div.style.top = '0px';
     this.cam_div.style.right = '0px';
     this.cam_div.style.textAlign = 'right';
-
-
-    /*
-    this.cam_div_bg = element_create(this.cam_div, 'div');
-    this.cam_div_bg.style.position = 'absolute';
-    this.cam_div_bg.style.top = '0px';
-    this.cam_div_bg.style.right = '0px';
-    this.cam_div_bg.style.backgroundColor = 'red';
-    this.cam_div_bg.style.width = this.div.style.width;
-    this.cam_div_bg.style.height = this.div.style.height;
-    element_opacity_set(this.cam_div_bg, 0.3);
-    */
 
 
     this.cam_img_div = element_create(this.cam_div, 'div');
@@ -135,12 +128,11 @@ FGMapMPCamControl.prototype.cam_visible_toggle = function() {
 
     if(this.cam_visible) {
         this.toggle_img.src = 'images/mpcam_button_selected.png';
-        //element_opacity_set(this.toggle_img, 0.6);
         this.camera_load();
     } else {
         this.toggle_img.src = 'images/mpcam_button.png';
-        //element_opacity_set(this.toggle_img, 1.0);
         this.camera_unload();
+        this.fgmap.pilot_follows_clear();
     }
 
 };
@@ -205,8 +197,12 @@ FGMapMPCamControl.prototype.poll_request_cb = function() {
             }
 
             this.targetname = xmldoc.documentElement.getAttribute("targetname");
-
             this.targetname_elem.innerHTML = this.targetname;
+
+            if(this.targetname != '') {
+                this.fgmap.pilot_follows_clear();
+                this.fgmap.pilot_follow_add(this.targetname);
+            }
         }
 
         delete(this.poll_request);
