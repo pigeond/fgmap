@@ -47,7 +47,6 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_img.style.height = FGMPCAM_HEIGHT + 'px';
     this.cam_img.style.border = '0px';
     this.cam_img.style.margin = '0px';
-    this.cam_img.title = 'Loading camera...';
 
     this.cam_control = element_create(this.cam_div, 'div');
     this.cam_control.style.backgroundColor = 'grey';
