@@ -26,8 +26,10 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.div.className = 'fgmap_mpcam_control';
 
 
+    /*
     this.div.style.width = (FGMPCAM_WIDTH + 2) + 'px';
     this.div.style.height = (FGMPCAM_HEIGHT + 24) + 'px';
+    */
 
 
     this.cam_div = element_create(this.div, 'div');
@@ -160,6 +162,9 @@ FGMapMPCamControl.prototype.cam_visible_toggle = function() {
 
 FGMapMPCamControl.prototype.cam_img_complete_cb = function() {
     
+    if(this.cam_img == null)
+        return;
+
     if(this.cam_img.complete) {
         this.msg_set('mpcam connection lost<br>try reload');
     } else {
