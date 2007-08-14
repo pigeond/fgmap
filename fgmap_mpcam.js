@@ -1,6 +1,7 @@
 /* FGMapMPCamControl */
 
-var FGMPCAM_URL = 'http://pigeond.net:8001/mpcam';
+//var FGMPCAM_URL = 'http://pigeond.net:8001/mpcam';
+var FGMPCAM_URL = 'http://localhost:8001/mpcam';
 var FGMPCAM_WIDTH = 240;
 var FGMPCAM_HEIGHT = 192;
 var FGMPCAM_CONTROL_URL = 'fg_mpcam_control.cgi';
@@ -35,20 +36,44 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_div.style.right = '0px';
     this.cam_div.style.textAlign = 'right';
 
-
     this.cam_img_div = element_create(this.cam_div, 'div');
     this.cam_img_div.style.width = FGMPCAM_WIDTH + 'px';
     this.cam_img_div.style.height = FGMPCAM_HEIGHT + 'px';
     this.cam_img_div.style.border = '1px solid grey';
 
+    this.cam_msg_table = element_create(this.cam_img_div, 'table');
+    this.cam_msg_table.style.border = '0px';
+    this.cam_msg_table.style.margin = '0px';
+    this.cam_msg_table.style.width = '100%';
+    this.cam_msg_table.style.height = '100%';
+    element_opacity_set(this.cam_msg_table, 0.7);
+    var tbody = element_create(this.cam_msg_table, 'tbody');
+    var tr = element_create(tbody, 'tr');
+
+    this.cam_msg = element_create(tr, 'td');
+    this.cam_msg.style.backgroundColor = 'white';
+    this.cam_msg.style.textAlign = 'center';
+    this.cam_msg.style.verticalAlign = 'middle';
+    this.cam_msg.className = 'fgmap_mpcam_msg';
+
 
     this.cam_img = element_create(this.cam_img_div, 'img');
+    this.cam_img.style.position = 'absolute';
+    this.cam_img.style.border = '0px';
+    this.cam_img.style.margin = '0px';
+    this.cam_img.style.top = '0px';
+    this.cam_img.style.right = '0px';
     this.cam_img.style.width = FGMPCAM_WIDTH + 'px';
     this.cam_img.style.height = FGMPCAM_HEIGHT + 'px';
     this.cam_img.style.border = '0px';
     this.cam_img.style.margin = '0px';
+    this.cam_img.style.border = '1px solid grey';
+    element_raise(this.cam_img);
 
-    this.cam_control = element_create(this.cam_div, 'div');
+
+    this.cam_control = element_create(this.cam_img_div, 'div');
+    this.cam_control.style.border = '0px';
+    this.cam_control.style.margin = '0px';
     this.cam_control.style.backgroundColor = 'grey';
     this.cam_control.style.paddingTop = '3px';
 
@@ -81,6 +106,12 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     attach_event(this.zoomout_elem, 'mousedown',
             this.camera_control.bind_event(this, 'zoom_out'));
 
+    this.reload_elem = element_create(this.cam_control, 'img');
+    this.reload_elem.src = 'images/reload.png';
+    this.reload_elem.title = 'Reload';
+    attach_event(this.reload_elem, 'mousedown',
+            this.camera_reload.bind_event(this));
+
 
     this.toggle_img = element_create(this.div, 'img');
     this.toggle_img.style.position = 'absolute';
@@ -102,6 +133,9 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
             this.cam_img_mouseover_cb.bind_event(this));
     attach_event(this.cam_img, "mouseout",
             this.cam_img_mouseout_cb.bind_event(this));
+
+
+    this.down = -1;
 
     return this.div;
 };
@@ -127,10 +161,16 @@ FGMapMPCamControl.prototype.cam_visible_toggle = function() {
 
     if(this.cam_visible) {
         this.toggle_img.src = 'images/mpcam_button_selected.png';
-        this.camera_load();
+        element_show(this.cam_div);
+        this.camera_poll_start();
+        this.msg_set('mpcam loading...');
+        element_show(this.cam_msg_table);
     } else {
         this.toggle_img.src = 'images/mpcam_button.png';
+        this.camera_poll_stop();
         this.camera_unload();
+        element_hide(this.cam_div);
+        element_hide(this.cam_msg_table);
         this.fgmap.pilot_follows_clear();
     }
 
@@ -139,19 +179,16 @@ FGMapMPCamControl.prototype.cam_visible_toggle = function() {
 
 FGMapMPCamControl.prototype.camera_load = function() {
     this.cam_img.src = FGMPCAM_URL;
-    element_show(this.cam_div);
-    this.camera_poll_start();
 };
 
 
 FGMapMPCamControl.prototype.camera_unload = function() {
     this.cam_img.src = '';
-    element_hide(this.cam_div);
-    this.camera_poll_stop();
 };
 
 
 FGMapMPCamControl.prototype.camera_poll_start = function() {
+    this.down = -1;
     this.should_poll = true;
     this.camera_poll_cb();
 };
@@ -162,6 +199,7 @@ FGMapMPCamControl.prototype.camera_poll_stop = function() {
     if(this.poll_request) {
         this.poll_request.abort();
     }
+    this.down = -1;
 };
 
 
@@ -195,12 +233,20 @@ FGMapMPCamControl.prototype.poll_request_cb = function() {
                 return;
             }
 
-            this.targetname = xmldoc.documentElement.getAttribute("targetname");
-            this.targetname_elem.innerHTML = this.targetname;
+            var down = xmldoc.documentElement.getAttribute('down');
 
-            if(this.targetname != '') {
-                this.fgmap.pilot_follows_clear();
-                this.fgmap.pilot_follow_add(this.targetname);
+            this.camera_down_set(down);
+
+            if(this.down == 0) {
+                this.targetname =
+                    xmldoc.documentElement.getAttribute('targetname');
+
+                this.targetname_elem.innerHTML = this.targetname;
+
+                if(this.targetname != '') {
+                    this.fgmap.pilot_follows_clear();
+                    this.fgmap.pilot_follow_add(this.targetname);
+                }
             }
         }
 
@@ -210,6 +256,8 @@ FGMapMPCamControl.prototype.poll_request_cb = function() {
         if(this.should_poll) {
             setTimeout(this.camera_poll_cb.bind_event(this),
                     FGMPCAM_POLL_INTERVAL);
+        } else {
+            this.down = 1;
         }
     }
 
@@ -246,7 +294,30 @@ FGMapMPCamControl.prototype.cam_img_mouseout_timeout_cb = function() {
 };
 
 
+FGMapMPCamControl.prototype.camera_down_set = function(down) {
+
+    if(down != this.down) {
+
+        if(down == 1) {
+            this.camera_unload();
+            //element_hide(this.cam_img);
+            this.msg_set('mpcam is currently down');
+        } else {
+            this.camera_load();
+            element_show(this.cam_img);
+            this.msg_set('mpcam connection lost');
+        }
+    }
+    
+    this.down = down;
+}
+            
+
 FGMapMPCamControl.prototype.camera_control = function(e, action) {
+
+    if(this.down == 1) {
+        return;
+    }
 
     if(this.control_request) {
         this.control_request.abort();
@@ -263,6 +334,18 @@ FGMapMPCamControl.prototype.camera_control = function(e, action) {
     if(action == 'next_target' || action == 'prev_target') {
         this.camera_poll_cb();
     }
+};
+
+
+FGMapMPCamControl.prototype.camera_reload = function() {
+    if(this.down == 0) {
+        this.camera_load();
+    }
+};
+
+
+FGMapMPCamControl.prototype.msg_set = function(msg) {
+    this.cam_msg.innerHTML = msg;
 };
 
 

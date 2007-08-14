@@ -232,4 +232,10 @@ a:hover     { color: #ddf; }
     margin-right: 2px;
 }
 
+.fgmap_mpcam_msg
+{
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
 /* vim: set sw=4 sts=4 expandtab: */
