@@ -1622,7 +1622,8 @@ FGMap.prototype.init = function(force) {
     this.latlng_visible_set(true);
 
 
-    if(this.mpcam_visible && !USER_AGENT.is_ie) {
+    if(this.mpcam_visible &&
+            (USER_AGENT.is_mozilla || USER_AGENT.is_gecko)) {
         this.mpcam_visible = false;
         this.mpcam_visible_set(true);
     }
