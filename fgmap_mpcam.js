@@ -170,6 +170,8 @@ FGMapMPCamControl.prototype.cam_img_complete_cb = function() {
 
 FGMapMPCamControl.prototype.camera_load = function() {
 
+    this.camera_unload();
+
     this.cam_img = element_create(this.cam_img_div, 'img');
     this.cam_img.style.position = 'absolute';
     this.cam_img.style.border = '0px';
