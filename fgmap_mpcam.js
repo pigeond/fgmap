@@ -187,7 +187,7 @@ FGMapMPCamControl.prototype.cam_img_complete_cb = function() {
         return;
 
     if(this.cam_img.complete) {
-        this.msg_set('mpcam connection lost<br>try reload');
+        this.msg_set('mpcam connection lost<br>try the reload button below');
     } else {
         setTimeout(this.cam_img_complete_cb.bind_event(this), 300);
     }
