@@ -43,14 +43,16 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_img_div.style.height = FGMPCAM_HEIGHT + 'px';
     this.cam_img_div.style.border = '1px solid grey';
 
+    var table, tbody, tr, td;
+
     this.cam_msg_table = element_create(this.cam_img_div, 'table');
     this.cam_msg_table.style.border = '0px';
     this.cam_msg_table.style.margin = '0px';
     this.cam_msg_table.style.width = '100%';
     this.cam_msg_table.style.height = '100%';
-    element_opacity_set(this.cam_msg_table, 0.7);
-    var tbody = element_create(this.cam_msg_table, 'tbody');
-    var tr = element_create(tbody, 'tr');
+    //element_opacity_set(this.cam_msg_table, 0.7);
+    tbody = element_create(this.cam_msg_table, 'tbody');
+    tr = element_create(tbody, 'tr');
 
     this.cam_msg = element_create(tr, 'td');
     this.cam_msg.style.backgroundColor = 'white';
@@ -59,43 +61,62 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_msg.className = 'fgmap_mpcam_msg';
 
 
-
     this.cam_control = element_create(this.cam_img_div, 'div');
     this.cam_control.style.border = '0px';
     this.cam_control.style.margin = '0px';
     this.cam_control.style.backgroundColor = 'grey';
     this.cam_control.style.paddingTop = '3px';
 
+    table = element_create(this.cam_control, 'table');
+    table.style.border = '0px';
+    table.style.margin = '0px';
+    table.style.paddingLeft = '4px';
+    table.style.paddingRight = '4px';
+    table.style.width = '100%';
+    table.style.height = '100%';
+    tbody = element_create(table, 'tbody');
+    tr = element_create(tbody, 'tr');
 
-    this.prevtarget_elem = element_create(this.cam_control, 'img');
+    td = element_create(tr, 'td');
+    td.style.textAlign = 'left';
+    td.style.whiteSpace = 'nowrap';
+    td.style.width = '50%';
+
+    this.prevtarget_elem = element_create(td, 'img');
     this.prevtarget_elem.src = 'images/prev.png';
     this.prevtarget_elem.title = 'Previous target';
     attach_event(this.prevtarget_elem, 'mousedown',
             this.camera_control.bind_event(this, 'prev_target'));
 
-    this.targetname_elem = element_create(this.cam_control, 'span');
+    this.targetname_elem = element_create(td, 'span');
     this.targetname_elem.className = 'fgmap_mpcam_targetname';
     this.targetname_elem.style.verticalAlign = 'top';
+    this.targetname_elem.innerHTML = '(no target)';
 
-    this.nexttarget_elem = element_create(this.cam_control, 'img');
+    this.nexttarget_elem = element_create(td, 'img');
     this.nexttarget_elem.src = 'images/next.png';
     this.nexttarget_elem.title = 'Next target';
     attach_event(this.nexttarget_elem, 'mousedown',
             this.camera_control.bind_event(this, 'next_target'));
 
-    this.zoomin_elem = element_create(this.cam_control, 'img');
+    td = element_create(tr, 'td');
+    td.style.textAlign = 'right';
+    td.style.whiteSpace = 'nowrap';
+    td.style.width = '50%';
+
+    this.zoomin_elem = element_create(td, 'img');
     this.zoomin_elem.src = 'images/zoom_in.png';
     this.zoomin_elem.title = 'Zoom in';
     attach_event(this.zoomin_elem, 'mousedown',
             this.camera_control.bind_event(this, 'zoom_in'));
 
-    this.zoomout_elem = element_create(this.cam_control, 'img');
+    this.zoomout_elem = element_create(td, 'img');
     this.zoomout_elem.src = 'images/zoom_out.png';
     this.zoomout_elem.title = 'Zoom out';
     attach_event(this.zoomout_elem, 'mousedown',
             this.camera_control.bind_event(this, 'zoom_out'));
 
-    this.reload_elem = element_create(this.cam_control, 'img');
+    this.reload_elem = element_create(td, 'img');
     this.reload_elem.src = 'images/reload.png';
     this.reload_elem.title = 'Reload';
     attach_event(this.reload_elem, 'mousedown',
@@ -265,9 +286,10 @@ FGMapMPCamControl.prototype.poll_request_cb = function() {
                 this.targetname =
                     xmldoc.documentElement.getAttribute('targetname');
 
-                this.targetname_elem.innerHTML = this.targetname;
-
-                if(this.targetname != '') {
+                if(this.targetname == '') {
+                    this.targetname_elem.innerHTML = '(no target)';
+                } else {
+                    this.targetname_elem.innerHTML = this.targetname;
                     this.fgmap.pilot_follows_clear();
                     this.fgmap.pilot_follow_add(this.targetname);
                 }
