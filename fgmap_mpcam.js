@@ -161,7 +161,7 @@ FGMapMPCamControl.prototype.cam_visible_toggle = function() {
 FGMapMPCamControl.prototype.cam_img_complete_cb = function() {
     
     if(this.cam_img.complete) {
-        this.msg_set('mpcam connection lost');
+        this.msg_set('mpcam connection lost<br>try reload');
     } else {
         setTimeout(this.cam_img_complete_cb.bind_event(this), 300);
     }
