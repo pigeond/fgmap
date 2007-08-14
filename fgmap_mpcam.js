@@ -57,19 +57,6 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_msg.className = 'fgmap_mpcam_msg';
 
 
-    this.cam_img = element_create(this.cam_img_div, 'img');
-    this.cam_img.style.position = 'absolute';
-    this.cam_img.style.border = '0px';
-    this.cam_img.style.margin = '0px';
-    this.cam_img.style.top = '0px';
-    this.cam_img.style.right = '0px';
-    this.cam_img.style.width = FGMPCAM_WIDTH + 'px';
-    this.cam_img.style.height = FGMPCAM_HEIGHT + 'px';
-    this.cam_img.style.border = '0px';
-    this.cam_img.style.margin = '0px';
-    this.cam_img.style.border = '1px solid grey';
-    element_raise(this.cam_img);
-
 
     this.cam_control = element_create(this.cam_img_div, 'div');
     this.cam_control.style.border = '0px';
@@ -129,11 +116,6 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     attach_event(this.toggle_img, "mouseout",
             this.toggle_img_mouseout_cb.bind_event(this));
 
-    attach_event(this.cam_img, "mouseover",
-            this.cam_img_mouseover_cb.bind_event(this));
-    attach_event(this.cam_img, "mouseout",
-            this.cam_img_mouseout_cb.bind_event(this));
-
 
     this.down = -1;
 
@@ -176,13 +158,48 @@ FGMapMPCamControl.prototype.cam_visible_toggle = function() {
 };
 
 
+FGMapMPCamControl.prototype.cam_img_complete_cb = function() {
+    
+    if(this.cam_img.complete) {
+        this.msg_set('mpcam connection lost');
+    } else {
+        setTimeout(this.cam_img_complete_cb.bind_event(this), 300);
+    }
+};
+
+
 FGMapMPCamControl.prototype.camera_load = function() {
+
+    this.cam_img = element_create(this.cam_img_div, 'img');
+    this.cam_img.style.position = 'absolute';
+    this.cam_img.style.border = '0px';
+    this.cam_img.style.margin = '0px';
+    this.cam_img.style.top = '0px';
+    this.cam_img.style.right = '0px';
+    this.cam_img.style.width = FGMPCAM_WIDTH + 'px';
+    this.cam_img.style.height = FGMPCAM_HEIGHT + 'px';
+    this.cam_img.style.border = '0px';
+    this.cam_img.style.margin = '0px';
+    this.cam_img.style.border = '1px solid grey';
+    element_raise(this.cam_img);
+
+    attach_event(this.cam_img, "mouseover",
+            this.cam_img_mouseover_cb.bind_event(this));
+    attach_event(this.cam_img, "mouseout",
+            this.cam_img_mouseout_cb.bind_event(this));
+
     this.cam_img.src = FGMPCAM_URL;
+    this.cam_img_complete_cb();
 };
 
 
 FGMapMPCamControl.prototype.camera_unload = function() {
-    this.cam_img.src = '';
+    if(this.cam_img) {
+        this.cam_img.src = '';
+        element_remove(this.cam_img);
+        delete(this.cam_img);
+        this.cam_img = null;
+    }
 };
 
 
@@ -305,7 +322,6 @@ FGMapMPCamControl.prototype.camera_down_set = function(down) {
         } else {
             this.camera_load();
             element_show(this.cam_img);
-            this.msg_set('mpcam connection lost');
         }
     }
     
