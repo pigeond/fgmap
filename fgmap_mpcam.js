@@ -1,7 +1,7 @@
 /* FGMapMPCamControl */
 
-//var FGMPCAM_URL = 'http://pigeond.net:8001/mpcam';
-var FGMPCAM_URL = 'http://localhost:8001/mpcam';
+var FGMPCAM_URL = 'http://pigeond.net:8001/mpcam';
+//var FGMPCAM_URL = 'http://localhost:8001/mpcam';
 var FGMPCAM_WIDTH = 240;
 var FGMPCAM_HEIGHT = 192;
 var FGMPCAM_CONTROL_URL = 'fg_mpcam_control.cgi';
@@ -162,9 +162,8 @@ FGMapMPCamControl.prototype.cam_visible_toggle = function() {
     if(this.cam_visible) {
         this.toggle_img.src = 'images/mpcam_button_selected.png';
         element_show(this.cam_div);
-        this.camera_poll_start();
-        this.msg_set('mpcam loading...');
         element_show(this.cam_msg_table);
+        this.camera_poll_start();
     } else {
         this.toggle_img.src = 'images/mpcam_button.png';
         this.camera_poll_stop();
@@ -189,6 +188,7 @@ FGMapMPCamControl.prototype.camera_unload = function() {
 
 FGMapMPCamControl.prototype.camera_poll_start = function() {
     this.down = -1;
+    this.msg_set('mpcam loading...');
     this.should_poll = true;
     this.camera_poll_cb();
 };
@@ -338,9 +338,7 @@ FGMapMPCamControl.prototype.camera_control = function(e, action) {
 
 
 FGMapMPCamControl.prototype.camera_reload = function() {
-    if(this.down == 0) {
-        this.camera_load();
-    }
+    this.camera_poll_start();
 };
 
 
