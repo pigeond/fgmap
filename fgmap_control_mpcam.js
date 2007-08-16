@@ -8,7 +8,7 @@ var FGMPCAM_SWF_URL = 'http://pigeond.net:8090/mpcam.flv';
 
 var FGMPCAM_WIDTH = 240;
 var FGMPCAM_HEIGHT = 192;
-var FGMPCAM_CONTROL_URL = 'fg_mpcam_control.cgi';
+var FGMPCAM_CONTROL_URL = 'fg_mpcam_xml.cgi';
 var FGMPCAM_POLL_INTERVAL = 2000;
 
 
