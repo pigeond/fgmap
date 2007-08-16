@@ -8,6 +8,7 @@ var FGMPCAM_SWF_URL = 'http://pigeond.net:8090/mpcam.flv';
 
 var FGMPCAM_WIDTH = 240;
 var FGMPCAM_HEIGHT = 192;
+var FGMPCAM_CONTROL_HEIGHT = 24;
 var FGMPCAM_CONTROL_URL = 'fg_mpcam_xml.cgi';
 var FGMPCAM_POLL_INTERVAL = 2000;
 
@@ -38,8 +39,10 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_div.style.textAlign = 'right';
 
     this.cam_img_div = element_create(this.cam_div, 'div');
+    this.cam_img_div.style.position = 'relative';
     this.cam_img_div.style.width = FGMPCAM_WIDTH + 'px';
-    this.cam_img_div.style.height = FGMPCAM_HEIGHT + 'px';
+    this.cam_img_div.style.height =
+        (FGMPCAM_HEIGHT + FGMPCAM_CONTROL_HEIGHT) + 'px';
     this.cam_img_div.style.border = '1px solid #888';
 
     var table, tbody, tr, td;
@@ -48,7 +51,7 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_msg_table.style.border = '0px';
     this.cam_msg_table.style.margin = '0px';
     this.cam_msg_table.style.width = '100%';
-    this.cam_msg_table.style.height = '100%';
+    this.cam_msg_table.style.height = FGMPCAM_HEIGHT + 'px';
     this.cam_msg_table.style.visiblity = 'visible';
     //element_opacity_set(this.cam_msg_table, 0.7);
 
@@ -65,6 +68,7 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_control = element_create(this.cam_img_div, 'div');
     this.cam_control.style.border = '0px';
     this.cam_control.style.margin = '0px';
+    this.cam_control.style.height = FGMPCAM_CONTROL_HEIGHT + 'px';
     this.cam_control.style.backgroundColor = '#888';
     this.cam_control.style.paddingTop = '2px';
 
