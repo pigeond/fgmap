@@ -8,7 +8,13 @@ binmode(STDOUT, ':utf8');
 my $FGHOST = 'localhost';
 my $FGPORT = 8000;
 
-print("Content-type: text/xml\n\n");
+my $header = <<HEADER;
+Pragma: no-cache
+Cache-Control: no-cache
+Expires: Sat, 17 Sep 1977 00:00:00 GMT
+Content-Type: text/xml
+
+HEADER
 
 my $qstr = $ENV{'QUERY_STRING'};
 
@@ -101,6 +107,7 @@ my $xml = <<XML;
 <mpcam down="${down}" targetname="${target_name}" />
 XML
 
+print($header);
 print($xml);
 
 exit(0);
