@@ -267,9 +267,6 @@ FGMapMPCamControl.prototype.camera_load = function() {
     cam.style.right = '0px';
     cam.style.width = FGMPCAM_WIDTH + 'px';
     cam.style.height = FGMPCAM_HEIGHT + 'px';
-    cam.style.border = '0px';
-    cam.style.margin = '0px';
-    cam.style.border = '1px solid #888';
 
     attach_event(cam, "mouseover",
             this.cam_mouseover_cb.bind_event(this));
