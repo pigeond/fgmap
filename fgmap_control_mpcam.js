@@ -40,7 +40,7 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_img_div = element_create(this.cam_div, 'div');
     this.cam_img_div.style.width = FGMPCAM_WIDTH + 'px';
     this.cam_img_div.style.height = FGMPCAM_HEIGHT + 'px';
-    this.cam_img_div.style.border = '1px solid grey';
+    this.cam_img_div.style.border = '1px solid #888';
 
     var table, tbody, tr, td;
 
@@ -56,7 +56,7 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     tr = element_create(tbody, 'tr');
 
     this.cam_msg = element_create(tr, 'td');
-    this.cam_msg.style.backgroundColor = 'white';
+    this.cam_msg.style.backgroundColor = '#fff';
     this.cam_msg.style.textAlign = 'center';
     this.cam_msg.style.verticalAlign = 'middle';
     this.cam_msg.className = 'fgmap_mpcam_msg';
@@ -65,7 +65,7 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_control = element_create(this.cam_img_div, 'div');
     this.cam_control.style.border = '0px';
     this.cam_control.style.margin = '0px';
-    this.cam_control.style.backgroundColor = 'grey';
+    this.cam_control.style.backgroundColor = '#888';
     this.cam_control.style.paddingTop = '2px';
 
     table = element_create(this.cam_control, 'table');
@@ -265,7 +265,7 @@ FGMapMPCamControl.prototype.camera_load = function() {
     cam.style.height = FGMPCAM_HEIGHT + 'px';
     cam.style.border = '0px';
     cam.style.margin = '0px';
-    cam.style.border = '1px solid grey';
+    cam.style.border = '1px solid #888';
 
     attach_event(cam, "mouseover",
             this.cam_mouseover_cb.bind_event(this));
