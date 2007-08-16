@@ -2,6 +2,10 @@
 
 var FGMPCAM_URL = 'http://pigeond.net:8090/mpcam';
 //var FGMPCAM_URL = 'http://localhost:8090/mpcam';
+
+var FGMPCAM_SWF_URL = 'http://pigeond.net:8090/mpcam.flv';
+//var FGMPCAM_SWF_URL = 'http://localhost:8090/mpcam.flv';
+
 var FGMPCAM_WIDTH = 240;
 var FGMPCAM_HEIGHT = 192;
 var FGMPCAM_CONTROL_URL = 'fg_mpcam_control.cgi';
@@ -239,7 +243,7 @@ FGMapMPCamControl.prototype.camera_load = function() {
 <param name="allowfullscreen" value="false" />\
 <param name="wmode" value="transparent" />\
 <param name="allowNetworking" value="all" />\
-<param name="flashvars" value=\'config={ autoPlay: true, loop: false, hideControls: true, showFullScreenButton: false, showLoopButton: false, showPlayListButtons: false, showPlayList: false, showMenu: false, initialScale: "scale", showLoopButton: false, showPlayListButtons: false, videoHeight: 240, playList: [ { url: "http://localhost:8090/mpcam.flv" } ] }\' />\
+<param name="flashvars" value=\'config={ autoPlay: true, loop: false, hideControls: true, showFullScreenButton: false, showLoopButton: false, showPlayListButtons: false, showPlayList: false, showMenu: false, initialScale: "scale", showLoopButton: false, showPlayListButtons: false, videoHeight: 240, playList: [ { url: "' + FGMPCAM_SWF_URL + '" } ] }\' />\
 </object>\
 ';
         this.swf = document.getElementById('flowplayer');
