@@ -25,29 +25,22 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.div = element_create(gmap.getContainer(), 'div');
     this.div.className = 'fgmap_mpcam_control';
 
-
-    /*
-    this.div.style.width = (FGMPCAM_WIDTH + 2) + 'px';
-    this.div.style.height = (FGMPCAM_HEIGHT + 24) + 'px';
-    */
-
-
     this.cam_div = element_create(this.div, 'div');
     this.cam_div.style.position = 'absolute';
     this.cam_div.style.top = '0px';
     this.cam_div.style.right = '0px';
     this.cam_div.style.textAlign = 'right';
 
-    this.cam_img_div = element_create(this.cam_div, 'div');
-    this.cam_img_div.style.position = 'relative';
-    this.cam_img_div.style.width = FGMPCAM_WIDTH + 'px';
-    this.cam_img_div.style.height =
+    this.cam_cam_div = element_create(this.cam_div, 'div');
+    this.cam_cam_div.style.position = 'relative';
+    this.cam_cam_div.style.width = FGMPCAM_WIDTH + 'px';
+    this.cam_cam_div.style.height =
         (FGMPCAM_HEIGHT + FGMPCAM_CONTROL_HEIGHT) + 'px';
-    this.cam_img_div.style.border = '1px solid #888';
+    this.cam_cam_div.style.border = '1px solid #888';
 
     var table, tbody, tr, td;
 
-    this.cam_msg_table = element_create(this.cam_img_div, 'table');
+    this.cam_msg_table = element_create(this.cam_cam_div, 'table');
     this.cam_msg_table.style.border = '0px';
     this.cam_msg_table.style.margin = '0px';
     this.cam_msg_table.style.width = '100%';
@@ -65,7 +58,7 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.cam_msg.className = 'fgmap_mpcam_msg';
 
 
-    this.cam_control = element_create(this.cam_img_div, 'div');
+    this.cam_control = element_create(this.cam_cam_div, 'div');
     this.cam_control.style.border = '0px';
     this.cam_control.style.margin = '0px';
     this.cam_control.style.height = FGMPCAM_CONTROL_HEIGHT + 'px';
@@ -144,7 +137,7 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     this.toggle_img = element_create(this.div, 'img');
     this.toggle_img.style.position = 'absolute';
     this.toggle_img.style.top = '0px';
-    this.toggle_img.style.right = '0px';
+    this.toggle_img.style.right = '1px';
     this.toggle_img.title = 'Toggle real-time camera';
 
     attach_event(this.toggle_img, "mousedown",
@@ -215,15 +208,15 @@ FGMapMPCamControl.prototype.cam_visible_toggle = function() {
 };
 
 
-FGMapMPCamControl.prototype.cam_img_complete_cb = function() {
+FGMapMPCamControl.prototype.cam_complete_cb = function() {
     
-    if(this.cam_img == null)
+    if(this.cam == null)
         return;
 
-    if(this.cam_img.complete) {
+    if(this.cam.complete) {
         this.msg_set('mpcam connection lost<br>try the reload button below');
     } else {
-        setTimeout(this.cam_img_complete_cb.bind_event(this), 300);
+        setTimeout(this.cam_complete_cb.bind_event(this), 300);
     }
 };
 
@@ -232,13 +225,13 @@ FGMapMPCamControl.prototype.camera_load = function() {
 
     this.camera_unload();
 
-    var cam;
+    if(this.cam == null) {
 
-    if(this.use_swf) {
+        if(this.use_swf) {
 
-        this.swfdiv = cam = element_create(this.cam_img_div, 'div');
+            this.cam = element_create(this.cam_cam_div, 'div');
 
-        this.swfdiv.innerHTML = '\
+            this.cam.innerHTML = '\
 <object type="application/x-shockwave-flash" data="FlowPlayer.swf" \
 id="flowplayer" name="flowplayer" \
 width="' + FGMPCAM_WIDTH + '"' + ' height="' + FGMPCAM_HEIGHT + '" \
@@ -252,49 +245,49 @@ width="' + FGMPCAM_WIDTH + '"' + ' height="' + FGMPCAM_HEIGHT + '" \
 <param name="flashvars" value=\'config={ autoPlay: true, loop: false, hideControls: true, showFullScreenButton: false, showLoopButton: false, showPlayListButtons: false, showPlayList: false, showMenu: false, initialScale: "scale", showLoopButton: false, showPlayListButtons: false, videoHeight: 240, playList: [ { url: "' + FGMPCAM_SWF_URL + '" } ] }\' />\
 </object>\
 ';
-        this.swf = document.getElementById('flowplayer');
+            this.swf = document.getElementById('flowplayer');
 
-    } else {
+        } else {
 
-        this.cam_img = cam = element_create(this.cam_img_div, 'img');
-        this.cam_img.src = FGMPCAM_URL;
-        this.cam_img_complete_cb();
-
+            this.cam = cam = element_create(this.cam_cam_div, 'img');
+        }
     }
 
-    cam.style.position = 'absolute';
-    cam.style.border = '0px';
-    cam.style.margin = '0px';
-    cam.style.top = '0px';
-    cam.style.right = '0px';
-    cam.style.width = FGMPCAM_WIDTH + 'px';
-    cam.style.height = FGMPCAM_HEIGHT + 'px';
+    this.cam.style.position = 'absolute';
+    this.cam.style.border = '0px';
+    this.cam.style.margin = '0px';
+    this.cam.style.top = '0px';
+    this.cam.style.right = '0px';
+    this.cam.style.width = FGMPCAM_WIDTH + 'px';
+    this.cam.style.height = FGMPCAM_HEIGHT + 'px';
 
-    attach_event(cam, "mouseover",
-            this.cam_mouseover_cb.bind_event(this));
-    attach_event(cam, "mouseout",
-            this.cam_mouseout_cb.bind_event(this));
+    if(this.use_swf) {
+        if(this.DoPlay) {
+            this.swf.DoPlay();
+        }
+    } else {
+        this.cam.src = FGMPCAM_URL;
+        this.cam_complete_cb();
+    }
 
 };
 
 
 FGMapMPCamControl.prototype.camera_unload = function() {
-    if(this.cam_img) {
-        this.cam_img.src = '';
-        element_remove(this.cam_img);
-        delete(this.cam_img);
-        this.cam_img = null;
+
+    if(this.cam == null)
+        return;
+
+    if(this.use_swf) {
+
+        if(this.swf && this.swf.DoStop) {
+            this.swf.DoStop();
+        }
+
+    } else {
+        this.cam.src = '';
     }
-    if(this.swf) {
-        element_remove(this.swf);
-        delete(this.swf);
-        this.swf = null;
-    }
-    if(this.swfdiv) {
-        element_remove(this.swfdiv);
-        delete(this.swfdiv);
-        this.swfdiv = null;
-    }
+
 };
 
 
@@ -386,7 +379,7 @@ FGMapMPCamControl.prototype.cam_mouseover_cb = function() {
 
 
 FGMapMPCamControl.prototype.cam_mouseout_cb = function() {
-    setTimeout(this.cam_img_mouseout_timeout_cb.bind_event(this), 100);
+    setTimeout(this.cam_mouseout_timeout_cb.bind_event(this), 100);
 };
 
 
@@ -400,7 +393,7 @@ FGMapMPCamControl.prototype.toggle_img_mouseout_cb = function() {
 };
 
 
-FGMapMPCamControl.prototype.cam_img_mouseout_timeout_cb = function() {
+FGMapMPCamControl.prototype.cam_mouseout_timeout_cb = function() {
     if(this.cam_visible && element_is_visible(this.toggle_img) &&
             !this.toggle_img_mouseover) {
         element_hide(this.toggle_img);
@@ -414,7 +407,6 @@ FGMapMPCamControl.prototype.camera_down_set = function(down) {
 
         if(down == 1) {
             this.camera_unload();
-            //element_hide(this.cam_img);
             this.msg_set('mpcam is currently down');
         } else {
             this.camera_load();
