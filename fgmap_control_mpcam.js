@@ -288,6 +288,11 @@ FGMapMPCamControl.prototype.camera_unload = function() {
         delete(this.swf);
         this.swf = null;
     }
+    if(this.swfdiv) {
+        element_remove(this.swfdiv);
+        delete(this.swfdiv);
+        this.swfdiv = null;
+    }
 };
 
 
