@@ -239,7 +239,9 @@ FGMapMPCamControl.prototype.camera_load = function() {
         this.swfdiv = cam = element_create(this.cam_img_div, 'div');
 
         this.swfdiv.innerHTML = '\
-<object type="application/x-shockwave-flash" data="FlowPlayer.swf" width="240" height="192" id="flowplayer">\
+<object type="application/x-shockwave-flash" data="FlowPlayer.swf" \
+id="flowplayer" name="flowplayer" \
+width="' + FGMPCAM_WIDTH + '"' + ' height="' + FGMPCAM_HEIGHT + '" \
 <param name="allowScriptAccess" value="always" />\
 <param name="movie" value="FlowPlayer.swf" />\
 <param name="quality" value="high" />\
