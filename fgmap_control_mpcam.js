@@ -280,14 +280,21 @@ FGMapMPCamControl.prototype.camera_unload = function() {
 
     if(this.use_swf) {
 
-        if(this.swf && this.swf.DoStop) {
-            this.swf.DoStop();
+        if(this.swf) {
+            if(this.swf.DoStop) {
+                this.swf.DoStop();
+            }
+            element_remove(this.swf);
+            delete(this.swf);
         }
 
     } else {
         this.cam.src = '';
     }
 
+    element_remove(this.cam);
+    delete(this.cam);
+    this.cam = null;
 };
 
 
