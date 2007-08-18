@@ -83,7 +83,7 @@ if ($qstr ne '') {
 
         $fov = fg_prop('/sim/current-view/field-of-view');
         if (defined($fov)) {
-            $fov /= FGFOV_K;
+            $fov /= $FGFOV_K;
             $fov = 0.1 if ($fov < 0.1);
             fg_prop('/sim/current-view/field-of-view', $fov);
         }
@@ -92,7 +92,7 @@ if ($qstr ne '') {
 
         $fov = fg_prop('/sim/current-view/field-of-view');
         if (defined($fov)) {
-            $fov *= FGFOV_K;
+            $fov *= $FGFOV_K;
             $fov = 120 if ($fov > 120);
             fg_prop('/sim/current-view/field-of-view', $fov);
         }
