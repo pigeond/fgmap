@@ -115,6 +115,15 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     td.style.whiteSpace = 'nowrap';
     td.style.width = '50%';
 
+    this.goto_elem = elem = element_create(td, 'img');
+    elem.src = 'images/mpcam/goto.png';
+    elem.title = 'Goto target immediately';
+    elem.style.width = '19px';
+    elem.style.height = '19px';
+    attach_event(elem, 'mousedown',
+            this.camera_control_cb.bind_event(this, 'goto'));
+    img_ie_fix(elem);
+
     this.zoomin_elem = elem = element_create(td, 'img');
     elem.src = 'images/mpcam/zoom_in.png';
     elem.title = 'Zoom in';
