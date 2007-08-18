@@ -7,6 +7,7 @@ binmode(STDOUT, ':utf8');
 
 my $FGHOST = 'localhost';
 my $FGPORT = 8000;
+my $FGFOV_K = 1.10778066622128886919;
 
 my $header = <<HEADER;
 Pragma: no-cache
@@ -82,14 +83,18 @@ if ($qstr ne '') {
 
         $fov = fg_prop('/sim/current-view/field-of-view');
         if (defined($fov)) {
-            fg_prop('/sim/current-view/field-of-view', $fov - 5.0);
+            $fov /= FGFOV_K;
+            $fov = 0.1 if ($fov < 0.1);
+            fg_prop('/sim/current-view/field-of-view', $fov);
         }
 
     } elsif ($qstr eq 'zoom_out') {
 
         $fov = fg_prop('/sim/current-view/field-of-view');
         if (defined($fov)) {
-            fg_prop('/sim/current-view/field-of-view', $fov + 5.0);
+            $fov *= FGFOV_K;
+            $fov = 120 if ($fov > 120);
+            fg_prop('/sim/current-view/field-of-view', $fov);
         }
 
     } elsif ($qstr eq 'goto') {
