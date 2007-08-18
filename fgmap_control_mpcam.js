@@ -1,10 +1,10 @@
 /* FGMapMPCamControl */
 
 var FGMPCAM_URL = 'http://pigeond.net:8090/mpcam';
-//var FGMPCAM_URL = 'http://localhost:8090/mpcam';
+//var FGMPCAM_URL = 'http://vejitto.pigeond.net:8090/mpcam';
 
 var FGMPCAM_SWF_URL = 'http://pigeond.net:8090/mpcam.flv';
-//var FGMPCAM_SWF_URL = 'http://localhost:8090/mpcam.flv';
+//var FGMPCAM_SWF_URL = 'http://vejitto.pigeond.net:8090/mpcam.flv';
 
 var FGMPCAM_WIDTH = 240;
 var FGMPCAM_HEIGHT = 192;
@@ -80,11 +80,16 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     td.style.whiteSpace = 'nowrap';
     td.style.width = '50%';
 
-    this.prevtarget_elem = element_create(td, 'img');
-    this.prevtarget_elem.src = 'images/mpcam/prev.png';
-    this.prevtarget_elem.title = 'Previous target';
-    attach_event(this.prevtarget_elem, 'mousedown',
+    var elem;
+
+    this.prevtarget_elem = elem = element_create(td, 'img');
+    elem.src = 'images/mpcam/prev.png';
+    elem.title = 'Previous target';
+    elem.style.width = '19px';
+    elem.style.height = '19px';
+    attach_event(elem, 'mousedown',
             this.camera_control_cb.bind_event(this, 'prev_target'));
+    img_ie_fix(elem);
 
     element_text_append(td, '\u00a0');
 
@@ -95,11 +100,14 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
 
     element_text_append(td, '\u00a0');
 
-    this.nexttarget_elem = element_create(td, 'img');
-    this.nexttarget_elem.src = 'images/mpcam/next.png';
-    this.nexttarget_elem.title = 'Next target';
-    attach_event(this.nexttarget_elem, 'mousedown',
+    this.nexttarget_elem = elem = element_create(td, 'img');
+    elem.src = 'images/mpcam/next.png';
+    elem.title = 'Next target';
+    elem.style.width = '19px';
+    elem.style.height = '19px';
+    attach_event(elem, 'mousedown',
             this.camera_control_cb.bind_event(this, 'next_target'));
+    img_ie_fix(elem);
 
 
     td = element_create(tr, 'td');
@@ -107,38 +115,50 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     td.style.whiteSpace = 'nowrap';
     td.style.width = '50%';
 
-    this.zoomin_elem = element_create(td, 'img');
-    this.zoomin_elem.src = 'images/mpcam/zoom_in.png';
-    this.zoomin_elem.title = 'Zoom in';
-    attach_event(this.zoomin_elem, 'mousedown',
+    this.zoomin_elem = elem = element_create(td, 'img');
+    elem.src = 'images/mpcam/zoom_in.png';
+    elem.title = 'Zoom in';
+    elem.style.width = '19px';
+    elem.style.height = '19px';
+    attach_event(elem, 'mousedown',
             this.camera_control_cb.bind_event(this, 'zoom_in'));
+    img_ie_fix(elem);
 
-    this.zoomout_elem = element_create(td, 'img');
-    this.zoomout_elem.src = 'images/mpcam/zoom_out.png';
-    this.zoomout_elem.title = 'Zoom out';
-    attach_event(this.zoomout_elem, 'mousedown',
+    this.zoomout_elem = elem = element_create(td, 'img');
+    elem.src = 'images/mpcam/zoom_out.png';
+    elem.title = 'Zoom out';
+    elem.style.width = '19px';
+    elem.style.height = '19px';
+    attach_event(elem, 'mousedown',
             this.camera_control_cb.bind_event(this, 'zoom_out'));
+    img_ie_fix(elem);
 
     element_text_append(td, '\u00a0');
 
-    this.reload_elem = element_create(td, 'img');
-    this.reload_elem.src = 'images/mpcam/reload.png';
-    this.reload_elem.title = 'Reload mpcam';
-    attach_event(this.reload_elem, 'mousedown',
+    this.reload_elem = elem = element_create(td, 'img');
+    elem.src = 'images/mpcam/reload.png';
+    elem.title = 'Reload mpcam';
+    elem.style.width = '19px';
+    elem.style.height = '19px';
+    attach_event(elem, 'mousedown',
             this.camera_reload.bind_event(this));
+    img_ie_fix(elem);
 
-    this.close_elem = element_create(td, 'img');
-    this.close_elem.src = 'images/mpcam/close.png';
-    this.close_elem.title = 'Close mpcam';
-    attach_event(this.close_elem, 'mousedown',
+    this.close_elem = elem = element_create(td, 'img');
+    elem.src = 'images/mpcam/close.png';
+    elem.title = 'Close mpcam';
+    elem.style.width = '19px';
+    elem.style.height = '19px';
+    attach_event(elem, 'mousedown',
             this.close_cb.bind_event(this));
+    img_ie_fix(elem);
 
 
-    this.toggle_img = element_create(this.div, 'img');
-    this.toggle_img.style.position = 'absolute';
-    this.toggle_img.style.top = '0px';
-    this.toggle_img.style.right = '1px';
-    this.toggle_img.title = 'Toggle real-time camera';
+    this.toggle_img = elem = element_create(this.div, 'img');
+    elem.style.position = 'absolute';
+    elem.style.top = '0px';
+    elem.style.right = '1px';
+    elem.title = 'Toggle real-time camera';
 
     attach_event(this.toggle_img, "mousedown",
             this.cam_visible_toggle.bind_event(this));
@@ -200,6 +220,10 @@ FGMapMPCamControl.prototype.cam_visible_set = function(visible) {
         element_hide(this.cam_msg_table);
         this.fgmap.pilot_follows_clear();
     }
+
+    this.toggle_img.style.width = '38px';
+    this.toggle_img.style.height = '38px';
+    img_ie_fix(this.toggle_img);
 };
 
 
