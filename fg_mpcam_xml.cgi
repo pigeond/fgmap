@@ -68,7 +68,7 @@ if ($qstr ne '') {
         if (defined($target_number)) {
             fg_prop('/sim/cam/target-number', $target_number + 1);
         }
-        fg_prop('/sim/cam/goto', 'true');
+        #fg_prop('/sim/cam/goto', 'true');
 
     } elsif ($qstr eq 'prev_target') {
 
@@ -76,7 +76,7 @@ if ($qstr ne '') {
         if (defined($target_number)) {
             fg_prop('/sim/cam/target-number', $target_number - 1);
         }
-        fg_prop('/sim/cam/goto', 'true');
+        #fg_prop('/sim/cam/goto', 'true');
 
     } elsif ($qstr eq 'zoom_in') {
 
