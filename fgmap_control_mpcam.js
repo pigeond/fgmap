@@ -87,12 +87,12 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     elem.title = 'Previous target';
     elem.style.width = '19px';
     elem.style.height = '19px';
-    /*
     attach_event(elem, 'mousedown',
             this.camera_control_cb.bind_event(this, 'prev_target'));
-    */
+    /*
     attach_event(elem, 'mousedown',
             this.target_change.bind_event(this, 'prev'));
+    */
     img_ie_fix(elem);
 
     element_text_append(td, '\u00a0');
@@ -109,12 +109,12 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     elem.title = 'Next target';
     elem.style.width = '19px';
     elem.style.height = '19px';
-    /*
     attach_event(elem, 'mousedown',
             this.camera_control_cb.bind_event(this, 'next_target'));
-    */
+    /*
     attach_event(elem, 'mousedown',
             this.target_change.bind_event(this, 'next'));
+    */
     img_ie_fix(elem);
 
 
@@ -302,6 +302,9 @@ width="' + FGMPCAM_WIDTH + '"' + ' height="' + FGMPCAM_HEIGHT + '" \
     this.cam.style.width = FGMPCAM_WIDTH + 'px';
     this.cam.style.height = FGMPCAM_HEIGHT + 'px';
 
+    attach_event(this.cam, "mouseover", this.cam_mouseover_cb.bind_event(this));
+    attach_event(this.cam, "mouseout", this.cam_mouseout_cb.bind_event(this));
+
     if(this.use_swf) {
         if(this.DoPlay) {
             this.swf.DoPlay();
@@ -456,6 +459,7 @@ FGMapMPCamControl.prototype.camera_down_set = function(down) {
         if(down == 1) {
             this.camera_unload();
             this.msg_set('mpcam is currently down');
+            this.targetname_elem.innerHTML = '(no target)';
         } else {
             this.camera_load();
         }
@@ -569,7 +573,8 @@ FGMapMPCamControl.prototype.target_change = function(e, action) {
     var lat = pilot.latlng.lat();
     var lng = pilot.latlng.lng();
 
-    this.camera_control('set_latlng', lat + ',' + lng);
     this.camera_control('set_target_name', pilot.callsign);
+
+    this.camera_control('set_latlng', lat + ',' + lng);
 };
 
