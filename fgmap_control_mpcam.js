@@ -283,7 +283,7 @@ width="' + FGMPCAM_WIDTH + '"' + ' height="' + FGMPCAM_HEIGHT + '" \
 <param name="allowfullscreen" value="false" />\
 <param name="wmode" value="transparent" />\
 <param name="allowNetworking" value="all" />\
-<param name="flashvars" value=\'config={ autoPlay: true, loop: false, hideControls: true, showFullScreenButton: false, showLoopButton: false, showPlayListButtons: false, showPlayList: false, showMenu: false, initialScale: "scale", showLoopButton: false, showPlayListButtons: false, autoBuffering: false, bufferLength: 0,videoHeight: ' + FGMPCAM_HEIGHT + ', playList: [ { url: "' + FGMPCAM_SWF_URL + '" } ] }\' />\
+<param name="flashvars" value=\'config={ autoPlay: true, loop: false, hideControls: true, showFullScreenButton: false, showLoopButton: false, showPlayListButtons: false, showPlayList: false, showMenu: false, initialScale: "scale", showLoopButton: false, showPlayListButtons: false, autoBuffering: false, bufferLength: 2,startingBufferLength: 2, videoHeight: ' + FGMPCAM_HEIGHT + ', playList: [ { url: "' + FGMPCAM_SWF_URL + '" } ] }\' />\
 </object>\
 ';
             this.swf = document.getElementById('flowplayer');
