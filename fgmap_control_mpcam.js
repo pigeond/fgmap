@@ -570,14 +570,6 @@ FGMapMPCamControl.prototype.target_change = function(e, action) {
     var lng = pilot.latlng.lng();
 
     this.camera_control('set_latlng', lat + ',' + lng);
-
-    /* Short delay to ensure this happens after the set_latlng */
-    setTimeout(this.set_target_name_cb.bind_event(this, pilot.callsign), 200);
-
+    this.camera_control('set_target_name', pilot.callsign);
 };
-
-
-FGMapMPCamControl.prototype.set_target_name_cb = function(e, callsign) {
-    this.camera_control('set_target_name', callsign);
-}
 
