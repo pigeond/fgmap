@@ -71,7 +71,7 @@ if ($action ne '') {
         if (defined($target_number)) {
             fg_prop('/sim/cam/target-number', $target_number + 1);
         }
-        #fg_prop('/sim/cam/goto', 'true');
+        fg_prop('/sim/cam/goto', 'true');
 
     } elsif ($action eq 'prev_target') {
 
@@ -79,12 +79,13 @@ if ($action ne '') {
         if (defined($target_number)) {
             fg_prop('/sim/cam/target-number', $target_number - 1);
         }
-        #fg_prop('/sim/cam/goto', 'true');
+        fg_prop('/sim/cam/goto', 'true');
 
     } elsif ($action eq 'set_target_name') {
 
         if ($arg ne '') {
             fg_prop('/sim/cam/target-name', $arg);
+            fg_prop('/sim/cam/goto', 'true');
         }
 
     } elsif ($action eq 'zoom_in') {
