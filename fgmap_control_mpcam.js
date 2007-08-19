@@ -87,8 +87,12 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     elem.title = 'Previous target';
     elem.style.width = '19px';
     elem.style.height = '19px';
+    /*
     attach_event(elem, 'mousedown',
             this.camera_control_cb.bind_event(this, 'prev_target'));
+    */
+    attach_event(elem, 'mousedown',
+            this.target_change.bind_event(this, 'prev'));
     img_ie_fix(elem);
 
     element_text_append(td, '\u00a0');
@@ -105,8 +109,12 @@ FGMapMPCamControl.prototype.initialize = function(gmap) {
     elem.title = 'Next target';
     elem.style.width = '19px';
     elem.style.height = '19px';
+    /*
     attach_event(elem, 'mousedown',
             this.camera_control_cb.bind_event(this, 'next_target'));
+    */
+    attach_event(elem, 'mousedown',
+            this.target_change.bind_event(this, 'next'));
     img_ie_fix(elem);
 
 
@@ -458,28 +466,31 @@ FGMapMPCamControl.prototype.camera_down_set = function(down) {
 
 
 FGMapMPCamControl.prototype.camera_control_cb = function(e, action) {
-    this.camera_control(action);
+    this.camera_control(action, null);
 }
 
-FGMapMPCamControl.prototype.camera_control = function(action) {
+FGMapMPCamControl.prototype.camera_control = function(action, arg) {
 
     if(this.down == 1) {
         return;
     }
 
-    if(this.control_request) {
-        this.control_request.abort();
+    var url = FGMPCAM_CONTROL_URL + '?' + action;
+
+    if(arg) {
+        url += '=' + arg;
     }
 
-    var url = FGMPCAM_CONTROL_URL + '?' + action;
-    this.control_request = GXmlHttp.create();
-    this.control_request.open('GET', url, true);
-    this.control_request.onreadystatechange =
-        this.control_request_cb.bind_event(this);
-    this.control_request.send(null);
+    var request = GXmlHttp.create();
+    request.open('GET', url, true);
+    request.onreadystatechange =
+        this.control_request_cb.bind_event(this, request);
+    request.send(null);
 
     /* Hack */
-    if(action == 'next_target' || action == 'prev_target') {
+    if(action == 'next_target' ||
+            action == 'prev_target' ||
+            action == 'set_target_name') {
         this.camera_poll_cb();
     }
 };
@@ -500,14 +511,73 @@ FGMapMPCamControl.prototype.msg_set = function(msg) {
 };
 
 
-FGMapMPCamControl.prototype.control_request_cb = function() {
+FGMapMPCamControl.prototype.control_request_cb = function(request) {
 
-    if(!this.control_request)
+    if(!request)
         return;
 
-    if(this.control_request.readyState >= 4) {
-        delete(this.control_request);
-        this.control_request = null;
+    if(request.readyState >= 4) {
     }
 };
+
+
+FGMapMPCamControl.prototype.target_change = function(e, action) {
+
+    var arr = new Array();
+    var i = 0;
+    var cur = 0;
+
+    if(this.fgmap.pilots == null) {
+        return;
+    }
+
+    for(var callsign in this.fgmap.pilots) {
+
+        /* Hack */
+        if(callsign == 'mpcam') {
+            continue;
+        }
+
+        arr.push(callsign);
+
+        if(this.targetname == callsign) {
+            cur = i;
+        }
+
+        i++;
+    }
+
+    if(arr.length == 0) {
+        return;
+    }
+
+    if(action == 'prev') {
+        cur -= 1;
+    } else if(action == 'next') {
+        cur += 1;
+    }
+
+    /* Wrap around */
+    if(cur < 0) {
+        cur = arr.length - 1;
+    } else if(cur >= arr.length) {
+        cur = 0;
+    }
+
+    var pilot = this.fgmap.pilots[arr[cur]];
+
+    var lat = pilot.latlng.lat();
+    var lng = pilot.latlng.lng();
+
+    this.camera_control('set_latlng', lat + ',' + lng);
+
+    /* Short delay to ensure this happens after the set_latlng */
+    setTimeout(this.set_target_name_cb.bind_event(this, pilot.callsign), 200);
+
+};
+
+
+FGMapMPCamControl.prototype.set_target_name_cb = function(e, callsign) {
+    this.camera_control('set_target_name', callsign);
+}
 
