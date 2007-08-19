@@ -19,6 +19,8 @@ HEADER
 
 my $qstr = $ENV{'QUERY_STRING'};
 
+my ($action, $arg) = split(/=/, $qstr, 2);
+
 my $down = 0;
 
 sub fg_prop {
@@ -61,9 +63,9 @@ my $target_number;
 my $target_name;
 my $fov;
 
-if ($qstr ne '') {
+if ($action ne '') {
 
-    if ($qstr eq 'next_target') {
+    if ($action eq 'next_target') {
 
         $target_number = fg_prop('/sim/cam/target-number');
         if (defined($target_number)) {
@@ -71,7 +73,7 @@ if ($qstr ne '') {
         }
         #fg_prop('/sim/cam/goto', 'true');
 
-    } elsif ($qstr eq 'prev_target') {
+    } elsif ($action eq 'prev_target') {
 
         $target_number = fg_prop('/sim/cam/target-number');
         if (defined($target_number)) {
@@ -79,7 +81,13 @@ if ($qstr ne '') {
         }
         #fg_prop('/sim/cam/goto', 'true');
 
-    } elsif ($qstr eq 'zoom_in') {
+    } elsif ($action eq 'set_target_name') {
+
+        if ($arg ne '') {
+            fg_prop('/sim/cam/target-name', $arg);
+        }
+
+    } elsif ($action eq 'zoom_in') {
 
         $fov = fg_prop('/sim/current-view/field-of-view');
         if (defined($fov)) {
@@ -88,7 +96,7 @@ if ($qstr ne '') {
             fg_prop('/sim/current-view/field-of-view', $fov);
         }
 
-    } elsif ($qstr eq 'zoom_out') {
+    } elsif ($action eq 'zoom_out') {
 
         $fov = fg_prop('/sim/current-view/field-of-view');
         if (defined($fov)) {
@@ -97,14 +105,23 @@ if ($qstr ne '') {
             fg_prop('/sim/current-view/field-of-view', $fov);
         }
 
-    } elsif ($qstr eq 'goto') {
+    } elsif ($action eq 'goto') {
+
         fg_prop('/sim/cam/goto', 'true');
 
-    } elsif ($qstr eq 'poll') {
+    } elsif ($action eq 'poll') {
 
         $target_name = fg_prop('/sim/cam/target-name');
         $target_name =~ s/"/\\"/g;
 
+    } elsif ($action eq 'set_latlng') {
+
+        my ($lat, $lng) = split(/,/, $arg);
+
+        if($lat =~ /^-?[\d\.]+$/ && $lng =~ /^-?[\d\.]+$/) {
+            fg_prop('/position/latitude-deg', $lat);
+            fg_prop('/position/longitude-deg', $lng);
+        }
     }
 }
 
