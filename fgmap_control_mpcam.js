@@ -568,13 +568,13 @@ FGMapMPCamControl.prototype.target_change = function(e, action) {
         cur = 0;
     }
 
+    /*
     var pilot = this.fgmap.pilots[arr[cur]];
-
     var lat = pilot.latlng.lat();
     var lng = pilot.latlng.lng();
+    //this.camera_control('set_latlng', lat + ',' + lng);
+    */
 
-    this.camera_control('set_target_name', pilot.callsign);
-
-    this.camera_control('set_latlng', lat + ',' + lng);
+    this.camera_control('set_target_name', arr[cur]);
 };
 
