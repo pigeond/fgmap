@@ -1506,6 +1506,7 @@ function FGMap(id)
     this.pantoall = false;
     this.latlng_visible = false;
     this.mpcam_visible = false;
+    this.mpcam_useswf = true;
 
     /* gmap initial settings */
     this.gmap = null;
@@ -1692,9 +1693,10 @@ FGMap.prototype.mpcam_visible_set = function(visible) {
     if(this.mpcam_visible) {
         if(this.mpcam_control == null) {
             this.mpcam_control = new FGMapMPCamControl();
-            this.mpcam_control.setFGMap(this);
+            this.mpcam_control.set_fgmap(this);
         }
         this.gmap.addControl(this.mpcam_control);
+        this.mpcam_control.set_use_swf(this.mpcam_useswf);
     } else {
         this.gmap.removeControl(this.mpcam_control);
     }
@@ -1978,7 +1980,13 @@ FGMap.prototype.query_string_parse = function() {
         } else if(pair[0] == "mpcam") {
 
             this.mpcam_visible = true;
+
+            if(pair[1] == 'mpjpeg') {
+                this.mpcam_useswf = false;
+            }
+
         }
+
     }
 
 };

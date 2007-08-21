@@ -214,9 +214,14 @@ FGMapMPCamControl.prototype.selectable = function() {
 };
 
 
-FGMapMPCamControl.prototype.setFGMap = function(fgmap) {
+FGMapMPCamControl.prototype.set_fgmap = function(fgmap) {
     this.fgmap = fgmap;
 };
+
+
+FGMapMPCamControl.prototype.set_use_swf = function(use_swf) {
+    this.use_swf = use_swf;
+}
 
 
 FGMapMPCamControl.prototype.cam_visible_set = function(visible) {
