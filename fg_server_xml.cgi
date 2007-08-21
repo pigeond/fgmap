@@ -378,13 +378,10 @@ if($socket)
     {
         chomp($l);
 
-        if(substr($l, 0, 1) eq "#")
+        if((substr($l, 0, 1) eq "#") && ($l =~ /^# (\d+) .*? online/))
         {
-            if($l =~ /^# (\d+) .*? online/)
-            {
-                $pilot_total = $1;
-                $output .= $ocs{'header'}->($pilot_total);
-            }
+            $pilot_total = $1;
+            $output .= $ocs{'header'}->($pilot_total);
         }
         elsif($l =~ m/^(.*)@(.*?): (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?)$/)
         {
@@ -396,6 +393,8 @@ if($socket)
                 ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
 
             $callsign = &escape_strs(${callsign});
+
+            $callsign =~ s/^# //g;
 
             if($callsign and $model)
             {
