@@ -60,7 +60,7 @@ sub fg_prop {
 }
 
 my $target_number;
-my $target_name;
+my $target_name = "";
 my $fov;
 
 if ($action ne '') {
