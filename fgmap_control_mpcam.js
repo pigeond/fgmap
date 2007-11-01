@@ -13,7 +13,8 @@ var FGMPCAM_CONTROL_URL = 'fg_mpcam_xml.cgi';
 var FGMPCAM_POLL_INTERVAL = 2000;
 
 
-function FGMapMPCamControl() {
+function FGMapMPCamControl(fgmap) {
+    this.fgmap = fgmap;
     GControl.apply(this, [ true, true ]);
 }
 FGMapMPCamControl.prototype = new GControl();
@@ -211,11 +212,6 @@ FGMapMPCamControl.prototype.printable = function() {
 
 FGMapMPCamControl.prototype.selectable = function() {
     return true;
-};
-
-
-FGMapMPCamControl.prototype.set_fgmap = function(fgmap) {
-    this.fgmap = fgmap;
 };
 
 
