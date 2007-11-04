@@ -24,14 +24,15 @@ mpserver02:5000::mpserver02.flightgear.org:5000 (Hong Kong)::mpserver02.flightge
 
 mpserver01:5000::mpserver01.flightgear.org:5000 (Germany)::mpserver01.flightgear.org::5001::85.214.36.1
 
-mpserver03:5000::mpserver03.flightgear.org:5000 (East Coast US)::mpserver03.flightgear.org::5001::75.28.141.184
+#mpserver03:5000::mpserver03.flightgear.org:5000 (East Coast US)::mpserver03.flightgear.org::5001::75.28.141.184
+mpserver03:5000::mpserver03.flightgear.org:5000 (Germany)::mpserver03.flightgear.org::5001::62.75.184.124
 
 mpserver04:5000::mpserver04.flightgear.org:5000 (UK)::mpserver04.flightgear.org::5001::87.127.199.127
 
 mpserver05:5000::mpserver05.flightgear.org:5000 (UK)::mpserver05.flightgear.org::5001::87.127.191.54
 
 #hugin:5000::hugin.gidenstam.org:5000 (Sweden)::hugin.gidenstam.org::5001::83.254.84.138
-mpserver06:5000::mpserver06.flightgear.org:5000 (Sweden)::mpserver06.flightgear.org::5001::83.254.77.47
+mpserver06:5000::mpserver06.flightgear.org:5000 (Sweden)::mpserver06.flightgear.org::5001::83.254.103.33
 
 
 -- For FG CVS --
@@ -40,10 +41,11 @@ mpserver02:5002::mpserver02.flightgear.org:5002 (Hong Kong)::mpserver02.flightge
 
 mpserver01:5002::mpserver01.flightgear.org:5002 (Germany)::mpserver01.flightgear.org::5003::85.214.36.1
 
-mpserver03:5002::mpserver03.flightgear.org:5002 (East Coast US)::mpserver03.flightgear.org::5003::75.28.141.184
+#mpserver03:5002::mpserver03.flightgear.org:5002 (East Coast US)::mpserver03.flightgear.org::5003::75.28.141.184
+mpserver03:5002::mpserver03.flightgear.org:5002 (Germany)::mpserver03.flightgear.org::5003::62.75.184.124
 
 mpserver04:5002::mpserver04.flightgear.org:5002 (UK)::mpserver04.flightgear.org::5003::87.127.199.127
 
 #hugin:5002::hugin.gidenstam.org:5002 (Sweden)::hugin.gidenstam.org::5003::83.254.84.138
-mpserver06:5002::mpserver06.flightgear.org:5002 (Sweden)::mpserver06.flightgear.org::5003::83.254.77.47
+mpserver06:5002::mpserver06.flightgear.org:5002 (Sweden)::mpserver06.flightgear.org::5003::83.254.103.33
 
