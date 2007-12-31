@@ -18,7 +18,7 @@
 # map page is loaded. It probably should be your local server, if you're
 # running one.
 
--- For FG 0.9.10 --
+-- For FG 0.9.10 and up --
 
 mpserver02:5000::mpserver02.flightgear.org:5000 (Hong Kong)::mpserver02.flightgear.org::5001::202.65.223.218
 
@@ -29,13 +29,15 @@ mpserver03:5000::mpserver03.flightgear.org:5000 (Germany)::mpserver03.flightgear
 
 mpserver04:5000::mpserver04.flightgear.org:5000 (UK)::mpserver04.flightgear.org::5001::87.127.199.127
 
-mpserver05:5000::mpserver05.flightgear.org:5000 (UK)::mpserver05.flightgear.org::5001::87.127.191.54
+#mpserver05:5000::mpserver05.flightgear.org:5000 (UK)::mpserver05.flightgear.org::5001::87.127.191.54
 
 #hugin:5000::hugin.gidenstam.org:5000 (Sweden)::hugin.gidenstam.org::5001::83.254.84.138
 mpserver06:5000::mpserver06.flightgear.org:5000 (Sweden)::mpserver06.flightgear.org::5001::83.254.103.33
 
+punk.lnxscene.org:5000::punk.lnxscene.org:5000 (France)::punk.lnxscene.org::5001::88.191.24.220
 
--- For FG CVS --
+
+-- For FG MP devel / testing --
 
 mpserver02:5002::mpserver02.flightgear.org:5002 (Hong Kong)::mpserver02.flightgear.org::5003::202.65.223.218
 
