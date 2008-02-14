@@ -292,7 +292,7 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
     span.style.textDecoration = "underline";
     span.style.cursor = "pointer";
     span.title = "Click to pan to this pilot";
-    span.innerHTML = callsign;
+    element_text_create(span, callsign);
     attach_event(span, "click",
         this.pilot_callsign_mouse_event_cb.bind_event(this, callsign));
     attach_event(span, "mouseover",

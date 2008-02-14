@@ -959,7 +959,7 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip, heading) {
     // callsign
     span = element_create(elem, "span");
     span.className = "fgmap_pilot_info_callsign";
-    span.innerHTML = callsign;
+    element_text_create(span, callsign);
 
 
     // lat/lng
