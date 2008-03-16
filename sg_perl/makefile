@@ -32,7 +32,7 @@ $(MAKEFILE_PERL): $(MAKEFILE_PL)
 	LDFLAGS=-L$(SG_PREFIX)/lib $(PERL) $<
 
 $(OBJECTS): $(SOURCES)
-	$(CXX) -c $^ -o $@ $(CXXFLAGS)
+	$(CXX) -c $^ -o $@ $(CXXFLAGS) -fPIC
 
 $(PM):
 	$(MAKE) -f $(MAKEFILE_PERL) SG_PREFIX=$(SG_PREFIX)
