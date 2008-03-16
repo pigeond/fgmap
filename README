@@ -92,7 +92,9 @@ Requirements
   too.
 
 - Also you probably want to install libwww-perl (under Debian) for the navaids
-  and metar lookup proxy. See the 'Additional notes' below for details.
+  and metar lookup proxy. You may also need to rebuild a tiny Perl binding if
+  you are not hosting FGMap on x86 32 or 64. See the 'Additional notes' below
+  for details.
 
 
 Files to tune/edit
@@ -169,7 +171,8 @@ Additional notes
   uses a function in a very tiny SimGear Perl binding. The binary for this
   binding is included for convenience. However if you'd like to rebuild this
   for whatever reasons (hosting FGMap on a platform other than x86), please
-  read the README in sg_perl/.
+  read the README in sg_perl/. If you are on x86, make sure the sg_perl/blib
+  symlink is pointing to the right one. It points to x86-32 by default.
 
 
 Troubleshooting
