@@ -1935,6 +1935,9 @@ FGMap.prototype.query_string_parse = function() {
             } else if(pair[1] == "dot") {
                 this.aircraft_icon_mode = FGMAP_ICON_MODE_DOT;
             }
+
+        } else if(pair[0] == "update_interval" && pair[1] >= 1) {
+            this.update_interval = pair[1] * 1000;
         }
     }
 
@@ -2121,6 +2124,7 @@ FGMap.prototype.map_update_interval_set = function(sec) {
     dprint(this, "changing update interval from " +
         (this.update_interval / 1000) + " to " + sec);
     this.update_interval = sec * 1000;
+    this.linktomap_update();
 };
 
 
@@ -2379,6 +2383,9 @@ FGMap.prototype.linktomap_update = function() {
             this.fg_server_current.host + "," +
             this.fg_server_current.port;
     }
+
+    // Update internval
+    href += "&update_interval=" + (this.update_interval / 1000);
 
     // Pilot label mode
     href += '&pilot_label=';

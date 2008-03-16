@@ -417,6 +417,10 @@ Currently valid keys and values are:<br>\
     <li style=\"line-height: 150%;\">\
     <code>menuminimized</code> - Have the menu minimized on startup.<br>\
     </li>\
+    <li style=\"line-height: 150%;\">\
+    <code>update_interval</code> - Set the startup map update interval, in seconds.<br>\
+    example: <code>update_interval=10</code>\
+    </li>\
 </ul>\
 <br><br><br>\
 ";
