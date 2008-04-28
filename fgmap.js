@@ -1976,6 +1976,10 @@ FGMap.prototype.query_string_parse = function() {
                 this.aircraft_icon_mode = FGMAP_ICON_MODE_DOT;
             }
 
+        } else if(pair[0] == "update_interval" && pair[1] >= 1) {
+
+            this.update_interval = pair[1] * 1000;
+
         } else if(pair[0] == "mpcam") {
 
             this.mpcam_visible = true;
@@ -1984,10 +1988,7 @@ FGMap.prototype.query_string_parse = function() {
                 this.mpcam_useswf = false;
             }
 
-        } else if(pair[0] == "update_interval" && pair[1] >= 1) {
-            this.update_interval = pair[1] * 1000;
         }
-
     }
 
 };
