@@ -1039,6 +1039,11 @@ FGMap.prototype.init = function(force) {
 
     }
 
+
+    this.gmap_start_point = new GLatLng(37.613545, -122.357237); // KSFO
+    this.gmap_type = G_SATELLITE_MAP;
+
+
     this.gmap = new GMap2(this.div);
 
     if(!this.gmap) {
@@ -1047,41 +1052,40 @@ FGMap.prototype.init = function(force) {
         return false;
     }
 
-    this.gmap_start_point = new GLatLng(37.613545, -122.357237); // KSFO
-    this.gmap_type = G_SATELLITE_MAP;
+    /* Don't really need all these, but I like being explicit */
+    this.gmap.addMapType(G_NORMAL_MAP);
+    this.gmap.addMapType(G_SATELLITE_MAP);
+    this.gmap.addMapType(G_HYBRID_MAP);
+    this.gmap.addMapType(G_PHYSICAL_MAP);
 
     this.gmap.setCenter(this.gmap_start_point, this.gmap_zoom);
+
+    GEvent.addListener(this.gmap, "maptypechanged",
+        this.maptypechanged_cb.bind_event(this));
+
+    GEvent.addListener(this.gmap, "maptypechanged",
+        this.linktomap_update.bind_event(this));
+
+    GEvent.addListener(this.gmap, "moveend",
+        this.linktomap_update.bind_event(this));
+
     this.gmap.setMapType(this.gmap_type);
 
     this.query_string_parse();
 
     if(!this.nomapcontrol) {
+
         //this.gmap.addControl(new GSmallMapControl());
         this.gmap.addControl(new GLargeMapControl());
-        this.gmap.addControl(new GMapTypeControl());
+
+        //this.gmap.addControl(new GMapTypeControl());
+        this.gmap.addControl(new GHierarchicalMapTypeControl());
+
         this.gmap.addControl(new GScaleControl());
 
         this.gmap_overview = new GOverviewMapControl();
         this.gmap.addControl(this.gmap_overview);
-
-        setTimeout(this.maptypechanged_cb.bind_event(this), 1);
     }
-
-    this.gmap.setCenter(this.gmap_start_point);
-    this.gmap.setZoom(this.gmap_zoom);
-    this.gmap.setMapType(this.gmap_type);
-
-
-    GEvent.addListener(this.gmap, "maptypechanged",
-        this.maptypechanged_cb.bind_event(this));
-
-    GEvent.addListener(this.gmap, "moveend",
-        this.linktomap_update.bind_event(this));
-
-    GEvent.addListener(this.gmap, "maptypechanged",
-        this.linktomap_update.bind_event(this));
-
-
 
     // TODO: Put this somewhere else better?
     this.aircraft_photo_icons = new Object();
@@ -1100,6 +1104,9 @@ FGMap.prototype.init = function(force) {
 
     /* TODO */
     this.latlng_visible_set(true);
+
+    /* Still need this... */
+    setTimeout(this.maptypechanged_cb.bind_event(this), 1000);
 };
 
 
@@ -1158,10 +1165,13 @@ FGMap.prototype.latlng_visible_set = function(visible) {
 
 FGMap.prototype.maptypechanged_cb = function() {
 
+    var map;
+
     this.gmap_type = this.gmap.getCurrentMapType();
 
-    if(this.gmap_overview != null) {
-        this.gmap_overview.getOverviewMap().setMapType(this.gmap_type);
+    if(this.gmap_overview != null &&
+            (map = this.gmap_overview.getOverviewMap()) != null) {
+        map.setMapType(this.gmap_type);
     }
 };
 
