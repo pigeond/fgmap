@@ -14,7 +14,10 @@ my $FGMAP_SERVERS_TAG = '// ### fgmap.servers ###';
 my $TEMPLATE = 'fg_server_map.html.in';
 my $OUTPUT = 'fg_server_map.html';
 
-my $GMAPI_VERSION = '2.66';
+#my $GMAPI_VERSION = '2.66';
+my $GMAPI_VERSION = '2';
+#my $GMAPI_VERSION = '2.x';
+#my $GMAPI_VERSION = '2.s';
 
 my $ssis = "";
 my @lines;
