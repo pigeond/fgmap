@@ -124,7 +124,7 @@ var FGMAP_CRAFT_ICON_ZINDEX = 5;
 var FGMAP_CRAFT_ICON_GENERIC = "generic/fg_generic_craft"
 
 var FGMAP_CRAFT_ICON_HELI = "heli/heli"
-var FGMAP_CRAFT_MODELS_HELI = [ "bo105", "sikorsky76c", "ec135", "r22", "s76c", "Lynx-WG13", "S51-sikorsky" ];
+var FGMAP_CRAFT_MODELS_HELI = [ "bo105", "sikorsky76c", "ec135", "r22", "s76c", "Lynx-WG13", "S51-sikorsky", "CH47", "R22" ];
 
 var FGMAP_CRAFT_ICON_SINGLEPROP = "singleprop/singleprop";
 var FGMAP_CRAFT_MODELS_SINGLEPROP = [ "c150", "c172p", "c172-dpm", "c182-dpm", "c310-dpm", "c310u3a", "dhc2floats", "pa28-161", "pc7", "j3cub" ];
