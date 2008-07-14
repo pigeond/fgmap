@@ -142,6 +142,8 @@ var FGMAP_CRAFT_MODELS_HEAVYJET = [ "boeing733", "boeing747-400-jw", "a320-fb", 
 var FGMAP_CRAFT_ICON_GLIDER = "glider/glider";
 var FGMAP_CRAFT_MODELS_GLIDER = [ "hgldr-cs-model", "paraglider_model", "colditz-model", "sgs233" ];
 
+var FGMAP_CRAFT_ICON_BLIMP = "blimp/blimp";
+var FGMAP_CRAFT_MODELS_BLIMP = [ "ZLT-NT", "ZF-balloon", "Submarine_Scout", "LZ-129", "Excelsior-model" ];
 
 /* Specific aircraft (non-photo) icons */
 var FGMAP_CRAFT_ICON_OV10 = "ov10/ov10";
@@ -1261,6 +1263,8 @@ FGPilot.prototype.marker_update = function(force) {
                 img += FGMAP_CRAFT_ICON_HEAVYJET;
             } else if(FGMAP_CRAFT_MODELS_GLIDER.indexOf(this.model) != -1) {
                 img += FGMAP_CRAFT_ICON_GLIDER;
+            } else if(FGMAP_CRAFT_MODELS_BLIMP.indexOf(this.model) != -1) {
+                img += FGMAP_CRAFT_ICON_BLIMP;
 
 
             } else if(FGMAP_CRAFT_MODELS_OV10.indexOf(this.model) != -1) {
