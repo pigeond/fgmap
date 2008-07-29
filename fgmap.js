@@ -124,7 +124,7 @@ var FGMAP_CRAFT_ICON_ZINDEX = 5;
 var FGMAP_CRAFT_ICON_GENERIC = "generic/fg_generic_craft"
 
 var FGMAP_CRAFT_ICON_HELI = "heli/heli"
-var FGMAP_CRAFT_MODELS_HELI = [ "bo105", "sikorsky76c", "ec135", "r22" ];
+var FGMAP_CRAFT_MODELS_HELI = [ "bo105", "sikorsky76c", "ec135", "r22", "s76c", "Lynx-WG13", "S51-sikorsky", "CH47", "R22" ];
 
 var FGMAP_CRAFT_ICON_SINGLEPROP = "singleprop/singleprop";
 var FGMAP_CRAFT_MODELS_SINGLEPROP = [ "c150", "c172p", "c172-dpm", "c182-dpm", "c310-dpm", "c310u3a", "dhc2floats", "pa28-161", "pc7", "j3cub" ];
@@ -142,6 +142,8 @@ var FGMAP_CRAFT_MODELS_HEAVYJET = [ "boeing733", "boeing747-400-jw", "a320-fb", 
 var FGMAP_CRAFT_ICON_GLIDER = "glider/glider";
 var FGMAP_CRAFT_MODELS_GLIDER = [ "hgldr-cs-model", "paraglider_model", "colditz-model", "sgs233" ];
 
+var FGMAP_CRAFT_ICON_BLIMP = "blimp/blimp";
+var FGMAP_CRAFT_MODELS_BLIMP = [ "ZLT-NT", "ZF-balloon", "Submarine_Scout", "LZ-129", "Excelsior-model" ];
 
 /* Specific aircraft (non-photo) icons */
 var FGMAP_CRAFT_ICON_OV10 = "ov10/ov10";
@@ -1274,6 +1276,8 @@ FGPilot.prototype.marker_update = function(force) {
                 img += FGMAP_CRAFT_ICON_HEAVYJET;
             } else if(FGMAP_CRAFT_MODELS_GLIDER.indexOf(this.model) != -1) {
                 img += FGMAP_CRAFT_ICON_GLIDER;
+            } else if(FGMAP_CRAFT_MODELS_BLIMP.indexOf(this.model) != -1) {
+                img += FGMAP_CRAFT_ICON_BLIMP;
 
 
             } else if(FGMAP_CRAFT_MODELS_OV10.indexOf(this.model) != -1) {
@@ -1560,6 +1564,11 @@ FGMap.prototype.init = function(force) {
 
     }
 
+
+    this.gmap_start_point = new GLatLng(37.613545, -122.357237); // KSFO
+    this.gmap_type = G_SATELLITE_MAP;
+
+
     this.gmap = new GMap2(this.div);
 
     if(!this.gmap) {
@@ -1568,41 +1577,40 @@ FGMap.prototype.init = function(force) {
         return false;
     }
 
-    this.gmap_start_point = new GLatLng(37.613545, -122.357237); // KSFO
-    this.gmap_type = G_SATELLITE_MAP;
+    /* Don't really need all these, but I like being explicit */
+    this.gmap.addMapType(G_NORMAL_MAP);
+    this.gmap.addMapType(G_SATELLITE_MAP);
+    this.gmap.addMapType(G_HYBRID_MAP);
+    this.gmap.addMapType(G_PHYSICAL_MAP);
 
     this.gmap.setCenter(this.gmap_start_point, this.gmap_zoom);
+
+    GEvent.addListener(this.gmap, "maptypechanged",
+        this.maptypechanged_cb.bind_event(this));
+
+    GEvent.addListener(this.gmap, "maptypechanged",
+        this.linktomap_update.bind_event(this));
+
+    GEvent.addListener(this.gmap, "moveend",
+        this.linktomap_update.bind_event(this));
+
     this.gmap.setMapType(this.gmap_type);
 
     this.query_string_parse();
 
     if(!this.nomapcontrol) {
+
         //this.gmap.addControl(new GSmallMapControl());
         this.gmap.addControl(new GLargeMapControl());
-        this.gmap.addControl(new GMapTypeControl());
+
+        //this.gmap.addControl(new GMapTypeControl());
+        this.gmap.addControl(new GHierarchicalMapTypeControl());
+
         this.gmap.addControl(new GScaleControl());
 
         this.gmap_overview = new GOverviewMapControl();
         this.gmap.addControl(this.gmap_overview);
-
-        setTimeout(this.maptypechanged_cb.bind_event(this), 1);
     }
-
-    this.gmap.setCenter(this.gmap_start_point);
-    this.gmap.setZoom(this.gmap_zoom);
-    this.gmap.setMapType(this.gmap_type);
-
-
-    GEvent.addListener(this.gmap, "maptypechanged",
-        this.maptypechanged_cb.bind_event(this));
-
-    GEvent.addListener(this.gmap, "moveend",
-        this.linktomap_update.bind_event(this));
-
-    GEvent.addListener(this.gmap, "maptypechanged",
-        this.linktomap_update.bind_event(this));
-
-
 
     // TODO: Put this somewhere else better?
     this.aircraft_photo_icons = new Object();
@@ -1622,11 +1630,13 @@ FGMap.prototype.init = function(force) {
     /* TODO */
     this.latlng_visible_set(true);
 
-
     if(this.mpcam_visible) {
         this.mpcam_visible = false;
         this.mpcam_visible_set(true);
     }
+
+    /* Still need this... */
+    setTimeout(this.maptypechanged_cb.bind_event(this), 1000);
 };
 
 
@@ -1704,10 +1714,13 @@ FGMap.prototype.mpcam_visible_set = function(visible) {
 
 FGMap.prototype.maptypechanged_cb = function() {
 
+    var map;
+
     this.gmap_type = this.gmap.getCurrentMapType();
 
-    if(this.gmap_overview != null) {
-        this.gmap_overview.getOverviewMap().setMapType(this.gmap_type);
+    if(this.gmap_overview != null &&
+            (map = this.gmap_overview.getOverviewMap()) != null) {
+        map.setMapType(this.gmap_type);
     }
 };
 
