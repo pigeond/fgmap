@@ -1,6 +1,6 @@
 
-SG_PREFIX ?= /home/pigeon/src/FG/sg-plib/install/usr/local
-PLIB_PREFIX ?= /home/pigeon/src/FG/plib-svn/trunk/install/usr
+SG_PREFIX ?= /usr/local
+PLIB_PREFIX ?= /usr/local
 
 CXXFLAGS += -I$(SG_PREFIX)/include -I$(PLIB_PREFIX)/include
 
