@@ -124,7 +124,7 @@ var FGMAP_CRAFT_ICON_ZINDEX = 5;
 var FGMAP_CRAFT_ICON_GENERIC = "generic/fg_generic_craft"
 
 var FGMAP_CRAFT_ICON_HELI = "heli/heli"
-var FGMAP_CRAFT_MODELS_HELI = [ "bo105", "sikorsky76c", "ec135", "r22", "s76c", "Lynx-WG13", "S51-sikorsky", "CH47", "R22" ];
+var FGMAP_CRAFT_MODELS_HELI = [ "bo105", "sikorsky76c", "ec135", "r22", "s76c", "Lynx-WG13", "S51-sikorsky", "CH47", "R22", "apache-model" ];
 
 var FGMAP_CRAFT_ICON_SINGLEPROP = "singleprop/singleprop";
 var FGMAP_CRAFT_MODELS_SINGLEPROP = [ "c150", "c172p", "c172-dpm", "c182-dpm", "c310-dpm", "c310u3a", "dhc2floats", "pa28-161", "pc7", "j3cub" ];
@@ -144,6 +144,10 @@ var FGMAP_CRAFT_MODELS_GLIDER = [ "hgldr-cs-model", "paraglider_model", "colditz
 
 var FGMAP_CRAFT_ICON_BLIMP = "blimp/blimp";
 var FGMAP_CRAFT_MODELS_BLIMP = [ "ZLT-NT", "ZF-balloon", "Submarine_Scout", "LZ-129", "Excelsior-model" ];
+
+var FGMAP_CRAFT_ICON_CARRIER = "carrier/fg_carrier";
+var FGMAP_CRAFT_MODELS_CARRIER = [ "mp-nimitz", "mp-eisenhower", "mp-foch" ];
+
 
 /* Specific aircraft (non-photo) icons */
 var FGMAP_CRAFT_ICON_OV10 = "ov10/ov10";
@@ -1278,6 +1282,8 @@ FGPilot.prototype.marker_update = function(force) {
                 img += FGMAP_CRAFT_ICON_GLIDER;
             } else if(FGMAP_CRAFT_MODELS_BLIMP.indexOf(this.model) != -1) {
                 img += FGMAP_CRAFT_ICON_BLIMP;
+            } else if(FGMAP_CRAFT_MODELS_CARRIER.indexOf(this.model) != -1) {
+                img += FGMAP_CRAFT_ICON_CARRIER;
 
 
             } else if(FGMAP_CRAFT_MODELS_OV10.indexOf(this.model) != -1) {

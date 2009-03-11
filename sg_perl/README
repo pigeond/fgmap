@@ -6,12 +6,16 @@ orientation values from the FG server into heading/pitch/roll.
 For convenience the binary for x86-32 and x86-64 are included in the tree. You
 may need to update the blib symlink to point to the right one.
 
-If you need to, say, host FGMap on a platform other than x86, you'll want to
-build this yourself. You'll need swig to rebuild this. A 'make clean' followed
-by a 'make' should do it,
+If you need to, say, host FGMap on a platform other than x86, or if the
+prebuilt binary doesn't work on your system for whatever reasons, you'll want
+to build this yourself. You'll need swig (apt-get install swig on Debian) to
+rebuild this. A 'make clean' followed by a 'make' should do it,
 
 Also you might want to edit the makefile (not Makefile, so that it won't be
 confused with those Makefile.PL etc) for the location of SimGear and PLIB.
+SG_PREFIX and PLIB_PREFIX specify the prefix of your simgear and plib
+installation. The two might be the same, depending on your setup. Default is
+/usr/local for both of them.
 
 
 Pigeon

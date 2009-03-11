@@ -1,6 +1,6 @@
 
-SG_PREFIX ?= /home/pigeon/src/FG/sg-plib/install/usr/local
-PLIB_PREFIX ?= /home/pigeon/src/FG/plib-svn/trunk/install/usr
+SG_PREFIX ?= /usr/local
+PLIB_PREFIX ?= /usr/local
 
 CXXFLAGS += -I$(SG_PREFIX)/include -I$(PLIB_PREFIX)/include
 
@@ -19,7 +19,10 @@ MAKEFILE_PERL = Makefile.perl
 SOURCES = sgmath.cxx
 OBJECTS = sgmath.o
 
-PM = blib/arch/auto/sgmath/sgmath.so
+# TODO: determine ARCH automatically
+ARCH=x86-32
+
+PM = blib-$(ARCH)/arch/auto/sgmath/sgmath.so
 
 
 
@@ -38,5 +41,5 @@ $(PM):
 	$(MAKE) -f $(MAKEFILE_PERL) SG_PREFIX=$(SG_PREFIX)
 
 clean:
-	rm -rf $(SWIG_OUTPUT) $(MAKEFILE_PERL) $(PM) *.o blib
+	rm -rf $(SWIG_OUTPUT) $(MAKEFILE_PERL) $(PM) *.o blib-$(ARCH)
 
