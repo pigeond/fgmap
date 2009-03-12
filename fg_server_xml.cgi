@@ -447,13 +447,33 @@ sub do_testing
 {
     my($ret) = "";
 
+    my($default_lat) = 37.613545;
+    my($default_lon) = -122.357237;
+
     my(@test_pilots) = (
         {   callsign => 'pilot1',
             model => 'model1',
             server_ip => '127.0.0.1',
-            lat => 37.613545,
-            lon => -122.357237,
-            alt => 0, head => 0, pitch => 0, roll => 0,
+            lat => $default_lat,
+            lon => $default_lon,
+            alt => 0,
+            head => 0, pitch => 0, roll => 0,
+        },
+        {   callsign => 'pilot2',
+            model => 'model2',
+            server_ip => '127.0.0.1',
+            lat => $default_lat + 0.01,
+            lon => $default_lon + 0.01,
+            alt => 0,
+            head => 90, pitch => 0, roll => 0,
+        },
+        {   callsign => 'pilot3',
+            model => 'model3',
+            server_ip => '127.0.0.1',
+            lat => $default_lat + 0.02,
+            lon => $default_lon + 0.02,
+            alt => 0,
+            head => 45, pitch => 0, roll => 0,
         },
     );
 
