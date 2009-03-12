@@ -364,93 +364,128 @@ else
 }
 
 
-my($pilot_total) = 0;
-my($pilot_cnt) = 0;
-
-my($socket) = IO::Socket::INET->new(PeerAddr => $server,
-                                    PeerPort => $port,
-                                    Proto => "tcp",
-                                    Type => SOCK_STREAM,
-                                    Timeout => 10);
-if($socket)
+sub do_socket
 {
-    while($l = <$socket>)
-    {
-        chomp($l);
+    my($ret) = "";
+    my($pilot_total) = 0;
+    my($pilot_cnt) = 0;
 
-        if((substr($l, 0, 1) eq "#") && ($l =~ /^# (\d+) .*? online/))
-        {
-            $pilot_total = $1;
-            $output .= $ocs{'header'}->($pilot_total);
-        }
-        elsif($l =~ m/^(.*)@(.*?): (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (.*?)$/)
-        {
-            my($callsign, $server_ip,
-                    $x, $y, $z,
-                    $lat, $lon, $alt,
-                    $ox, $oy, $oz,
-                    $model) =
-                ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
-
-            $callsign = &escape_strs(${callsign});
-
-            $callsign =~ s/^# //g;
-
-            if($callsign and $model)
-            {
-                #$model =~ s#.*/(.*?)\..*?$#$1#;
-                $model =~ s#.*/(.*?)#$1#;
-                $model =~ s#\..*?$##;
-
-                my($head, $pitch, $roll) = &sgmath::euler_get($lat, $lon,
-                        $ox, $oy, $oz);
-
-                $output .= $ocs{'single'}->($callsign, $server_ip, $model,
-                        $lat, $lon, $alt,
-                        $head, $pitch, $roll);
-
-                $pilot_cnt++;
-
-                if($pilot_cnt >= $pilot_total)
-                {
-                    close($socket);
-                    undef($socket);
-                    last;
-                }
-            }
-        }
-
-    }
-
-    $output .= $ocs{'tail'}->();
+    my($socket) = IO::Socket::INET->new(PeerAddr => $server,
+                                        PeerPort => $port,
+                                        Proto => "tcp",
+                                        Type => SOCK_STREAM,
+                                        Timeout => 10);
 
     if($socket)
     {
-        close($socket);
+        while($l = <$socket>)
+        {
+            chomp($l);
+
+            if((substr($l, 0, 1) eq "#") && ($l =~ /^# (\d+) .*? online/))
+            {
+                $pilot_total = $1;
+                $ret .= $ocs{'header'}->($pilot_total);
+            }
+            elsif($l =~ m/^(.*)@(.*?): (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (.*?)$/)
+            {
+                my($callsign, $server_ip,
+                        $x, $y, $z,
+                        $lat, $lon, $alt,
+                        $ox, $oy, $oz,
+                        $model) =
+                    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
+
+                $callsign = &escape_strs(${callsign});
+
+                $callsign =~ s/^# //g;
+
+                if($callsign and $model)
+                {
+                    #$model =~ s#.*/(.*?)\..*?$#$1#;
+                    $model =~ s#.*/(.*?)#$1#;
+                    $model =~ s/\..*?$//;
+
+                    my($head, $pitch, $roll) = &sgmath::euler_get($lat, $lon,
+                            $ox, $oy, $oz);
+
+                    $ret .= $ocs{'single'}->($callsign, $server_ip, $model,
+                            $lat, $lon, $alt,
+                            $head, $pitch, $roll);
+
+                    $pilot_cnt++;
+
+                    if($pilot_cnt >= $pilot_total)
+                    {
+                        close($socket);
+                        undef($socket);
+                        last;
+                    }
+                }
+            }
+
+        }
+
+        $ret .= $ocs{'tail'}->();
+
+        if($socket)
+        {
+            close($socket);
+        }
     }
+    else
+    {
+        $ret .= $ocs{'header'}->(0);
+        $ret .= $ocs{'tail'}->();
+    }
+
+    return $ret;
+}
+
+
+sub do_testing
+{
+    my($ret) = "";
+
+    my(@test_pilots) = (
+        {   callsign => 'pilot1',
+            model => 'model1',
+            server_ip => '127.0.0.1',
+            lat => 37.613545,
+            lon => -122.357237,
+            alt => 0, head => 0, pitch => 0, roll => 0,
+        },
+    );
+
+    my($pilot_total) = $#test_pilots;
+
+    $ret .= $ocs{'header'}->($pilot_total);
+
+    foreach my $p (@test_pilots)
+    {
+        $ret .= $ocs{'single'}->($p->{'callsign'},
+                $p->{'server_ip'},
+                $p->{'model'},
+                $p->{'lat'}, $p->{'lon'}, $p->{'alt'},
+                $p->{'head'}, $p->{'pitch'}, $p->{'roll'});
+    }
+
+    $ret .= $ocs{'tail'}->();
+
+    return $ret;
+}
+
+
+my($testing) = 0;
+
+if($testing)
+{
+    $output = &do_testing();
 }
 else
 {
-    $output .= $ocs{'header'}->(0);
-    $output .= $ocs{'tail'}->();
+    $output = &do_socket();
 }
-
-
-#my($testing) = 0;
-#
-#if($testing)
-#{
-#    $xml .= "\t<marker server_ip=\"server\" callsign=\"testing\" lng=\"-122.357237\" lat=\"37.613545\" alt=\"100\" model=\"model\" />\n";
-#}
-#
-#print("Pragma: no-cache\r\n");
-#print("Cache-Control: no-cache\r\n");
-#print("Expires: Sat, 17 Sep 1977 00:00:00 GMT\r\n");
-#print("Content-Type: text/xml\r\n\r\n");
-#
-#print("<fg_server pilot_cnt=\"$pilot_cnt\">\n");
-#print($xml);
-#print("</fg_server>\n\n");
 
 
 binmode(STDOUT, ":utf8");
