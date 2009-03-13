@@ -475,6 +475,22 @@ sub do_testing
             alt => 0,
             head => 45, pitch => 0, roll => 0,
         },
+        {   callsign => 'pilot4',
+            model => 'model4',
+            server_ip => '127.0.0.1',
+            lat => $default_lat + 0.03,
+            lon => $default_lon + 0.03,
+            alt => 0,
+            head => 180, pitch => 0, roll => 0,
+        },
+        {   callsign => 'pilot5',
+            model => 'model5',
+            server_ip => '127.0.0.1',
+            lat => $default_lat + 0.04,
+            lon => $default_lon + 0.04,
+            alt => 0,
+            head => 270, pitch => 0, roll => 0,
+        },
     );
 
     my($pilot_total) = $#test_pilots;
