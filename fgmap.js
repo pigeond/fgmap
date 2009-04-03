@@ -651,6 +651,10 @@ function element_visible_toggle(elem) {
     }
 }
 
+function element_visible_get(elem) {
+    return elem.style.display == 'block';
+}
+
 
 function element_opacity_set(elem, opacity) {
     if(USER_AGENT.is_ie) {
