@@ -1045,6 +1045,9 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip, heading) {
         this.marker_mouse_event_cb.bind_event(this));
 
 
+    /* pilots filters */
+    this.filtered_pilots_cnt = 0;
+
     this.marker_update(true);
 }
 
@@ -1768,6 +1771,10 @@ FGMap.prototype.server_get_by_ip = function(ip) {
         return null;
     }
 
+    if(ip == 'LOCAL') {
+        return this.fg_server_current;
+    }
+
     for(var k in this.fg_servers) {
         if(this.fg_servers[k].ip == ip) {
             return this.fg_servers[k];
@@ -2005,6 +2012,7 @@ FGMap.prototype.xml_request_cb = function() {
         var onlines = new Object();
         var follows_need_update = false;
         var has_new_pilots = false;
+        this.filtered_pilots_cnt = 0;
 
         for(var i = 0; i < markers.length; i++) {
 
@@ -2015,6 +2023,11 @@ FGMap.prototype.xml_request_cb = function() {
             var model = markers[i].getAttribute("model");
             var server_ip = markers[i].getAttribute("server_ip");
             var heading = parseFloat(markers[i].getAttribute("heading"));
+
+            if(!this.pilots_filter_match(callsign, model, server_ip)) {
+                this.filtered_pilots_cnt++;
+                continue;
+            }
 
             onlines[callsign] = 1;
 
@@ -4286,6 +4299,88 @@ FGHeliport.prototype.remove = function() {
 };
 
 
+
+/* Pilots filters */
+
+var FGMAP_PILOTS_FILTER_TYPE_CALLSIGN = 0;
+var FGMAP_PILOTS_FILTER_TYPE_AIRCRAFT = 1;
+var FGMAP_PILOTS_FILTER_TYPE_SERVER = 2;
+
+FGMap.prototype.pilots_filter_set = function(type, str, cond) {
+
+    if (this.pilots_filters == null) {
+        this.pilots_filters = new Object();
+    }
+
+    var need_update = false;
+
+    var f = this.pilots_filters[type];
+
+    if(f == null) {
+        f = new Object();
+    }
+
+    if (str == null || str == '') {
+        if(f.str != null) {
+            need_update = true;
+        }
+        f.str = null;
+    } else {
+        f.str = str;
+        f.cond = !!parseInt(cond);
+        need_update = true;
+    }
+
+    this.pilots_filters[type] = f;
+
+    if(need_update) {
+        this.map_update(true);
+    }
+};
+
+
+FGMap.prototype.pilots_filter_match = function(callsign, model, server_ip) {
+
+    if(this.pilots_filters == null || this.pilots_filters.length == 0) {
+        return true;
+    }
+
+    var totests = new Object();
+    totests[FGMAP_PILOTS_FILTER_TYPE_CALLSIGN] = callsign;
+    totests[FGMAP_PILOTS_FILTER_TYPE_AIRCRAFT] = model;
+    totests[FGMAP_PILOTS_FILTER_TYPE_SERVER] = this.server_get_by_ip(server_ip);
+
+    // TODO: clear follows?
+
+    var has_filter = false;
+    var matched = true;
+
+    for(var type in this.pilots_filters) {
+
+        var f = this.pilots_filters[type];
+
+        if(f == null || f.str == null) {
+            continue;
+        }
+
+        has_filter = true;
+
+        var re = RegExp(f.str, 'i');
+        var totest = totests[type];
+
+        if(!(f.cond && re.test(totest)) &&
+                !(!f.cond && !re.test(totest))) {
+            matched = false;
+        }
+
+    }
+
+    if(has_filter) {
+        return matched;
+    }
+
+    return true;
+}
 
 
 

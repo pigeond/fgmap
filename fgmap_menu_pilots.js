@@ -16,22 +16,138 @@ function FGMapMenuPilots(fgmap, tabdiv) {
 }
 
 
+FGMapMenuPilots.prototype.filter_setup = function(div) {
+
+    var FILTER_STR_HAVE = 'have';
+    var FILTER_STR_DONTHAVE = 'don\'t have';
+    var FILTER_FORM_MARGINLEFT = '24px';
+    var FILTER_LINE_MARGINLEFT = '64px';
+
+    var filter_div = this.filter_div = element_create(div, 'div');
+    filter_div.style.width = "100%";
+    filter_div.style.overflow = 'hidden';
+    filter_div.style.margin = '0px';
+    filter_div.style.padding = '0px';
+    filter_div.style.textAlign = 'center';
+    filter_div.style.lineHeight = '0px';
+
+    var filter_box_toggle_img = this.filter_box_toggle_img =
+        element_create(this.filter_div, 'img');
+    filter_box_toggle_img.style.cursor = 'pointer';
+    filter_box_toggle_img.verticalAlign = 'middle';
+    attach_event(filter_box_toggle_img, 'click',
+            this.filter_box_toggle_img_click_cb.bind_event(this));
+
+    var filter_box = this.filter_box = element_create(this.filter_div, 'div');
+    filter_box.style.lineHeight = '100%';
+    filter_box.style.textAlign = 'left';
+    filter_box.style.borderBottom = '1px dotted #fff';
+    filter_box.style.paddingBottom = '8px';
+    element_show(filter_box);
+    this.filter_box_toggle();
+
+    var form = this.filter_form = element_create(this.filter_box, 'form');
+    form.style.marginLeft = FILTER_FORM_MARGINLEFT;
+    form.style.display = 'inline';
+    form.action = '';
+    form.method = '';
+
+    attach_event(form, 'submit',
+            this.filter_form_submit_cb.bind_event(this));
+    form.onsubmit = this.filter_form_submit_cb.bind_event(this);
+
+    element_text_append(form, 'Show pilots that');
+    element_create(form, 'br');
+
+    var select;
+    var option;
+    var input;
+    
+    /* callsign filter */
+    select = this.filter_callsign_select = element_create(form, 'select');
+    select.className = 'fgmap_menu';
+    select.style.marginLeft = FILTER_LINE_MARGINLEFT;
+    select.style.marginTop = '4px';
+    attach_event(select, 'change',
+            this.filter_callsign_changed_cb.bind_event(this));
+
+    option = element_create(select, 'option');
+    option.text = FILTER_STR_HAVE;
+    option.value = 1;
+
+    option = element_create(select, 'option');
+    option.text = FILTER_STR_DONTHAVE;
+    option.value = 0;
+
+    element_text_append(form, '\u00a0');
+
+    input = this.filter_callsign_input = element_create(form, 'input', 'text');
+    input.size = 12;
+    input.maxLength = 12;
+    input.className = 'fgmap_menu';
+    input.value = '';
+    input.title = 'callsign keyword';
+    input.style.verticalAlign = 'middle';
+    attach_event(input, 'change',
+            this.filter_callsign_changed_cb.bind_event(this));
+
+    element_text_append(form, '\u00a0in the callsign');
+
+    element_create(form, 'br');
+
+
+    /* aircraft filter */
+    select = this.filter_aircraft_select = element_create(form, 'select');
+    select.className = 'fgmap_menu';
+    select.style.marginLeft = FILTER_LINE_MARGINLEFT;
+    attach_event(select, 'change',
+            this.filter_aircraft_changed_cb.bind_event(this));
+
+    option = element_create(select, 'option');
+    option.text = FILTER_STR_HAVE;
+    option.value = 1;
+
+    option = element_create(select, 'option');
+    option.text = FILTER_STR_DONTHAVE;
+    option.value = 0;
+
+    element_text_append(form, '\u00a0');
+
+    input = this.filter_aircraft_input = element_create(form, 'input', 'text');
+    input.size = 12;
+    input.maxLength = 12;
+    input.className = 'fgmap_menu';
+    input.value = '';
+    input.title = 'aircraft model keyword';
+    input.style.verticalAlign = 'middle';
+    attach_event(input, 'change',
+            this.filter_aircraft_changed_cb.bind_event(this));
+
+    element_text_append(form, '\u00a0in the aircraft model');
+
+    /* TODO: server filter UI */
+}
+
+
 FGMapMenuPilots.prototype.setup = function() {
 
     var elem = this.div = element_create(null, 'div');
     elem.style.width = "100%";
     elem.style.height = "95%";
-    elem.style.overflow = "hidden";
-    //elem.style.overflow = "auto";
+    //elem.style.overflow = "hidden";
+    elem.style.overflow = "auto";
     elem.style.paddingTop = "4px";
 
+    this.filter_setup(this.div);
+
     var list = this.list = element_create(this.div, "div");
-    list.style.position = 'absolute';
+    //list.style.position = 'absolute';
+    list.style.position = 'relative';
     list.style.left = '0px';
     list.style.top = '0px';
     list.style.width = "100%";
     list.style.height = "100%";
-    list.style.overflow = "auto";
+    //list.style.overflow = "auto";
     list.style.margin = "0px auto";
     list.style.padding = "0px";
     element_hide(list);
@@ -45,6 +161,7 @@ FGMapMenuPilots.prototype.setup = function() {
         ul.style.width = "98%";
     }
 
+    ul.style.height = '100%';
     ul.style.listStyle = "none inside none";
     ul.style.margin = '0px';
     ul.style.padding = '0px 0px 0px 6px';
@@ -318,11 +435,7 @@ FGMapMenuPilots.prototype.pilot_join_cb = function(event, cb_data, callsign) {
     var fgserver;
     var n;
 
-    if(p.server_ip == 'LOCAL') {
-        fgserver = this.fgmap.fg_server_current;
-    } else {
-        fgserver = this.fgmap.server_get_by_ip(p.server_ip);
-    }
+    fgserver = this.fgmap.server_get_by_ip(p.server_ip);
 
     if(fgserver == null) {
         span.innerHTML = p.server_ip;
@@ -366,6 +479,49 @@ FGMapMenuPilots.prototype.pilot_part_cb = function(event, cb_data, callsign) {
         pilot = null;
         delete(pilot);
     }
+};
+
+
+
+/* Pilots filter functions */
+
+
+FGMapMenuPilots.prototype.filter_box_toggle = function() {
+    var img_src, img_title;
+
+    element_visible_toggle(this.filter_box);
+
+    if(element_visible_get(this.filter_box)) {
+        img_src = 'images/arrow_up.gif';
+        img_title = 'Hide pilots filter';
+    } else {
+        img_src = 'images/arrow_down.gif';
+        img_title = 'Show pilots filter';
+    }
+    this.filter_box_toggle_img.src = img_src;
+    this.filter_box_toggle_img.title = img_title;
+}
+
+FGMapMenuPilots.prototype.filter_box_toggle_img_click_cb = function(e) {
+    this.filter_box_toggle();
+};
+
+
+FGMapMenuPilots.prototype.filter_form_submit_cb = function(e) {
+    return false;
+};
+
+
+FGMapMenuPilots.prototype.filter_callsign_changed_cb = function(e) {
+    this.fgmap.pilots_filter_set(FGMAP_PILOTS_FILTER_TYPE_CALLSIGN,
+            this.filter_callsign_input.value,
+            this.filter_callsign_select.value);
+};
+
+FGMapMenuPilots.prototype.filter_aircraft_changed_cb = function(e) {
+    this.fgmap.pilots_filter_set(FGMAP_PILOTS_FILTER_TYPE_AIRCRAFT,
+            this.filter_aircraft_input.value,
+            this.filter_aircraft_select.value);
 };
 
 /* vim: set sw=4 sts=4 expandtab: */
