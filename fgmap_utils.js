@@ -547,39 +547,82 @@ function button_create(parent, img_normal, img_pressed, tooltip, cb, cb_data) {
     var but = element_create(parent, 'img');
     but.src = img_normal;
     but.style.cursor = "pointer";
-    //but.style.verticalAlign = "middle";
-    //but.className = "fgmap_menu";
 
     if(tooltip) {
 	but.title = tooltip;
     }
 
+    var button_func = function(e) {
 
-    if(img_pressed) {
+	e = e || window.event;
+	var target = target_get(e);
 
-	/* Preload the image */
-	var preload = new Image();
-	preload.src = img_pressed;
-
-	var button_func = function(e) {
-	    e = e || window.event;
-	    var target = target_get(e);
-	    if(e.type == 'mouseup') {
-		target.src = img_normal;
-		if(cb) {
-		    cb(cb_data);
-		}
-	    } else if(e.type == 'mouseout') {
-		target.src = img_normal;
-	    } else if(e.type == 'mousedown') {
-		target.src = img_pressed;
+	if(e.type == 'mouseup') {
+	    target.src = img_normal;
+	    if(cb) {
+		cb(cb_data);
 	    }
-	};
+	} else if(e.type == 'mouseout') {
+	    target.src = img_normal;
+	} else if(e.type == 'mousedown' && img_pressed) {
+	    target.src = img_pressed;
+	}
+    };
 
-	attach_event(but, "mousedown", button_func);
-	attach_event(but, "mouseup", button_func);
-	attach_event(but, "mouseout", button_func);
-    }
+    attach_event(but, "mousedown", button_func);
+    attach_event(but, "mouseup", button_func);
+    attach_event(but, "mouseout", button_func);
 
     return but;
 }
+
+
+
+/* Toggle button helper */
+
+function toggle_button_create(parent, img_normal, img_pressed,
+	tooltip_normal, tooltip_pressed, cb_down, cb_up, cb_data) {
+
+    var but = element_create(parent, 'img');
+    but.src = img_normal;
+    but.style.cursor = "pointer";
+    but.up = true;
+
+    if(tooltip_normal) {
+	but.title = tooltip_normal;
+    }
+
+    var button_func = function(e) {
+
+	e = e || window.event;
+	var target = target_get(e);
+
+	if(target.up) {
+	    target.up = false;
+	    if(img_pressed) {
+		target.src = img_pressed;
+	    }
+	    if(tooltip_pressed) {
+		target.title = tooltip_pressed;
+	    }
+	    if(cb_down) {
+		cb_down(cb_data);
+	    }
+	} else {
+	    target.up = true;
+	    target.src = img_normal;
+	    if(tooltip_normal) {
+		target.title = tooltip_normal;
+	    }
+	    if(cb_up) {
+		cb_up(cb_data);
+	    }
+	}
+    };
+
+    attach_event(but, "mousedown", button_func);
+
+    return but;
+}
+
+
