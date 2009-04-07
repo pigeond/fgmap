@@ -14,6 +14,7 @@
     }
     </script>
 
+    <script src="fgmap_utils.js"></script>
     <script src="fgmap.js"></script>
     <script src="fgmap_tabbed_div.js"></script>
     <script src="fgmap_model_lookup.js"></script>
