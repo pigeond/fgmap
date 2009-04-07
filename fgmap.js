@@ -4387,6 +4387,48 @@ FGMap.prototype.pilots_filter_match = function(callsign, model, server_ip) {
 }
 
 
+/* Utils */
+function button_create(parent, img_normal, img_pressed, tooltip, cb, cb_data) {
+
+    var but = element_create(parent, 'img');
+    but.src = img_normal;
+    but.style.cursor = "pointer";
+    //but.style.verticalAlign = "middle";
+    //but.className = "fgmap_menu";
+
+    if(tooltip) {
+	but.title = tooltip;
+    }
+
+
+    if(img_pressed) {
+
+	/* Preload the image */
+	var preload = new Image();
+	preload.src = img_pressed;
+
+	var button_func = function(e) {
+	    e = e || window.event;
+	    var target = target_get(e);
+	    if(e.type == 'mouseup') {
+		target.src = img_normal;
+		if(cb) {
+		    cb(cb_data);
+		}
+	    } else if(e.type == 'mouseout') {
+		target.src = img_normal;
+	    } else if(e.type == 'mousedown') {
+		target.src = img_pressed;
+	    }
+	};
+
+	attach_event(but, "mousedown", button_func);
+	attach_event(but, "mouseup", button_func);
+	attach_event(but, "mouseout", button_func);
+    }
+
+    return but;
+}
 
 /* vim: set sw=4 sts=4 expandtab: */
 
