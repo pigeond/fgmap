@@ -31,20 +31,12 @@ FGMapMenuPilots.prototype.filter_setup = function(div) {
     filter_div.style.textAlign = 'center';
     filter_div.style.lineHeight = '0px';
 
-    var filter_box_toggle_img = this.filter_box_toggle_img =
-        element_create(this.filter_div, 'img');
-    filter_box_toggle_img.style.cursor = 'pointer';
-    filter_box_toggle_img.verticalAlign = 'middle';
-    attach_event(filter_box_toggle_img, 'click',
-            this.filter_box_toggle_img_click_cb.bind_event(this));
-
     var filter_box = this.filter_box = element_create(this.filter_div, 'div');
     filter_box.style.lineHeight = '100%';
     filter_box.style.textAlign = 'left';
     filter_box.style.borderBottom = '1px dotted #fff';
     filter_box.style.paddingBottom = '8px';
-    element_show(filter_box);
-    this.filter_box_toggle();
+    element_hide(filter_box);
 
     var form = this.filter_form = element_create(this.filter_box, 'form');
     form.style.marginLeft = FILTER_FORM_MARGINLEFT;
@@ -234,6 +226,17 @@ FGMapMenuPilots.prototype.setup = function() {
         this.pilot_follow_cb.bind_event(this), null);
     this.fgmap.event_callback_add(FGMAP_EVENT_PILOT_FOLLOWS_CLEAR,
         this.pilot_follow_cb.bind_event(this), null);
+
+    /* The pilot filter toggle button */
+    var filter_box_toggle_but = toggle_button_create(this.div,
+            'images/filter.gif', 'images/filter_pressed.gif',
+            'Show pilots filter', 'Hide pilots filter',
+            this.filter_box_toggle.bind_event(this),
+            this.filter_box_toggle.bind_event(this),
+            null);
+    filter_box_toggle_but.style.position = 'absolute';
+    filter_box_toggle_but.style.top = '2px';
+    filter_box_toggle_but.style.right = '4px';
 };
 
 
@@ -505,19 +508,7 @@ FGMapMenuPilots.prototype.pilot_part_cb = function(event, cb_data, callsign) {
 
 
 FGMapMenuPilots.prototype.filter_box_toggle = function() {
-    var img_src, img_title;
-
     element_visible_toggle(this.filter_box);
-
-    if(element_visible_get(this.filter_box)) {
-        img_src = 'images/arrow_up.gif';
-        img_title = 'Hide pilots filter';
-    } else {
-        img_src = 'images/arrow_down.gif';
-        img_title = 'Show pilots filter';
-    }
-    this.filter_box_toggle_img.src = img_src;
-    this.filter_box_toggle_img.title = img_title;
 }
 
 FGMapMenuPilots.prototype.filter_box_toggle_img_click_cb = function(e) {
