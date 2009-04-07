@@ -59,14 +59,23 @@ FGMapMenuPilots.prototype.filter_setup = function(div) {
     element_text_append(form, 'Show pilots that');
     element_create(form, 'br');
 
+    var but;
     var select;
     var option;
     var input;
     
     /* callsign filter */
+
+    but = button_create(form, 'images/clear.gif', 'images/clear_pressed.gif',
+            'Clear callsign filter',
+            this.filter_callsign_clear_cb.bind_event(this), null);
+    but.style.marginLeft = FILTER_LINE_MARGINLEFT;
+    but.style.verticalAlign = 'bottom';
+
+    element_text_append(form, '\u00a0');
+
     select = this.filter_callsign_select = element_create(form, 'select');
     select.className = 'fgmap_menu';
-    select.style.marginLeft = FILTER_LINE_MARGINLEFT;
     select.style.marginTop = '4px';
     attach_event(select, 'change',
             this.filter_callsign_changed_cb.bind_event(this));
@@ -97,9 +106,17 @@ FGMapMenuPilots.prototype.filter_setup = function(div) {
 
 
     /* aircraft filter */
+    but = button_create(form, 'images/clear.gif', 'images/clear_pressed.gif',
+            'Clear aircraft filter',
+            this.filter_aircraft_clear_cb.bind_event(this), null);
+    but.style.marginLeft = FILTER_LINE_MARGINLEFT;
+    but.style.verticalAlign = 'bottom';
+
+    element_text_append(form, '\u00a0');
+
     select = this.filter_aircraft_select = element_create(form, 'select');
+    select.style.display = 'inline';
     select.className = 'fgmap_menu';
-    select.style.marginLeft = FILTER_LINE_MARGINLEFT;
     attach_event(select, 'change',
             this.filter_aircraft_changed_cb.bind_event(this));
 
@@ -124,6 +141,7 @@ FGMapMenuPilots.prototype.filter_setup = function(div) {
             this.filter_aircraft_changed_cb.bind_event(this));
 
     element_text_append(form, '\u00a0in the aircraft model');
+
 
     /* TODO: server filter UI */
 }
@@ -522,6 +540,18 @@ FGMapMenuPilots.prototype.filter_aircraft_changed_cb = function(e) {
     this.fgmap.pilots_filter_set(FGMAP_PILOTS_FILTER_TYPE_AIRCRAFT,
             this.filter_aircraft_input.value,
             this.filter_aircraft_select.value);
+};
+
+FGMapMenuPilots.prototype.filter_callsign_clear_cb = function(e) {
+    this.filter_callsign_input.value = '';
+    this.filter_callsign_select.value = 1;
+    this.filter_callsign_changed_cb(null);
+};
+
+FGMapMenuPilots.prototype.filter_aircraft_clear_cb = function(e) {
+    this.filter_aircraft_input.value = '';
+    this.filter_aircraft_select.value = 1;
+    this.filter_aircraft_changed_cb(null);
 };
 
 /* vim: set sw=4 sts=4 expandtab: */
