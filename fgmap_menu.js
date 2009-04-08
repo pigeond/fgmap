@@ -316,6 +316,7 @@ Pilots tab\
 <ul style=\"margin: 0px 0px 0px 0px; padding: 0px 0px 0px 8px;\">\
     <li>You can pan to a pilot by clicking on the callsign/name.</li>\
     <li>You can \"follow\" and track a pilot by ticking the checkbox of a pilot. This means that pilot will always be visible on the map. You can follow more than one pilot, and the map will pan and zoom automatically.</li>\
+    <li>You can define a filter by specifying a keyword that matches (or doesn\'t match) the callsign or aircraft name of a pilot. Click on the <img src=\"images/filter.gif\" alt=\"\" title=\"\" border=0 align=\"middle\"> button to toggle displaying of the filter panel.</li>\
 </ul>\
 \
 <p style=\"text-align: center; font-weight: bold;\">\
