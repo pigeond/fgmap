@@ -446,7 +446,7 @@ FGMapMenu.prototype.server_changed_cb = function(event, cb_data, name) {
 FGMapMenu.prototype.pilots_pos_update_cb = function(event, cb_data) {
     this.menu_title_pilots.innerHTML = this.fgmap.pilots_cnt;
     if(this.fgmap.filtered_pilots_cnt > 0) {
-        this.menu_title_pilots.innerHTML += ' (' + this.fgmap.filtered_pilots_cnt + ')';
+        this.menu_title_pilots.innerHTML += ' + ' + this.fgmap.filtered_pilots_cnt;
     }
 };
 
