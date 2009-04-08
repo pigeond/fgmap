@@ -53,8 +53,11 @@ FGMapMenuPilots.prototype.filter_setup = function(div) {
 
     var but;
     var select;
-    var option;
+    var option_have;
+    var option_havent;
     var input;
+    var filter;
+
     
     /* callsign filter */
 
@@ -72,13 +75,13 @@ FGMapMenuPilots.prototype.filter_setup = function(div) {
     attach_event(select, 'change',
             this.filter_callsign_changed_cb.bind_event(this));
 
-    option = element_create(select, 'option');
-    option.text = FILTER_STR_HAVE;
-    option.value = 1;
+    option_have = element_create(select, 'option');
+    option_have.text = FILTER_STR_HAVE;
+    option_have.value = 1;
 
-    option = element_create(select, 'option');
-    option.text = FILTER_STR_DONTHAVE;
-    option.value = 0;
+    option_havent = element_create(select, 'option');
+    option_havent.text = FILTER_STR_DONTHAVE;
+    option_havent.value = 0;
 
     element_text_append(form, '\u00a0');
 
@@ -96,6 +99,16 @@ FGMapMenuPilots.prototype.filter_setup = function(div) {
 
     element_create(form, 'br');
 
+    filter = this.fgmap.pilots_filter_get(FGMAP_PILOTS_FILTER_TYPE_CALLSIGN);
+    if(filter) {
+        input.value = filter.str || '';
+        if(filter.cond) {
+            option_have.selected = 1;
+        } else {
+            option_havent.selected = 1;
+        }
+    }
+
 
     /* aircraft filter */
     but = button_create(form, 'images/clear.gif', 'images/clear_pressed.gif',
@@ -112,13 +125,13 @@ FGMapMenuPilots.prototype.filter_setup = function(div) {
     attach_event(select, 'change',
             this.filter_aircraft_changed_cb.bind_event(this));
 
-    option = element_create(select, 'option');
-    option.text = FILTER_STR_HAVE;
-    option.value = 1;
+    option_have = element_create(select, 'option');
+    option_have.text = FILTER_STR_HAVE;
+    option_have.value = 1;
 
-    option = element_create(select, 'option');
-    option.text = FILTER_STR_DONTHAVE;
-    option.value = 0;
+    option_havent = element_create(select, 'option');
+    option_havent.text = FILTER_STR_DONTHAVE;
+    option_havent.value = 0;
 
     element_text_append(form, '\u00a0');
 
@@ -134,6 +147,15 @@ FGMapMenuPilots.prototype.filter_setup = function(div) {
 
     element_text_append(form, '\u00a0in the aircraft model');
 
+    filter = this.fgmap.pilots_filter_get(FGMAP_PILOTS_FILTER_TYPE_AIRCRAFT);
+    if(filter) {
+        input.value = filter.str || '';
+        if(filter.cond) {
+            option_have.selected = 1;
+        } else {
+            option_havent.selected = 1;
+        }
+    }
 
     /* TODO: server filter UI */
 }

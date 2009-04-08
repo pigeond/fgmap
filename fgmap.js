@@ -1436,6 +1436,15 @@ FGMap.prototype.query_string_parse = function() {
 
         } else if(pair[0] == "update_interval" && pair[1] >= 1) {
             this.update_interval = pair[1] * 1000;
+
+        } else if(pair[0] == 'pilots_filter_callsign') {
+            this.pilots_filter_query_string_set(
+                    FGMAP_PILOTS_FILTER_TYPE_CALLSIGN,
+                    pair[1]);
+        } else if(pair[0] == 'pilots_filter_aircraft') {
+            this.pilots_filter_query_string_set(
+                    FGMAP_PILOTS_FILTER_TYPE_AIRCRAFT,
+                    pair[1]);
         }
     }
 
@@ -3787,9 +3796,28 @@ var FGMAP_PILOTS_FILTER_TYPE_CALLSIGN = 0;
 var FGMAP_PILOTS_FILTER_TYPE_AIRCRAFT = 1;
 var FGMAP_PILOTS_FILTER_TYPE_SERVER = 2;
 
+
+FGMap.prototype.pilots_filter_query_string_set = function(type, str) {
+    var cond = 1;
+    if(str[0] == '!') {
+        cond = 0;
+        str = str.substring(1);
+    }
+    this.pilots_filter_set(type, str, cond);
+};
+
+
+FGMap.prototype.pilots_filter_get = function(type) {
+    if(this.pilots_filters == null) {
+        return null;
+    }
+    return this.pilots_filters[type];
+};
+
+
 FGMap.prototype.pilots_filter_set = function(type, str, cond) {
 
-    if (this.pilots_filters == null) {
+    if(this.pilots_filters == null) {
         this.pilots_filters = new Object();
     }
 
@@ -3801,7 +3829,7 @@ FGMap.prototype.pilots_filter_set = function(type, str, cond) {
         f = new Object();
     }
 
-    if (str == null || str == '') {
+    if(str == null || str == '') {
         if(f.str != null) {
             need_update = true;
         }
@@ -3861,7 +3889,7 @@ FGMap.prototype.pilots_filter_match = function(callsign, model, server_ip) {
     }
 
     return true;
-}
+};
 
 
 /* vim: set sw=4 sts=4 expandtab: */
