@@ -1922,6 +1922,27 @@ FGMap.prototype.linktomap_update = function() {
         href += 'dot';
     }
 
+    // Pilot filters
+    if(this.pilots_filters) {
+        var f;
+        if((f = this.pilots_filters[FGMAP_PILOTS_FILTER_TYPE_CALLSIGN])
+                != null && f.str && f.str != '') {
+            href += '&pilots_filter_callsign=';
+            if(!f.cond) {
+                href += '!';
+            }
+            href += f.str;
+        }
+        if((f = this.pilots_filters[FGMAP_PILOTS_FILTER_TYPE_AIRCRAFT])
+               != null && f.str && f.str != '') {
+            href += '&pilots_filter_aircraft=';
+            if(!f.cond) {
+                href += '!';
+            }
+            href += f.str;
+        }
+    }
+
     this.linktomap = href;
 
     this.event_callback_call(FGMAP_EVENT_MAP_VIEW_CHANGED);
@@ -3843,6 +3864,7 @@ FGMap.prototype.pilots_filter_set = function(type, str, cond) {
     this.pilots_filters[type] = f;
 
     if(need_update) {
+        this.linktomap_update();
         this.map_update(true);
     }
 };
