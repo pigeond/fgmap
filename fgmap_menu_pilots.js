@@ -94,6 +94,8 @@ FGMapMenuPilots.prototype.filter_setup = function(div) {
     input.style.verticalAlign = 'middle';
     attach_event(input, 'change',
             this.filter_callsign_changed_cb.bind_event(this));
+    attach_event(input, 'keypress',
+            this.filter_callsign_keypress_cb.bind_event(this));
 
     element_text_append(form, '\u00a0in the callsign');
 
@@ -144,6 +146,8 @@ FGMapMenuPilots.prototype.filter_setup = function(div) {
     input.style.verticalAlign = 'middle';
     attach_event(input, 'change',
             this.filter_aircraft_changed_cb.bind_event(this));
+    attach_event(input, 'keypress',
+            this.filter_aircraft_keypress_cb.bind_event(this));
 
     element_text_append(form, '\u00a0in the aircraft model');
 
@@ -258,7 +262,13 @@ FGMapMenuPilots.prototype.setup = function() {
             null);
     filter_box_toggle_but.style.position = 'absolute';
     filter_box_toggle_but.style.top = '2px';
-    filter_box_toggle_but.style.right = '4px';
+
+    /* Don't you hate making web sites... */
+    if(USER_AGENT.is_gecko) {
+        filter_box_toggle_but.style.right = '4px';
+    } else {
+        filter_box_toggle_but.style.left = '91%';
+    }
 };
 
 
@@ -565,6 +575,20 @@ FGMapMenuPilots.prototype.filter_aircraft_clear_cb = function(e) {
     this.filter_aircraft_input.value = '';
     this.filter_aircraft_select.value = 1;
     this.filter_aircraft_changed_cb(null);
+};
+
+FGMapMenuPilots.prototype.filter_callsign_keypress_cb = function(e) {
+    e = e || window.event;
+    if(e.keyCode == 13) {
+        this.filter_callsign_changed_cb(null);
+    }
+};
+
+FGMapMenuPilots.prototype.filter_aircraft_keypress_cb = function(e) {
+    e = e || window.event;
+    if(e.keyCode == 13) {
+        this.filter_aircraft_changed_cb(null);
+    }
 };
 
 /* vim: set sw=4 sts=4 expandtab: */
