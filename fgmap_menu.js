@@ -422,6 +422,14 @@ Currently valid keys and values are:<br>\
     <code>update_interval</code> - Set the startup map update interval, in seconds.<br>\
     example: <code>update_interval=10</code>\
     </li>\
+    <li style=\"line-height: 150%;\">\
+    <code>pilots_filter_callsign</code> - Set a keyword as the startup pilot callsign filter. Keyword that starts with a ! represents a not condition.<br>\
+    example: <code>pilots_filter_callsign=!mpdummy</code>\
+    </li>\
+    <li style=\"line-height: 150%;\">\
+    <code>pilots_filter_aircraft</code> - Set a keyword as the startup pilot aircraft filter. Keyword that starts with a ! represents a not condition.<br>\
+    example: <code>pilots_filter_aircraft=cp172</code>\
+    </li>\
 </ul>\
 <br><br><br>\
 ";
