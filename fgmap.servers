@@ -29,12 +29,18 @@ mpserver03:5000::mpserver03.flightgear.org:5000 (Germany)::mpserver03.flightgear
 
 mpserver04:5000::mpserver04.flightgear.org:5000 (UK)::mpserver04.flightgear.org::5001::217.151.102.18
 
-#mpserver05:5000::mpserver05.flightgear.org:5000 (UK)::mpserver05.flightgear.org::5001::87.127.191.54
+mpserver05:5000::mpserver05.flightgear.org:5000 (Texas US)::mpserver05.flightgear.org::5001::69.162.115.208
 
 #hugin:5000::hugin.gidenstam.org:5000 (Sweden)::hugin.gidenstam.org::5001::83.254.84.138
-mpserver06:5000::mpserver06.flightgear.org:5000 (Sweden)::mpserver06.flightgear.org::5001::83.254.85.5
+mpserver06:5000::mpserver06.flightgear.org:5000 (Sweden)::mpserver06.flightgear.org::5001::83.254.89.70
 
-punk.lnxscene.org:5000::punk.lnxscene.org:5000 (France)::punk.lnxscene.org::5001::88.191.24.220
+mpserver07:5000::mpserver07.flightgear.org:5000 (Wisconsin US)::mpserver07.flightgear.org::5001::98.100.234.6
+
+mpserver08:5000::mpserver08.flightgear.org:5000 (Germany)::mpserver08.flightgear.org::5001::217.172.186.31
+
+mpserver09:5000::mpserver09.flightgear.org:5000 (Germany)::mpserver09.flightgear.org::5001::83.169.1.170
+
+#punk.lnxscene.org:5000::punk.lnxscene.org:5000 (France)::punk.lnxscene.org::5001::88.191.24.220
 
 
 -- For FG MP devel / testing --
