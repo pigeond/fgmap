@@ -40,7 +40,7 @@ mpserver08:5000::mpserver08.flightgear.org:5000 (Germany)::mpserver08.flightgear
 
 mpserver09:5000::mpserver09.flightgear.org:5000 (Germany)::mpserver09.flightgear.org::5001::83.169.1.170
 
-#punk.lnxscene.org:5000::punk.lnxscene.org:5000 (France)::punk.lnxscene.org::5001::88.191.24.220
+mpserver10:5000::mpserver10.flightgear.org:5000 (France)::mpserver10.flightgear.org::5001::194.9.62.110
 
 
 -- For FG MP devel / testing --
