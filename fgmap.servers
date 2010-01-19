@@ -42,6 +42,8 @@ mpserver09:5000::mpserver09.flightgear.org:5000 (Germany)::mpserver09.flightgear
 
 mpserver10:5000::mpserver10.flightgear.org:5000 (France)::mpserver10.flightgear.org::5001::194.9.62.110
 
+mpserver11:5000::mpserver11.flightgear.org:5000 (Lithuania)::mpserver11.flightgear.org::5001::193.219.56.151
+
 
 -- For FG MP devel / testing --
 
