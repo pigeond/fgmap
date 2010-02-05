@@ -20,18 +20,16 @@
 
 -- For FG 0.9.10 and up --
 
-mpserver02:5000::mpserver02.flightgear.org:5000 (Hong Kong)::mpserver02.flightgear.org::5001::202.65.223.218
-
 mpserver01:5000::mpserver01.flightgear.org:5000 (Germany)::mpserver01.flightgear.org::5001::85.214.36.1
 
-#mpserver03:5000::mpserver03.flightgear.org:5000 (East Coast US)::mpserver03.flightgear.org::5001::75.28.141.184
+mpserver02:5000::mpserver02.flightgear.org:5000 (Hong Kong)::mpserver02.flightgear.org::5001::202.65.223.218
+
 mpserver03:5000::mpserver03.flightgear.org:5000 (Germany)::mpserver03.flightgear.org::5001::62.75.184.124
 
 mpserver04:5000::mpserver04.flightgear.org:5000 (UK)::mpserver04.flightgear.org::5001::217.151.102.18
 
 mpserver05:5000::mpserver05.flightgear.org:5000 (Texas US)::mpserver05.flightgear.org::5001::69.162.115.208
 
-#hugin:5000::hugin.gidenstam.org:5000 (Sweden)::hugin.gidenstam.org::5001::83.254.84.138
 mpserver06:5000::mpserver06.flightgear.org:5000 (Sweden)::mpserver06.flightgear.org::5001::83.254.89.70
 
 mpserver07:5000::mpserver07.flightgear.org:5000 (Wisconsin US)::mpserver07.flightgear.org::5001::98.100.234.6
