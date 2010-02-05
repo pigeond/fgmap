@@ -214,6 +214,9 @@ Troubleshooting
     is somehow not configured to run the script as a CGI. You might want to
     have a look at the server configuration.
 
+  - Are you on 64-bit platform? The default sg_perl is symlinked to 32-bit.
+    Update the symlink and try again. Read sg_perl/README for more info, or
+    maybe you need to build your own sg_perl if you're not on x86 platform.
 
 
 FGMap on Google Earth
