@@ -124,7 +124,7 @@ var FGMAP_CRAFT_ICON_ZINDEX = 5;
 var FGMAP_CRAFT_ICON_GENERIC = "generic/fg_generic_craft"
 
 var FGMAP_CRAFT_ICON_HELI = "heli/heli"
-var FGMAP_CRAFT_MODELS_HELI = [ "bo105", "sikorsky76c", "ec135", "r22", "s76c", "Lynx-WG13", "S51-sikorsky", "CH47", "R22", "apache-model" ];
+var FGMAP_CRAFT_MODELS_HELI = [ "bo105", "sikorsky76c", "ec135", "r22", "s76c", "Lynx-WG13", "S51-sikorsky", "CH47", "R22", "apache-model", "uh-1", "uh60", "OH-1" ];
 
 var FGMAP_CRAFT_ICON_SINGLEPROP = "singleprop/singleprop";
 var FGMAP_CRAFT_MODELS_SINGLEPROP = [ "c150", "c172p", "c172-dpm", "c182-dpm", "c310-dpm", "c310u3a", "dhc2floats", "pa28-161", "pc7", "j3cub" ];
@@ -136,7 +136,7 @@ var FGMAP_CRAFT_ICON_SMALLJET = "smalljet/smalljet";
 var FGMAP_CRAFT_MODELS_SMALLJET = [ "Citation-II", "Bravo", "fokker100", "tu154B" ];
 
 var FGMAP_CRAFT_ICON_HEAVYJET = "heavyjet/heavyjet";
-var FGMAP_CRAFT_MODELS_HEAVYJET = [ "boeing733", "boeing747-400-jw", "a320-fb", "A380", "AN-225-model", "B-52F-model", "Concorde-ba", "FINNAIRmd11", "MD11", "KLMmd11", "737-300", "787", "777-200", "747-400", "737-100" ];
+var FGMAP_CRAFT_MODELS_HEAVYJET = [ "boeing733", "boeing747-400-jw", "a320-fb", "A380", "AN-225-model", "B-52F-model", "Concorde-ba", "FINNAIRmd11", "MD11", "KLMmd11", "737-300", "787", "777-200", "747-400", "737-100", "737-400" ];
 
 
 var FGMAP_CRAFT_ICON_GLIDER = "glider/glider";
@@ -163,7 +163,7 @@ var FGMAP_CRAFT_ICON_E3B = "e3b/e3b";
 var FGMAP_CRAFT_MODELS_E3B = [ "E3B" ];
 
 var FGMAP_CRAFT_ICON_ATC = "atc/atc";
-var FGMAP_CRAFT_MODELS_ATC = [ "atc-tower", "mibs", "atc" ];
+var FGMAP_CRAFT_MODELS_ATC = [ "atc-tower", "atc-tower2", "mibs", "atc" ];
 
 var dummy_cnt = 1;
 
