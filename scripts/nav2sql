@@ -57,6 +57,10 @@ while(<STDIN>)
 
         ($name, $type_name) = ($name =~ m/^(.*) (.*?)$/);
 
+        $name =~ s/^\s+//;
+        $name =~ s/\s+$//;
+        $name =~ s/\s+/ /;
+
         my($abslng) = $lng;
         if($abslng < 0)
         {
