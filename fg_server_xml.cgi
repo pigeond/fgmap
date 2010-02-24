@@ -40,7 +40,7 @@ XML
 sub do_xml_header
 {
     my($cnt) = @_;
-    return ${XML_HEADER}."<fg_server pilot_cnt=\"${cnt}\">\n";
+    return ${XML_HEADER}."<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<fg_server pilot_cnt=\"${cnt}\">\n";
 }
 
 sub do_xml_single
