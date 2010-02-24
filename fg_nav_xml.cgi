@@ -83,42 +83,28 @@ sub bound_sql_cond_get
 
     if($ne_lng < $sw_lng)
     {
-        #$ret .= "(${lat_colname} < ${ne_lat}";
-        $ret .= "(${lat_colname} < ?";
-
-        #$ret .= " AND ${lat_colname} > ${sw_lat})";
-        $ret .= " AND ${lat_colname} > ?)";
-
+        $ret .= "(${lat_colname} < ${ne_lat}";
+        $ret .= " AND ${lat_colname} > ${sw_lat})";
         $ret .= " AND ";
         $ret .= "(";
         $ret .= "(${lng_colname} < 180";
-
-        #$ret .= " AND ${lng_colname} > ${sw_lng})";
-        $ret .= " AND ${lng_colname} > ?)";
-
+        $ret .= " AND ${lng_colname} > ${sw_lng})";
         $ret .= " OR ";
-
-        #$ret .= " (${lng_colname} < ${ne_lng}";
-        $ret .= " (${lng_colname} < ?";
-
+        $ret .= " (${lng_colname} < ${ne_lng}";
         $ret .= " AND ${lng_colname} > -180)";
         $ret .= ")";
     }
     else
     {
-        #$ret .= "${lat_colname} < ${ne_lat}";
-        #$ret .= " AND ${lat_colname} > ${sw_lat}";
-        #$ret .= " AND ${lng_colname} > ${sw_lng}";
-        #$ret .= " AND ${lng_colname} < ${ne_lng}";
-        $ret .= "${lat_colname} < ?";
-        $ret .= " AND ${lat_colname} > ?";
-        $ret .= " AND ${lng_colname} > ?";
-        $ret .= " AND ${lng_colname} < ?";
+        $ret .= "${lat_colname} < ${ne_lat}";
+        $ret .= " AND ${lat_colname} > ${sw_lat}";
+        $ret .= " AND ${lng_colname} < ${ne_lng}";
+        $ret .= " AND ${lng_colname} > ${sw_lng}";
     }
 
     $ret .= ")";
 
-    return ($ret, $ne_lat, $sw_lat, $sw_lng, $ne_lng);
+    return $ret;
 }
 
 sub rwy_nav
@@ -392,15 +378,12 @@ if($ne and $sw)
 
 my($result_cnt) = 0;
 my($sql);
-my(@sql_arr);
-my($sql_ret);
+
 
 
 if($apt_code or $apt_name)
 {
     # airport
-    @sql_arr = ();
-    $sql_ret = "";
 
     if($sstr)
     {
@@ -408,9 +391,7 @@ if($apt_code or $apt_name)
 
         if($apt_code)
         {
-            #$sql .= "UPPER(apt_code) LIKE '\%".uc(${sstr})."\%'";
-            $sql .= "UPPER(apt_code) LIKE ?";
-            push(@sql_arr, '%'.uc($sstr).'%');
+            $sql .= "UPPER(apt_code) LIKE '\%".uc(${sstr})."\%'";
         }
 
         if($apt_name)
@@ -419,9 +400,7 @@ if($apt_code or $apt_name)
             {
                 $sql .= " OR ";
             }
-            #$sql .= "UPPER(apt_name) LIKE '\%".uc(${sstr})."\%'";
-            $sql .= "UPPER(apt_name) LIKE ?";
-            push(@sql_arr, '%'.uc($sstr).'%');
+            $sql .= "UPPER(apt_name) LIKE '\%".uc(${sstr})."\%'";
         }
 
         $sql .= " ORDER BY apt_code;";
@@ -435,17 +414,14 @@ if($apt_code or $apt_name)
         $sql .= " WHERE ${APTWAY_TABLE}.type = 'r'";
         
         $sql .= " AND ";
-        ($sql_ret, @sql_arr) = &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
-        $sql .= $sql_ret;
+        $sql .= &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
 
         $sql .= " ORDER BY ${APT_TABLE}.apt_id, apt_code;";
     }
 
 
     #print(STDERR "$sql\n");
-    #$sth = $dbi->process($sql);
-    $sth = $dbi->prepare($sql);
-    $sth->execute(@sql_arr);
+    $sth = $dbi->process($sql);
 
     if($sth->rows > 0)
     {
@@ -582,9 +558,6 @@ if($vor or $ndb)
 
     # TACAN: 12, 1 freq 
 
-    @sql_arr = ();
-    $sql_ret = "";
-
     $sql = "SELECT ${NAV_TABLE}.*, ${NAVCHAN_TABLE}.channel";
     $sql .= " FROM ${NAV_TABLE}";
     $sql .= " FULL JOIN ${NAVCHAN_TABLE} ON";
@@ -593,18 +566,12 @@ if($vor or $ndb)
 
     if($sstr)
     {
-        #$sql .= "(UPPER(ident) LIKE '\%".uc(${sstr})."\%' OR ";
-        #$sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%')";
-        $sql .= "(UPPER(ident) LIKE ? OR ";
-        $sql .= "UPPER(name) LIKE ?)";
-        push(@sql_arr, '%'.uc($sstr).'%');
-        push(@sql_arr, '%'.uc($sstr).'%');
+        $sql .= "(UPPER(ident) LIKE '\%".uc(${sstr})."\%' OR ";
+        $sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%')";
     }
     elsif($ne and $sw)
     {
-        #$sql .= &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
-        ($sql_ret, @sql_arr) = &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
-        $sql .= $sql_ret;
+        $sql .= &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
     }
 
     $sql .= " AND (";
@@ -642,9 +609,7 @@ if($vor or $ndb)
 
     #print("$sql\n\n");
 
-    #$sth = $dbi->process($sql);
-    $sth = $dbi->prepare($sql);
-    $sth->execute(@sql_arr);
+    $sth = $dbi->process($sql);
 
     if($sth->rows > 0)
     {
@@ -707,9 +672,6 @@ XML
 
 if($fix)
 {
-    @sql_arr = ();
-    $sql_ret = "";
-
     $sql = "SELECT * FROM ${FIX_TABLE} WHERE ";
 
     if($sstr)
