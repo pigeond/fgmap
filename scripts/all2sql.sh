@@ -48,10 +48,19 @@ if [ ! -f ${TACAN} ]; then
 fi
 
 
+echo Processing ${APT}
 zcat ${APT} | iconv -f latin1 -t utf8 | ./apt2sql > apt.sql
+
+echo Processing ${NAV}
 zcat ${NAV} | iconv -f latin1 -t utf8 | ./nav2sql > nav.sql
+
+echo Processing ${FIX}
 zcat ${FIX} | iconv -f latin1 -t utf8 | ./fix2sql > fix.sql
+
+echo Processing ${AWY}
 zcat ${AWY} | iconv -f latin1 -t utf8 | ./awy2sql > awy.sql
+
+echo Processing ${TACAN}
 zcat ${TACAN} | iconv -f latin1 -t utf8 | ./tacan2sql > tacan.sql
 
 
