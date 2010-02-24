@@ -714,16 +714,21 @@ if($fix)
 
     if($sstr)
     {
-        $sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%'";
+        #$sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%'";
+        $sql .= "UPPER(name) LIKE ?";
+        push(@sql_arr, '%'.uc(${sstr}).'%');
     }
     elsif($ne and $sw)
     {
-        $sql .= &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
+        ($sql_ret, @sql_arr) = &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
+        $sql .= $sql_ret;
     }
 
     $sql .= ";";
 
-    $sth = $dbi->process($sql);
+    #$sth = $dbi->process($sql);
+    $sth = $dbi->prepare($sql);
+    $sth->execute(@sql_arr);
 
     if($sth->rows > 0)
     {
