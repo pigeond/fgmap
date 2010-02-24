@@ -1160,7 +1160,7 @@ FGMap.prototype.maptypechanged_cb = function() {
 
     this.gmap_type = this.gmap.getCurrentMapType();
 
-    if(this.gmap_overview != null) {
+    if(this.gmap_overview != null && this.gmap_overview.getOverviewMap() != null) {
         this.gmap_overview.getOverviewMap().setMapType(this.gmap_type);
     }
 };
