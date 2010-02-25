@@ -278,6 +278,7 @@ my($xml) = "";
 
 # search string
 my($sstr);
+my($orig_sstr);
 
 my($debug) = "";
 
@@ -302,7 +303,8 @@ foreach $p (@a)
 
     if($key eq 'sstr')
     {
-        $sstr = $value;
+        $orig_sstr = $value;
+        $sstr = uc($orig_sstr);
     }
     elsif($key eq 'apt_name')
     {
@@ -410,7 +412,7 @@ if($apt_code or $apt_name)
         {
             #$sql .= "UPPER(apt_code) LIKE '\%".uc(${sstr})."\%'";
             $sql .= "UPPER(apt_code) LIKE ?";
-            push(@sql_arr, '%'.uc($sstr).'%');
+            push(@sql_arr, '%'.$sstr.'%');
         }
 
         if($apt_name)
@@ -421,7 +423,7 @@ if($apt_code or $apt_name)
             }
             #$sql .= "UPPER(apt_name) LIKE '\%".uc(${sstr})."\%'";
             $sql .= "UPPER(apt_name) LIKE ?";
-            push(@sql_arr, '%'.uc($sstr).'%');
+            push(@sql_arr, '%'.$sstr.'%');
         }
 
         $sql .= " ORDER BY apt_code;";
@@ -597,8 +599,8 @@ if($vor or $ndb)
         #$sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%')";
         $sql .= "(UPPER(ident) LIKE ? OR ";
         $sql .= "UPPER(name) LIKE ?)";
-        push(@sql_arr, '%'.uc($sstr).'%');
-        push(@sql_arr, '%'.uc($sstr).'%');
+        push(@sql_arr, '%'.$sstr.'%');
+        push(@sql_arr, '%'.$sstr.'%');
     }
     elsif($ne and $sw)
     {
@@ -716,7 +718,7 @@ if($fix)
     {
         #$sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%'";
         $sql .= "UPPER(name) LIKE ?";
-        push(@sql_arr, '%'.uc(${sstr}).'%');
+        push(@sql_arr, '%'.$sstr.'%');
     }
     elsif($ne and $sw)
     {
@@ -767,8 +769,7 @@ if($awy)
         $sql .= " OR UPPER(name_start) LIKE ?";
         $sql .= " OR UPPER(name_end) LIKE ?";
         
-        push(@sql_arr,
-                '%'.uc(${sstr}).'%', '%'.uc(${sstr}).'%', '%'.uc(${sstr}).'%');
+        push(@sql_arr, '%'.$sstr.'%', '%'.$sstr.'%', '%'.$sstr.'%');
     }
     elsif($ne and $sw)
     {
