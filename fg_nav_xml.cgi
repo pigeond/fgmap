@@ -83,22 +83,18 @@ sub bound_sql_cond_get
 
     if($ne_lng < $sw_lng)
     {
-        #$ret .= "(${lat_colname} < ${ne_lat}";
         $ret .= "(${lat_colname} < ?";
 
-        #$ret .= " AND ${lat_colname} > ${sw_lat})";
         $ret .= " AND ${lat_colname} > ?)";
 
         $ret .= " AND ";
         $ret .= "(";
         $ret .= "(${lng_colname} < 180";
 
-        #$ret .= " AND ${lng_colname} > ${sw_lng})";
         $ret .= " AND ${lng_colname} > ?)";
 
         $ret .= " OR ";
 
-        #$ret .= " (${lng_colname} < ${ne_lng}";
         $ret .= " (${lng_colname} < ?";
 
         $ret .= " AND ${lng_colname} > -180)";
@@ -106,10 +102,6 @@ sub bound_sql_cond_get
     }
     else
     {
-        #$ret .= "${lat_colname} < ${ne_lat}";
-        #$ret .= " AND ${lat_colname} > ${sw_lat}";
-        #$ret .= " AND ${lng_colname} > ${sw_lng}";
-        #$ret .= " AND ${lng_colname} < ${ne_lng}";
         $ret .= "${lat_colname} < ?";
         $ret .= " AND ${lat_colname} > ?";
         $ret .= " AND ${lng_colname} > ?";
@@ -410,7 +402,6 @@ if($apt_code or $apt_name)
 
         if($apt_code)
         {
-            #$sql .= "UPPER(apt_code) LIKE '\%".uc(${sstr})."\%'";
             $sql .= "UPPER(apt_code) LIKE ?";
             push(@sql_arr, '%'.$sstr.'%');
         }
@@ -421,7 +412,6 @@ if($apt_code or $apt_name)
             {
                 $sql .= " OR ";
             }
-            #$sql .= "UPPER(apt_name) LIKE '\%".uc(${sstr})."\%'";
             $sql .= "UPPER(apt_name) LIKE ?";
             push(@sql_arr, '%'.$sstr.'%');
         }
@@ -444,8 +434,6 @@ if($apt_code or $apt_name)
     }
 
 
-    #print(STDERR "$sql\n");
-    #$sth = $dbi->process($sql);
     $sth = $dbi->prepare($sql);
     $sth->execute(@sql_arr);
 
@@ -595,8 +583,6 @@ if($vor or $ndb)
 
     if($sstr)
     {
-        #$sql .= "(UPPER(ident) LIKE '\%".uc(${sstr})."\%' OR ";
-        #$sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%')";
         $sql .= "(UPPER(ident) LIKE ? OR ";
         $sql .= "UPPER(name) LIKE ?)";
         push(@sql_arr, '%'.$sstr.'%');
@@ -604,7 +590,6 @@ if($vor or $ndb)
     }
     elsif($ne and $sw)
     {
-        #$sql .= &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
         ($sql_ret, @sql_arr) = &bound_sql_cond_get($ne, $sw, 'lat', 'lng');
         $sql .= $sql_ret;
     }
@@ -642,9 +627,6 @@ if($vor or $ndb)
 
     $sql .= " ORDER BY type_name, ident;";
 
-    #print("$sql\n\n");
-
-    #$sth = $dbi->process($sql);
     $sth = $dbi->prepare($sql);
     $sth->execute(@sql_arr);
 
@@ -716,7 +698,6 @@ if($fix)
 
     if($sstr)
     {
-        #$sql .= "UPPER(name) LIKE '\%".uc(${sstr})."\%'";
         $sql .= "UPPER(name) LIKE ?";
         push(@sql_arr, '%'.$sstr.'%');
     }
@@ -728,7 +709,6 @@ if($fix)
 
     $sql .= ";";
 
-    #$sth = $dbi->process($sql);
     $sth = $dbi->prepare($sql);
     $sth->execute(@sql_arr);
 
@@ -762,9 +742,6 @@ if($awy)
     if($sstr)
     {
         $sql = "SELECT * FROM ${AWY_TABLE} WHERE ";
-        #$sql .= "UPPER(seg_name) LIKE '\%".uc(${sstr})."\%'";
-        #$sql .= " OR UPPER(name_start) LIKE '\%".uc(${sstr})."\%'";
-        #$sql .= " OR UPPER(name_end) LIKE '\%".uc(${sstr})."\%'";
         $sql .= "UPPER(seg_name) LIKE ?";
         $sql .= " OR UPPER(name_start) LIKE ?";
         $sql .= " OR UPPER(name_end) LIKE ?";
@@ -809,13 +786,10 @@ if($awy)
 
             $sql .= "(";
             $sql .= "NOT (";
-            #$sql .= "(rr < ${sw_lng})";
             $sql .= "(rr < ?)";
             $sql .= " OR ";
-            #$sql .= "(rt < ${sw_lat})";
             $sql .= "(rt < ?)";
             $sql .= " OR ";
-            #$sql .= "(rb > ${ne_lat})";
             $sql .= "(rb > ?)";
             $sql .= ")";
             $sql .= ")";
@@ -826,13 +800,10 @@ if($awy)
             $sql .= "(";
 
             $sql .= "NOT (";
-            #$sql .= "(rl > ${ne_lng})";
             $sql .= "(rl > ?)";
             $sql .= " OR ";
-            #$sql .= "(rt < ${sw_lat})";
             $sql .= "(rt < ?)";
             $sql .= " OR ";
-            #$sql .= "(rb > ${ne_lat})";
             $sql .= "(rb > ?)";
             $sql .= ")";
             $sql .= ")";
@@ -845,16 +816,12 @@ if($awy)
         else
         {
             $sql .= "NOT (";
-            #$sql .= "(rl > ${ne_lng})";
             $sql .= "(rl > ?)";
             $sql .= " OR ";
-            #$sql .= "(rr < ${sw_lng})";
             $sql .= "(rr < ?)";
             $sql .= " OR ";
-            #$sql .= "(rt < ${sw_lat})";
             $sql .= "(rt < ?)";
             $sql .= " OR ";
-            #$sql .= "(rb > ${ne_lat})";
             $sql .= "(rb > ?)";
             $sql .= ")";
             push(@sql_arr, $ne_lng, $sw_lng, $sw_lat, $ne_lat);
@@ -863,7 +830,6 @@ if($awy)
 
     $sql .= ";";
 
-    #$sth = $dbi->process($sql);
     $sth = $dbi->prepare($sql);
     $sth->execute(@sql_arr);
 
