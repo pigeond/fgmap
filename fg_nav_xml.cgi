@@ -753,12 +753,22 @@ XML
 
 if($awy)
 {
+    @sql_arr = ();
+    $sql_ret = "";
+    my(@arr) = ();
+
     if($sstr)
     {
         $sql = "SELECT * FROM ${AWY_TABLE} WHERE ";
-        $sql .= "UPPER(seg_name) LIKE '\%".uc(${sstr})."\%'";
-        $sql .= " OR UPPER(name_start) LIKE '\%".uc(${sstr})."\%'";
-        $sql .= " OR UPPER(name_end) LIKE '\%".uc(${sstr})."\%'";
+        #$sql .= "UPPER(seg_name) LIKE '\%".uc(${sstr})."\%'";
+        #$sql .= " OR UPPER(name_start) LIKE '\%".uc(${sstr})."\%'";
+        #$sql .= " OR UPPER(name_end) LIKE '\%".uc(${sstr})."\%'";
+        $sql .= "UPPER(seg_name) LIKE ?";
+        $sql .= " OR UPPER(name_start) LIKE ?";
+        $sql .= " OR UPPER(name_end) LIKE ?";
+        
+        push(@sql_arr,
+                '%'.uc(${sstr}).'%', '%'.uc(${sstr}).'%', '%'.uc(${sstr}).'%');
     }
     elsif($ne and $sw)
     {
@@ -771,12 +781,16 @@ if($awy)
         $sql = "SELECT * FROM ${AWY_TABLE} WHERE ";
 
         # start point within the current view
-        $sql .= &bound_sql_cond_get($ne, $sw, 'lat_start', 'lng_start');
+        ($sql_ret, @arr) = &bound_sql_cond_get($ne, $sw, 'lat_start', 'lng_start');
+        $sql .= $sql_ret;
+        push(@sql_arr, @arr);
 
         $sql .= " OR ";
 
         # end point within the current view
-        $sql .= &bound_sql_cond_get($ne, $sw, 'lat_end', 'lng_end');
+        ($sql_ret, @arr) = &bound_sql_cond_get($ne, $sw, 'lat_end', 'lng_end');
+        $sql .= $sql_ret;
+        push(@sql_arr, @arr);
 
         $sql .= " OR ";
 
@@ -794,26 +808,34 @@ if($awy)
 
             $sql .= "(";
             $sql .= "NOT (";
-            $sql .= "(rr < ${sw_lng})";
+            #$sql .= "(rr < ${sw_lng})";
+            $sql .= "(rr < ?)";
             $sql .= " OR ";
-            $sql .= "(rt < ${sw_lat})";
+            #$sql .= "(rt < ${sw_lat})";
+            $sql .= "(rt < ?)";
             $sql .= " OR ";
-            $sql .= "(rb > ${ne_lat})";
+            #$sql .= "(rb > ${ne_lat})";
+            $sql .= "(rb > ?)";
             $sql .= ")";
             $sql .= ")";
+            push(@sql_arr, $sw_lng, $sw_lat, $ne_lat);
             
             $sql .= " OR ";
             
             $sql .= "(";
 
             $sql .= "NOT (";
-            $sql .= "(rl > ${ne_lng})";
+            #$sql .= "(rl > ${ne_lng})";
+            $sql .= "(rl > ?)";
             $sql .= " OR ";
-            $sql .= "(rt < ${sw_lat})";
+            #$sql .= "(rt < ${sw_lat})";
+            $sql .= "(rt < ?)";
             $sql .= " OR ";
-            $sql .= "(rb > ${ne_lat})";
+            #$sql .= "(rb > ${ne_lat})";
+            $sql .= "(rb > ?)";
             $sql .= ")";
             $sql .= ")";
+            push(@sql_arr, $ne_lng, $sw_lat, $ne_lat);
             
             $sql .= ")";
 
@@ -822,20 +844,27 @@ if($awy)
         else
         {
             $sql .= "NOT (";
-            $sql .= "(rl > ${ne_lng})";
+            #$sql .= "(rl > ${ne_lng})";
+            $sql .= "(rl > ?)";
             $sql .= " OR ";
-            $sql .= "(rr < ${sw_lng})";
+            #$sql .= "(rr < ${sw_lng})";
+            $sql .= "(rr < ?)";
             $sql .= " OR ";
-            $sql .= "(rt < ${sw_lat})";
+            #$sql .= "(rt < ${sw_lat})";
+            $sql .= "(rt < ?)";
             $sql .= " OR ";
-            $sql .= "(rb > ${ne_lat})";
+            #$sql .= "(rb > ${ne_lat})";
+            $sql .= "(rb > ?)";
             $sql .= ")";
+            push(@sql_arr, $ne_lng, $sw_lng, $sw_lat, $ne_lat);
         }
     }
 
     $sql .= ";";
 
-    $sth = $dbi->process($sql);
+    #$sth = $dbi->process($sql);
+    $sth = $dbi->prepare($sql);
+    $sth->execute(@sql_arr);
 
     if($sth->rows > 0)
     {
