@@ -163,7 +163,7 @@ var FGMAP_CRAFT_ICON_E3B = "e3b/e3b";
 var FGMAP_CRAFT_MODELS_E3B = [ "E3B" ];
 
 var FGMAP_CRAFT_ICON_ATC = "atc/atc";
-var FGMAP_CRAFT_MODELS_ATC = [ "atc-tower", "atc-tower2", "mibs", "atc" ];
+var FGMAP_CRAFT_MODELS_ATC = [ "atc-tower", "atc-tower2", "mibs", "atc", "OpenRadar" ];
 
 var dummy_cnt = 1;
 
