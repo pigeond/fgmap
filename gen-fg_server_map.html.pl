@@ -37,7 +37,7 @@ foreach my $l (@lines)
     $ssis .= <<SSI;
 <!--#if expr="\\"\${HTTP_HOST}\\" = \\"${host}\\"" -->
     <!-- Using HTTP_HOST ${host} -->
-    <script src="http://maps.google.com/maps?file=api&amp;v=${GMAPI_VERSION}&amp;key=${key}" type="text/javascript"></script>
+    <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=${key}&amp;sensor=false"></script>
 <!--#endif -->
 
 SSI

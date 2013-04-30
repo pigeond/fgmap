@@ -6,14 +6,6 @@
 
 <!-- ### fgmap.keys ### -->
 
-    <script>
-    // FIXME Temporary workaround for browsers that GM doesn't think it will
-    // work. It should now load in gpe-mini-browser (add ?t=m) and minimo
-    if(typeof(GMap) == "undefined") {
-        GLoadMapsScript();
-    }
-    </script>
-
     <script src="fgmap_utils.js"></script>
     <script src="fgmap.js"></script>
     <script src="fgmap_tabbed_div.js"></script>
