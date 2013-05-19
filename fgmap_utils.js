@@ -348,11 +348,19 @@ function element_event_bubble_cancel(elem) {
 /* GMapElement ***************************************************************/
 /* Helper class for creating/manipulating overlay within GMap */
 
-function GMapElement(latlng, align, child, gmap_pane, classname) {
+GMapElement.prototype = new google.maps.OverlayView();
+
+function GMapElement(fgmap, latlng, align, child, gmap_pane, classname) {
+
+    this.fgmap = fgmap;
     this.latlng = latlng;
-    this.align = align || new GPoint(0, 0);
+    this.align = align || new google.maps.Point(0, 0);
+
+    /* TODO: v3 */
     //this.gmap_pane = gmap_pane || G_MAP_MARKER_PANE;
-    this.gmap_pane = gmap_pane || G_MAP_MARKER_MOUSE_TARGET_PANE;
+    //this.gmap_pane = gmap_pane || G_MAP_MARKER_MOUSE_TARGET_PANE;
+    this.gmap_pane = gmap_pane;
+
     this.child = child;
     this.classname = classname || "";
 
@@ -360,22 +368,27 @@ function GMapElement(latlng, align, child, gmap_pane, classname) {
         element_hide(child);
     }
 }
-GMapElement.prototype = new GOverlay();
+
 
 GMapElement.prototype.copy = function() {
-    return new GMapElement(this.latlng, this.align, this.child, this.gmap_pane, this.classname);
+    return new GMapElement(this.fgmap, this.latlng, this.align, this.child, this.gmap_pane, this.classname);
 };
 
-GMapElement.prototype.initialize = function(gmap) {
+GMapElement.prototype.onAdd = function() {
 
-    this.gmap = gmap;
-    this.elem = element_create(gmap.getPane(this.gmap_pane), "div");
+    var panes = this.getPanes();
+
+    /* TODO: v3 */
+    var pane = panes.floatPane;
+    //var pane = panes.overlayLayer;
+
+    this.elem = element_create(pane, "div");
     this.elem.style.position = "absolute";
     this.elem.className = this.classname;
 
     // TODO: Not setting zindex according to GMap here allows raise() to work,
     // but check me
-    //this.elem.style.zIndex = GOverlay.getZIndex(this.latlng.lat());
+    //this.elem.style.zIndex = google.maps.Overlay.getZIndex(this.latlng.lat());
     this.elem.style.zIndex = 32767;
 
     this.update(this.latlng, this.align);
@@ -391,6 +404,30 @@ GMapElement.prototype.initialize = function(gmap) {
 };
 
 
+GMapElement.prototype.draw = function() {
+    if(this.elem == null)
+	return;
+
+    var proj = this.getProjection();
+
+    if (proj) {
+	var px = this.getProjection().fromLatLngToDivPixel(this.latlng);
+	this.elem.style.left = str_to_pos(parseInt(px.x + this.align.x));
+	this.elem.style.top = str_to_pos(parseInt(px.y + this.align.y));
+    }
+};
+
+
+GMapElement.prototype.onRemove = function() {
+    element_remove(this.elem);
+    this.child = null;
+    this.elem = null;
+    this.align = null;
+    this.eleme = null;
+    this.latlng = null;
+};
+
+
 GMapElement.prototype.child_set = function(child) {
     if(child) {
         if(this.child) {
@@ -402,17 +439,24 @@ GMapElement.prototype.child_set = function(child) {
 };
 
 
-GMapElement.prototype.update = function(latlng, align) {
+GMapElement.prototype.opacity_set = function(opacity) {
+    this.opacity = opacity;
+    //element_opacity_set(this.child, opacity);
+    if(this.elem) {
+        element_opacity_set(this.elem, opacity);
+    }
+};
 
+
+
+GMapElement.prototype.update = function(latlng, align) {
     if(latlng)
         this.latlng = latlng;
 
     if(align)
         this.align = align;
 
-    var dc = this.gmap.fromLatLngToDivPixel(this.latlng);
-    this.elem.style.left = str_to_pos(parseInt(dc.x + this.align.x));
-    this.elem.style.top = str_to_pos(parseInt(dc.y + this.align.y));
+    this.draw();
 };
 
 
@@ -441,29 +485,8 @@ GMapElement.prototype.visible_set = function(visible) {
 }
 
 
-GMapElement.prototype.opacity_set = function(opacity) {
-    this.opacity = opacity;
-    //element_opacity_set(this.child, opacity);
-    if(this.elem) {
-        element_opacity_set(this.elem, opacity);
-    }
-};
-
-
 GMapElement.prototype.raise = function() {
     element_raise(this.elem);
-};
-
-
-GMapElement.prototype.remove = function() {
-    element_remove(this.child);
-    this.child = null;
-    element_remove(this.elem);
-    this.eleme = null;
-    delete(this.latlng);
-    this.latlng = null;
-    delete(this.align);
-    this.align = null;
 };
 
 
@@ -471,8 +494,8 @@ GMapElement.prototype.remove = function() {
 
 var IMG_CHECK_INTERVAL = 200;
 
-function GMapImageElement(latlng, src) {
-    GMapElement.apply(this, [ latlng, null, null, null, null ]);
+function GMapImageElement(fgmap, latlng, src) {
+    GMapElement.apply(this, [ fgmap, latlng, null, null, null, null ]);
     this.img = null;
     this.pending = null;
     this.src_set(src);
@@ -498,7 +521,7 @@ GMapImageElement.prototype.img_complete_cb = function() {
         this.child_set(this.img);
 
         // TODO: check those magic numbers...
-        var align = new GPoint(-this.img.width / 2 + 1,
+        var align = new google.maps.Point(-this.img.width / 2 + 1,
                 -this.img.height / 2 - 6);
         this.update(null, align);
 
