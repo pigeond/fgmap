@@ -434,12 +434,11 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip, heading) {
     attach_event(elem, "mouseover",
         this.info_mouseover_cb.bind_event(this));
 
-    this.info = new GMapElement(this.latlng,
-                                new GPoint(20, 15),
+    this.info = new GMapElement(this.fgmap, this.latlng,
+                                new google.maps.Point(20, 15),
                                 this.info_elem);
-    fgmap.gmap.addOverlay(this.info);
+    this.info.setMap(this.fgmap.gmap);
     this.info.opacity_set(FGMAP_PILOT_OPACITY);
-
 
     // callsign
     span = element_create(elem, "span");
@@ -514,8 +513,8 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip, heading) {
 
 
     /* pilot icon */
-    this.marker = new GMapImageElement(this.latlng, null);
-    fgmap.gmap.addOverlay(this.marker);
+    this.marker = new GMapImageElement(this.fgmap, this.latlng, null);
+    this.marker.setMap(this.fgmap.gmap);
 
     // TODO
     attach_event(this.marker.elem, "mouseover",
@@ -819,7 +818,7 @@ FGPilot.prototype.trail_visible_set = function(visible) {
 
         if(plen == (this.fgmap.gmap_trail_limit - 1)) {
             pl = this.polylines.shift();
-            this.fgmap.gmap.removeOverlay(pl);
+            pl.setMap(null);
             delete(pl);
         }
 
@@ -836,7 +835,7 @@ FGPilot.prototype.trail_visible_set = function(visible) {
             //dprint(this.fgmap, "n " + n);
 
             if(this.polylines[n]) {
-                this.fgmap.gmap.removeOverlay(this.polylines[n]);
+                this.polylines[n].setMap(null);
                 this.polylines[n] = null;
             }
 
@@ -847,7 +846,7 @@ FGPilot.prototype.trail_visible_set = function(visible) {
                             this.fgmap.gmap_trail_color,
                             this.fgmap.gmap_trail_weight, opacity);
                 //dprint(this.fgmap, "created new polyline " + n);
-                this.fgmap.gmap.addOverlay(pl);
+                pl.setMap(this.fgmap.gmap);
                 this.polylines[n] = pl;
             } /* TODO else {
                 //dprint(this.fgmap, "updating polyline " + n);
@@ -866,7 +865,7 @@ FGPilot.prototype.trail_visible_set = function(visible) {
 
         while(this.polylines.length) {
             var pl = this.polylines.shift();
-            this.fgmap.gmap.removeOverlay(pl);
+            pl.setMap(null);
             delete(pl);
         }
     }
@@ -882,8 +881,8 @@ FGPilot.prototype.remove = function() {
 
     this.fgmap.pilot_follow_remove(this.callsign);
 
-    this.fgmap.gmap.removeOverlay(this.info);
-    this.fgmap.gmap.removeOverlay(this.marker);
+    this.info.setMap(null);
+    this.marker.setMap(null);
 
     this.trail_visible_set(false);
     // TODO: do I need to delete each element...
@@ -2462,11 +2461,11 @@ FGAirport.prototype.ils_setup = function(runway) {
     element_text_append(span, ils_heading + "\u00b0");
     attach_event(span, "mouseover",
         this.runway_mouseover_cb.bind_event(this, runway));
-    runway.ils_hdg_label = new GMapElement(
+    runway.ils_hdg_label = new GMapElement(this.fgmap,
             latlng_dist_heading(spt, ils_course_length / 2, hdg),
-            new GPoint(-10, -10),
+            new google.maps.Point(-10, -10),
             ils_hdg_elem);
-    this.fgmap.gmap.addOverlay(runway.ils_hdg_label);
+    runway.ils_hdg_label.setMap(this.fgmap.gmap);
     runway.ils_hdg_label.hide();
     runway.ils_hdg_label.opacity_set(FGMAP_NAV_OPACITY);
 
@@ -2550,10 +2549,11 @@ FGAirport.prototype.ils_setup = function(runway) {
         img.style.height = str_to_pos(wh.h);
         img_ie_fix(img);
 
-        ils.icon = new GMapElement(new GLatLng(ils.lat, ils.lng),
-                new GPoint(-wh.w / 2, -wh.h / 2),
+        ils.icon = new GMapElement(this.fgmap,
+                new google.maps.LatLng(ils.lat, ils.lng),
+                new google.maps.Point(-wh.w / 2, -wh.h / 2),
                 img, null, null);
-        this.fgmap.gmap.addOverlay(ils.icon);
+        ils.icon.setMap(this.fgmap.gmap);
         ils.icon.visible_set(false);
 
         attach_event(img, "mouseover",
@@ -2563,11 +2563,12 @@ FGAirport.prototype.ils_setup = function(runway) {
             span.className = 'fgmap_nav_ils';
             info_elem.style.textAlign = 'center';
             info_elem.className = 'fgmap_nav_info';
-            ils.info = new GMapElement(new GLatLng(ils.lat, ils.lng),
-                    new GPoint(10, 15),
+            ils.info = new GMapElement(this.fgmap,
+                    new google.maps.LatLng(ils.lat, ils.lng),
+                    new google.maps.Point(10, 15),
                     info_elem);
             ils.info.opacity_set(FGMAP_NAV_OPACITY);
-            this.fgmap.gmap.addOverlay(ils.info);
+            ils.info.setMap(this.fgmap.gmap);
             ils.info.visible_set(false);
 
             attach_event(info_elem, "mouseover",
@@ -2652,13 +2653,14 @@ FGAirport.prototype.runway_setup = function() {
 
 
         var label = runway.label =
-            new GMapElement(latlng_dist_heading(latlng, len, hdg),
-                        new GPoint(runway_info_align_x, runway_info_align_y),
+            new GMapElement(this.fgmap,
+                        latlng_dist_heading(latlng, len, hdg),
+                        new google.maps.Point(runway_info_align_x, runway_info_align_y),
                         elem /*, G_MAP_MARKER_SHADOW_PANE */);
         attach_event(elem, "mouseover",
             this.runway_mouseover_cb.bind_event(this, runway));
 
-        this.fgmap.gmap.addOverlay(label);
+        label.setMap(this.fgmap.gmap);
         label.hide();
         label.opacity_set(runway_opacity);
 
@@ -2861,10 +2863,10 @@ FGAirport.prototype.airport_setup = function() {
 
     if(!this.bounds.isEmpty())
     {
-        this.label = new GMapElement(this.bounds.getNorthEast(),
+        this.label = new GMapElement(this.fgmap, this.bounds.getNorthEast(),
                                         airport_info_align, elem
                                         /*, G_MAP_MARKER_SHADOW_PANE */);
-        this.fgmap.gmap.addOverlay(this.label);
+        this.label.setMap(this.fgmap.gmap);
         this.label.hide();
         this.label.opacity_set(airport_info_opacity);
         attach_event(elem, "click",
@@ -3077,13 +3079,13 @@ FGAirport.prototype.ils_visible_set = function(runway, visible) {
         if(visible) {
             if(runway.ils_course_lines) {
                 for(var i = 0; i < runway.ils_course_lines.length; i++) {
-                    this.fgmap.gmap.addOverlay(runway.ils_course_lines[i]);
+                    runway.ils_course_lines[i].setMap(this.fgmap.gmap);
                 }
             }
         } else {
             if(runway.ils_course_lines) {
                 for(var i = 0; i < runway.ils_course_lines.length; i++) {
-                    this.fgmap.gmap.removeOverlay(runway.ils_course_lines[i]);
+                    runway.ils_course_lines[i].setMap(null);
                 }
             }
         }
@@ -3135,7 +3137,7 @@ FGAirport.prototype.ils_toggle = function(runway) {
         }
         if(runway.ils_course_lines) {
             for(var i = 0; i < runway.ils_course_lines.length; i++) {
-                this.fgmap.gmap.addOverlay(runway.ils_course_lines[i]);
+                runway.ils_course_lines[i].setMap(this.fgmap.gmap);
             }
         }
 
@@ -3155,7 +3157,7 @@ FGAirport.prototype.ils_toggle = function(runway) {
         }
         if(runway.ils_course_lines) {
             for(var i = 0; i < runway.ils_course_lines.length; i++) {
-                this.fgmap.gmap.removeOverlay(runway.ils_course_lines[i]);
+                runway.ils_course_lines[i].setMap(null);
             }
         }
     }
@@ -3179,7 +3181,7 @@ FGAirport.prototype.visible_set = function(visible) {
         for(var r in this.runways) {
             var runway = this.runways[r];
             if(runway.polyline) {
-                this.fgmap.gmap.addOverlay(runway.polyline);
+                runway.polyline.setMap(this.fgmap.gmap);
             }
             if(runway.label) {
                 runway.label.show();
@@ -3195,7 +3197,7 @@ FGAirport.prototype.visible_set = function(visible) {
         for(var r in this.runways) {
             var runway = this.runways[r];
             if(runway.polyline) {
-                this.fgmap.gmap.removeOverlay(runway.polyline);
+                runway.polyline.setMap(null);
             }
             if(runway.label) {
                 runway.label.hide();
@@ -3225,18 +3227,19 @@ FGAirport.prototype.remove = function() {
         var runway = this.runways[r];
 
         if(runway.polyline) {
-            this.fgmap.gmap.removeOverlay(runway.polyline)
+            runway.polyline.setMap(null);
         }
         if(runway.label) {
-            this.fgmap.gmap.removeOverlay(runway.label);
+            runway.label.setMap(null);
             delete(runway.label);
         }
 
         delete(runway.ilss); // TODO: possible leak
     }
 
-    if(this.label)
-        this.fgmap.gmap.removeOverlay(this.label);
+    if(this.label) {
+        this.label.setMap(null);
+    }
 
     delete(this.runways);
 };
@@ -3294,11 +3297,11 @@ FGNavMarker.prototype.setup = function() {
         img_ie_fix(img);
         
         align = new google.maps.Point(w / -2, h / -2);
-        this.img = new GMapElement(this.latlng, align,
+        this.img = new GMapElement(this.fgmap, this.latlng, align,
                                     img
                                     /*, G_MAP_MARKER_SHADOW_PANE */);
         attach_event(img, "mouseover", this.info_mouseover_cb.bind_event(this));
-        this.fgmap.gmap.addOverlay(this.img);
+        this.img.setMap(this.fgmap.gmap);
         this.img.hide();
     }
 
@@ -3312,14 +3315,14 @@ FGNavMarker.prototype.setup = function() {
         // TODO
         align = new google.maps.Point(w * 3 / 4, h / -2);
 
-        this.info = new GMapElement(this.latlng, align,
+        this.info = new GMapElement(this.fgmap, this.latlng, align,
                                     this.info_elem
                                     /*, G_MAP_MARKER_SHADOW_PANE */);
 
         /* Debug */
         //this.fgmap.gmap.addOverlay(new GMarker(this.latlng));
 
-        this.fgmap.gmap.addOverlay(this.info);
+        this.info.setMap(this.fgmap.gmap);
         this.info.hide();
 
         this.info.opacity_set(FGMAP_NAV_OPACITY);
@@ -3378,12 +3381,12 @@ FGNavMarker.prototype.remove = function() {
     this.visible_set(false);
 
     if(this.img) {
-        this.fgmap.gmap.removeOverlay(this.img);
+        this.img.setMap(null);
         delete(this.img);
     }
 
     if(this.info) {
-        this.fgmap.gmap.removeOverlay(this.info);
+        this.info.setMap(null);
         delete(this.info);
     }
 };
@@ -3486,8 +3489,8 @@ FGNavAirway.prototype.setup = function() {
     element_text_append(span, 'FL' + this.awy_hash['base'] + ' - FL' +
             this.awy_hash['top']);
 
-    this.info = new GMapElement(this.latlng_center, awy_align, div);
-    this.fgmap.gmap.addOverlay(this.info);
+    this.info = new GMapElement(this.fgmap, this.latlng_center, awy_align, div);
+    this.info.setMap(this.fgmap.gmap);
     this.info.opacity_set(FGMAP_NAV_OPACITY);
     this.info.hide();
 
@@ -3637,8 +3640,9 @@ FGNavAirway.prototype.info_reposition = function() {
 
     // Debug
     /*
-    if(this.debug2)
-        this.fgmap.gmap.removeOverlay(this.debug2);
+    if(this.debug2) {
+        this.debug2.setMap(null)
+    }
     this.debug2 = new GPolyline(
         [ new google.maps.LatLng(bt, bl),
           new google.maps.LatLng(bt, br),
@@ -3690,7 +3694,7 @@ FGNavAirway.prototype.visible_set = function(visible) {
     this.info.visible_set(visible);
 
     if(visible) {
-        this.fgmap.gmap.addOverlay(this.polyline);
+        this.polyline.setMap(this.fgmap.gmap);
         this.info_reposition();
     } else {
         this.fgmap.gmap.removeOverlay(this.polyline);
@@ -3754,11 +3758,11 @@ FGHeliport.prototype.setup = function() {
     span.className = "fgmap_nav_hpt";
     element_text_append(span, this.name + " - " + this.code);
 
-    this.info = new GMapElement(this.bounds.getNorthEast(),
+    this.info = new GMapElement(this.fgmap, this.bounds.getNorthEast(),
                                 heliport_info_align,
                                 this.info_elem
                                 /*, G_MAP_MARKER_SHADOW_PANE */);
-    this.fgmap.gmap.addOverlay(this.info);
+    this.info.setMap(this.fgmap.gmap);
     this.info.hide();
     this.info.opacity_set(heliport_info_opacity);
 
