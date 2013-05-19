@@ -56,7 +56,7 @@
 
   </head>
 
-  <body onLoad="fgmap_load();" onUnload="GUnload();">
+  <body onLoad="fgmap_load();">
     <div id="fgmap" style="width: 100%; height: 100%;"></div>
   </body>
 </html>
