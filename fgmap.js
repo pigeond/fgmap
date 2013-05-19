@@ -1344,19 +1344,24 @@ FGMap.prototype.debug_elem_set = function(elem) {
 };
 
 
+
 FGMap.prototype.pilot_test = function() {
 
-    for(var n = 0; n < 11; n++) {
+    for(var n = 0; n < 100; n++) {
         var p = new FGPilot(this, "testpilot" + (n + 1),
                 this.gmap_start_point.lat() + (n * 0.01),
                 this.gmap_start_point.lng() + (n * 0.01),
-                (n + 1) * 100, "test", "test", n * 10.0);
+                (n + 1) * 100, "test", "test", (n * 10.0) % 360);
         this.pilots["testpilot" + (n + 1)] = p;
         //p.info_visible_set(true);
         this.pilots_cnt++;
+        this.event_callback_call(FGMAP_EVENT_PILOT_JOIN, "testpilot" + (n + 1));
     }
 
-    //this.pilots_tab_update();
+    this.event_callback_call(FGMAP_EVENT_PILOTS_POS_UPDATE);
+
+    this.info_type_set(this.info_type);
+
 };
 
 
