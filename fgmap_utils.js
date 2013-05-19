@@ -156,6 +156,9 @@ Function.prototype.bind_event = function(obj) {
  * My own helper function for events 
  */
 function attach_event(elem, event_str, bind_func) {
+    if(elem == null) {
+	return;
+    }
     if(elem.attachEvent) { 
         elem.attachEvent("on" + event_str, bind_func);
     } else if(elem.addEventListener) {
@@ -221,7 +224,9 @@ function element_create(parent, tag, type) {
 
 
 function element_attach(elem, parent) {
-    parent.appendChild(elem);
+    if(parent && elem) {
+	parent.appendChild(elem);
+    }
 }
 
 
