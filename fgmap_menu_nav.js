@@ -494,7 +494,7 @@ FGMapMenuNav.prototype.nav_form_submit_cb = function(e) {
     if(this.awy_chbx.checked == true)
         url += "&awy";
     
-    this.xml_request = GXmlHttp.create();
+    this.xml_request = new XMLHttpRequest();
     this.xml_request.open("GET", url, true);
     this.xml_request.onreadystatechange =
         this.nav_form_xml_request_cb.bind_event(this);
