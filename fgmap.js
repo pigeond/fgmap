@@ -417,7 +417,7 @@ function FGPilot(fgmap, callsign, lat, lng, alt, model, server_ip, heading) {
 
     this.hdg = this.last_hdg = heading;
 
-    /* Arrays of GPolyline */
+    /* Arrays of Polyline */
     this.polylines = new Array();
 
     /* Arrays of GLatLng for the polyline */
@@ -842,11 +842,15 @@ FGPilot.prototype.trail_visible_set = function(visible) {
             /* TODO */
             if(!this.polylines[n]) {
                 //dprint(this.fgmap, "creating new polyline " + n);
-                var pl = new GPolyline([ this.trails[n], this.trails[(n + 1)] ],
-                            this.fgmap.gmap_trail_color,
-                            this.fgmap.gmap_trail_weight, opacity);
+                var pl = new google.maps.Polyline({
+                        map: this.fgmap.gmap,
+                        path: [ this.trails[n], this.trails[(n + 1)] ],
+                        strokeColor: this.fgmap.gmap_trail_color,
+                        strokeWeight: this.fgmap.gmap_trail_weight,
+                        strokeOpacity: opacity,
+                        clickable: false,
+                        });
                 //dprint(this.fgmap, "created new polyline " + n);
-                pl.setMap(this.fgmap.gmap);
                 this.polylines[n] = pl;
             } /* TODO else {
                 //dprint(this.fgmap, "updating polyline " + n);
@@ -1749,7 +1753,7 @@ FGMap.prototype.follows_update = function() {
 
     var map_bounds = this.gmap.getBounds();
 
-    if(map_bounds.containsBounds(follow_bounds) == false ||
+    if(map_bounds.equals(follow_bounds) == false ||
             this.follows_always_center) {
 
         /* Change the zoom only if we need to */
@@ -2420,28 +2424,58 @@ FGAirport.prototype.ils_setup = function(runway) {
 
     var line;
 
-    line = new GPolyline([spt, ept1],
-            ils_course_color, ils_course_line_width, ils_course_opacity);
+    line = new google.maps.Polyline({
+            map: this.fgmap.gmap,
+            path: [spt, ept1],
+            strokeColor: ils_course_color,
+            strokeWeight: ils_course_line_width,
+            strokeOpacity: ils_course_opacity,
+            clickable: false,
+            });
     runway.ils_course_lines.push(line);
 
     var ept2 = latlng_dist_heading(spt, ils_course_side_length,
             hdg - ils_course_angle / 2);
-    line = new GPolyline([spt, ept2],
-            ils_course_color, ils_course_line_width, ils_course_opacity);
+    line = new google.maps.Polyline({
+            map: this.fgmap.gmap,
+            path: [spt, ept2],
+            strokeColor: ils_course_color,
+            strokeWeight: ils_course_line_width,
+            strokeOpacity: ils_course_opacity,
+            clickable: false,
+            });
     runway.ils_course_lines.push(line);
 
     var ept3 = latlng_dist_heading(spt, ils_course_side_length,
             hdg + ils_course_angle / 2);
-    line = new GPolyline([spt, ept3],
-            ils_course_color, ils_course_line_width, ils_course_opacity);
+    line = new google.maps.Polyline({
+            map: this.fgmap.gmap,
+            path: [spt, ept3],
+            strokeColor: ils_course_color,
+            strokeWeight: ils_course_line_width,
+            strokeOpacity: ils_course_opacity,
+            clickable: false,
+            });
     runway.ils_course_lines.push(line);
 
-    line = new GPolyline([ept1, ept2],
-            ils_course_color, ils_course_line_width, ils_course_opacity);
+    line = new google.maps.Polyline({
+            map: this.fgmap.gmap,
+            path: [ept1, ept2],
+            strokeColor: ils_course_color,
+            strokeWeight: ils_course_line_width,
+            strokeOpacity: ils_course_opacity,
+            clickable: false,
+            });
     runway.ils_course_lines.push(line);
 
-    line = new GPolyline([ept1, ept3],
-            ils_course_color, ils_course_line_width, ils_course_opacity);
+    line = new google.maps.Polyline({
+            map: this.fgmap.gmap,
+            path: [ept1, ept3],
+            strokeColor: ils_course_color,
+            strokeWeight: ils_course_line_width,
+            strokeOpacity: ils_course_opacity,
+            clickable: false,
+            });
     runway.ils_course_lines.push(line);
 
     // Debug
@@ -2617,8 +2651,14 @@ FGAirport.prototype.runway_setup = function() {
         var p2 = latlng_dist_heading(latlng, length / 2.0, rev_deg(heading));
 
         // The runway line
-        runway.polyline = new GPolyline([ p1, p2 ],
-                                    runway_color, runway_width, runway_opacity);
+        runway.polyline = new google.maps.Polyline({
+                map: this.fgmap.gmap,
+                path: [ p1, p2 ],
+                strokeColor: runway_color,
+                strokeWeight: runway_width,
+                strokeOpacity: runway_opacity,
+                clickable: false
+            });
 
         // Start building the airport bounds
         this.bounds.extend(p1);
@@ -3388,11 +3428,13 @@ FGNavMarker.prototype.remove = function() {
     if(this.img) {
         this.img.setMap(null);
         delete(this.img);
+        this.img = null;
     }
 
     if(this.info) {
         this.info.setMap(null);
         delete(this.info);
+        this.info = null;
     }
 };
 
@@ -3468,9 +3510,14 @@ FGNavAirway.prototype.setup = function() {
     var latlng_end = new google.maps.LatLng(
             this.awy_hash['lat_end'], this.awy_hash['lng_end']);
 
-    this.polyline = new GPolyline([ latlng_start, latlng_end ],
-        (this.awy_hash['route'] == 'high' ? awy_high_color : awy_low_color),
-        awy_width, awy_opacity);
+    this.polyline = new google.maps.Polyline({
+            map: this.fgmap.gmap,
+            path: [ latlng_start, latlng_end ],
+            strokeColor: (this.awy_hash['route'] == 'high' ? awy_high_color : awy_low_color),
+            strokeWeight: awy_width,
+            strokeOpacity: awy_opacity,
+            clickable: false,
+            });
 
     this.bounds = new google.maps.LatLngBounds();
     this.bounds.extend(latlng_start);
@@ -3500,10 +3547,10 @@ FGNavAirway.prototype.setup = function() {
     this.info.hide();
 
 
-    GEvent.addListener(this.fgmap.gmap, "moveend",
+    google.maps.event.addListener(this.fgmap.gmap, 'dragend',
         this.gmap_moveend_cb.bind_event(this));
 
-    GEvent.addListener(this.fgmap.gmap, "zoomend",
+    google.maps.event.addListener(this.fgmap.gmap, 'zoom_changed',
         this.gmap_zoomend_cb.bind_event(this));
 
     return true;
@@ -3522,7 +3569,7 @@ FGNavAirway.prototype.info_reposition = function() {
 
     var gmap_bounds = this.fgmap.gmap.getBounds();
 
-    if(gmap_bounds.containsBounds(this.bounds)) {
+    if(gmap_bounds.equals(this.bounds)) {
 
         latlng = this.latlng_center;
 
@@ -3648,7 +3695,7 @@ FGNavAirway.prototype.info_reposition = function() {
     if(this.debug2) {
         this.debug2.setMap(null)
     }
-    this.debug2 = new GPolyline(
+    this.debug2 = new google.maps.Polyline(
         [ new google.maps.LatLng(bt, bl),
           new google.maps.LatLng(bt, br),
           new google.maps.LatLng(bb, br),
@@ -3702,7 +3749,7 @@ FGNavAirway.prototype.visible_set = function(visible) {
         this.polyline.setMap(this.fgmap.gmap);
         this.info_reposition();
     } else {
-        this.fgmap.gmap.removeOverlay(this.polyline);
+        this.polyline.setMap(null);
     }
 
     this.visible = visible;
@@ -3711,8 +3758,8 @@ FGNavAirway.prototype.visible_set = function(visible) {
 };
 
 FGNavAirway.prototype.remove = function() {
-    this.fgmap.gmap.removeOverlay(this.polyline);
-    this.fgmap.gmap.removeOverlay(this.info);
+    this.polyline.setMap(null);
+    this.info.setMap(null);
     delete(this.info);
     this.info = null;
 };
