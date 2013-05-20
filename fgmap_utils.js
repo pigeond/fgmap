@@ -241,7 +241,12 @@ function element_attach_after(elem, ref_elem, parent) {
 
 
 function element_raise(elem) {
+    if(elem == null) {
+	return;
+    }
+
     var parent = elem.parentNode;
+
     if(parent && parent.lastChild) {
         // TODO
         element_attach_after(elem, parent.lastChild, parent);
@@ -279,6 +284,8 @@ function element_text_append(elem, text) {
 
 
 function element_show(elem) {
+    if(elem == null)
+	return;
     if(elem.style.display == "none")
         elem.style.display = "block";
     if(elem.style.visibility == "hidden")
@@ -287,6 +294,8 @@ function element_show(elem) {
 
 
 function element_hide(elem) {
+    if(elem == null)
+	return;
     if(elem.style.display == "block")
         elem.style.display = "none";
     if(elem.style.visibility == "visible")
@@ -364,8 +373,24 @@ function GMapElement(fgmap, latlng, align, child, gmap_pane, classname) {
     this.child = child;
     this.classname = classname || "";
 
+
+    var panes = this.getPanes();
+
+    this.elem = element_create(null, "div");
+    this.elem.style.position = "absolute";
+    this.elem.className = this.classname;
+
+    // TODO: Not setting zindex according to GMap here allows raise() to work,
+    // but check me
+    //this.elem.style.zIndex = google.maps.Overlay.getZIndex(this.latlng.lat());
+    this.elem.style.zIndex = 32767;
+
     if(child) {
-        element_hide(child);
+	this.child_set(this.child);
+    }
+
+    if(this.opacity != null) {
+        this.opacity_set(this.opacity);
     }
 }
 
@@ -382,29 +407,12 @@ GMapElement.prototype.onAdd = function() {
     var pane = panes.floatPane;
     //var pane = panes.overlayLayer;
 
-    this.elem = element_create(pane, "div");
-    this.elem.style.position = "absolute";
-    this.elem.className = this.classname;
-
-    // TODO: Not setting zindex according to GMap here allows raise() to work,
-    // but check me
-    //this.elem.style.zIndex = google.maps.Overlay.getZIndex(this.latlng.lat());
-    this.elem.style.zIndex = 32767;
-
-    this.update(this.latlng, this.align);
-    this.child_set(this.child);
-
-    if(this.child) {
-        element_show(this.child);
-    }
-
-    if(this.opacity != null) {
-        this.opacity_set(this.opacity);
-    }
+    element_attach(this.elem, pane);
 };
 
 
 GMapElement.prototype.draw = function() {
+
     if(this.elem == null)
 	return;
 
@@ -419,11 +427,17 @@ GMapElement.prototype.draw = function() {
 
 
 GMapElement.prototype.onRemove = function() {
-    element_remove(this.elem);
+
+    element_remove(this.child);
     this.child = null;
+
+    element_remove(this.elem);
     this.elem = null;
+
+    delete(this.align);
     this.align = null;
-    this.eleme = null;
+
+    delete(this.latlng);
     this.latlng = null;
 };
 
@@ -469,19 +483,21 @@ GMapElement.prototype.redraw = function(force) {
 
 GMapElement.prototype.show = function() {
     element_show(this.elem);
+    element_show(this.child);
 };
 
 
 GMapElement.prototype.hide = function() {
     element_hide(this.elem);
+    element_hide(this.child);
 };
 
 
 GMapElement.prototype.visible_set = function(visible) {
     if(visible)
-        element_show(this.elem);
+	this.show();
     else
-        element_hide(this.elem);
+	this.hide();
 }
 
 
