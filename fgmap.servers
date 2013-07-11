@@ -45,18 +45,17 @@ mpserver11:5000::mpserver11.flightgear.org:5000 (Lithuania)::mpserver11.flightge
 mpserver12:5000::mpserver12.flightgear.org:5000 (Netherlands)::mpserver12.flightgear.org::5001::62.129.133.10
 
 
--- For FG MP devel / testing --
-
-
-mpserver01:5002::mpserver01.flightgear.org:5002 (Germany)::mpserver01.flightgear.org::5003::85.214.36.1
-
-mpserver02:5002::mpserver02.flightgear.org:5002 (Los Angeles US)::mpserver02.flightgear.org::5003::64.69.45.88
-
-#mpserver03:5002::mpserver03.flightgear.org:5002 (East Coast US)::mpserver03.flightgear.org::5003::75.28.141.184
-mpserver03:5002::mpserver03.flightgear.org:5002 (Germany)::mpserver03.flightgear.org::5003::62.75.184.124
-
-mpserver04:5002::mpserver04.flightgear.org:5002 (UK)::mpserver04.flightgear.org::5003::217.151.102.18
-
-#hugin:5002::hugin.gidenstam.org:5002 (Sweden)::hugin.gidenstam.org::5003::83.254.84.138
-mpserver06:5002::mpserver06.flightgear.org:5002 (Sweden)::mpserver06.flightgear.org::5003::83.254.85.5
+#-- For FG MP devel / testing --
+#
+#mpserver01:5002::mpserver01.flightgear.org:5002 (Germany)::mpserver01.flightgear.org::5003::85.214.36.1
+#
+#mpserver02:5002::mpserver02.flightgear.org:5002 (Los Angeles US)::mpserver02.flightgear.org::5003::64.69.45.88
+#
+##mpserver03:5002::mpserver03.flightgear.org:5002 (East Coast US)::mpserver03.flightgear.org::5003::75.28.141.184
+#mpserver03:5002::mpserver03.flightgear.org:5002 (Germany)::mpserver03.flightgear.org::5003::62.75.184.124
+#
+#mpserver04:5002::mpserver04.flightgear.org:5002 (UK)::mpserver04.flightgear.org::5003::217.151.102.18
+#
+##hugin:5002::hugin.gidenstam.org:5002 (Sweden)::hugin.gidenstam.org::5003::83.254.84.138
+#mpserver06:5002::mpserver06.flightgear.org:5002 (Sweden)::mpserver06.flightgear.org::5003::83.254.85.5
 
