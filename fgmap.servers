@@ -22,7 +22,7 @@
 
 mpserver01:5000::mpserver01.flightgear.org:5000 (Germany)::mpserver01.flightgear.org::5001::85.214.36.1
 
-mpserver02:5000::mpserver02.flightgear.org:5000 (Hong Kong)::mpserver02.flightgear.org::5001::202.65.223.218
+mpserver02:5000::mpserver02.flightgear.org:5000 (Los Angeles US)::mpserver02.flightgear.org::5001::64.69.45.88
 
 mpserver03:5000::mpserver03.flightgear.org:5000 (Germany)::mpserver03.flightgear.org::5001::62.75.184.124
 
@@ -47,9 +47,10 @@ mpserver12:5000::mpserver12.flightgear.org:5000 (Netherlands)::mpserver12.flight
 
 -- For FG MP devel / testing --
 
-mpserver02:5002::mpserver02.flightgear.org:5002 (Hong Kong)::mpserver02.flightgear.org::5003::202.65.223.218
 
 mpserver01:5002::mpserver01.flightgear.org:5002 (Germany)::mpserver01.flightgear.org::5003::85.214.36.1
+
+mpserver02:5002::mpserver02.flightgear.org:5002 (Los Angeles US)::mpserver02.flightgear.org::5003::64.69.45.88
 
 #mpserver03:5002::mpserver03.flightgear.org:5002 (East Coast US)::mpserver03.flightgear.org::5003::75.28.141.184
 mpserver03:5002::mpserver03.flightgear.org:5002 (Germany)::mpserver03.flightgear.org::5003::62.75.184.124
