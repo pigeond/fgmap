@@ -1085,8 +1085,10 @@ FGMap.prototype.init = function(force) {
     this.gmap.setMapTypeId(this.gmap_type);
 
 
+    /* TODO: v3
     google.maps.event.addListener(this.gmap, 'maptypeid_changed',
         this.maptypechanged_cb.bind_event(this));
+    */
 
     google.maps.event.addListener(this.gmap, 'center_changed',
         this.linktomap_update.bind_event(this));
@@ -1172,6 +1174,7 @@ FGMap.prototype.latlng_visible_set = function(visible) {
 }
 */
 
+/*
 FGMap.prototype.maptypechanged_cb = function() {
 
     this.gmap_type = this.gmap.getCurrentMapType();
@@ -1180,6 +1183,7 @@ FGMap.prototype.maptypechanged_cb = function() {
         this.gmap_overview.getOverviewMap().setMapType(this.gmap_type);
     }
 };
+*/
 
 
 FGMap.prototype.menu_setup = function() {
