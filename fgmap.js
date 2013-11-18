@@ -1417,9 +1417,9 @@ FGMap.prototype.query_string_parse = function() {
 
         } else if(pair[0] == "t") {
 
-            this.gmap_type = (pair[1] == "m" ? G_NORMAL_MAP :
-                                (pair[1] == "s" ? G_SATELLITE_MAP :
-                                    G_HYBRID_MAP));
+            this.gmap_type = (pair[1] == "m" ? google.maps.MapTypeId.ROADMAP :
+                                (pair[1] == "s" ? google.maps.MapTypeId.SATELLITE :
+                                    google.maps.MapTypeId.HYBRID));
 
         } else if(pair[0] == "nomapcontrol") {
 
