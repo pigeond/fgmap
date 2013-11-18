@@ -1760,7 +1760,10 @@ FGMap.prototype.follows_update = function() {
     if(map_bounds.equals(follow_bounds) == false ||
             this.follows_always_center) {
 
+        this.gmap.fitBounds(follow_bounds);
+
         /* Change the zoom only if we need to */
+        /*
         var map_zoom = this.gmap.getZoom();
         var follow_zoom = this.gmap.getBoundsZoomLevel(follow_bounds);
 
@@ -1775,7 +1778,7 @@ FGMap.prototype.follows_update = function() {
                     follow_bounds.getSouthWest().lng()) / 2;
 
         this.gmap.setCenter(new google.maps.LatLng(clat, clng), map_zoom);
-
+        */
     }
 };
 
