@@ -40,6 +40,7 @@ FGMapMenu.prototype.init = function() {
     elem.style.overflow = "hidden";
     element_opacity_set(elem, 0.8);
     //element_event_bubble_cancel(elem);
+    elem.style.zIndex = 32767;
 
     html = "";
     html += "<b class=\"mh\">";
