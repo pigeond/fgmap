@@ -1050,7 +1050,26 @@ FGMap.prototype.init = function(force) {
     div.style.width = '100%';
     div.style.height = '100%';
 
-    this.gmap = new google.maps.Map(div);
+    var map_opts = {
+        streetViewControl: false,
+        scaleControl: true,
+        scaleControlOptions: {
+            position: google.maps.ControlPosition.BOTTOM_LEFT,
+        },
+        overviewMapControl: true,
+        overviewMapControlOptions: {
+            opened: false,
+        },
+        /*
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+        },
+        */
+    };
+
+
+    this.gmap = new google.maps.Map(div, map_opts);
 
     if(!this.gmap) {
         this.div.innerHTML =
