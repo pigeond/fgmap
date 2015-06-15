@@ -1,9 +1,4 @@
 
-SG_PREFIX ?= /usr/local
-PLIB_PREFIX ?= /usr/local
-
-CXXFLAGS += -I$(SG_PREFIX)/include -I$(PLIB_PREFIX)/include
-
 SWIG ?= /usr/bin/swig
 PERL ?= /usr/bin/perl
 MAKE ?= /usr/bin/make
@@ -19,10 +14,7 @@ MAKEFILE_PERL = Makefile.perl
 SOURCES = sgmath.cxx
 OBJECTS = sgmath.o
 
-# TODO: determine ARCH automatically
-ARCH=x86-32
-
-PM = blib-$(ARCH)/arch/auto/sgmath/sgmath.so
+PM = blib/arch/auto/sgmath/sgmath.so
 
 
 
@@ -32,14 +24,14 @@ $(SWIG_OUTPUT): $(SWIG_INPUT)
 	$(SWIG) -perl5 -c++ $(CXXFLAGS) $<
 
 $(MAKEFILE_PERL): $(MAKEFILE_PL)
-	LDFLAGS=-L$(SG_PREFIX)/lib $(PERL) $<
+	$(PERL) $<
 
 $(OBJECTS): $(SOURCES)
 	$(CXX) -c $^ -o $@ $(CXXFLAGS) -fPIC
 
 $(PM):
-	$(MAKE) -f $(MAKEFILE_PERL) SG_PREFIX=$(SG_PREFIX)
+	$(MAKE) -f $(MAKEFILE_PERL)
 
 clean:
-	rm -rf $(SWIG_OUTPUT) $(MAKEFILE_PERL) $(PM) *.o blib-$(ARCH)
+	rm -rf $(SWIG_OUTPUT) $(MAKEFILE_PERL) $(PM) *.o blib
 
