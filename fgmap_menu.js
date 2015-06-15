@@ -276,8 +276,8 @@ FGMapMenu.prototype.about_tab_setup = function() {
 
     elem.innerHTML = "\
 <a href=\"http://pigeond.net/flightgear/fgmap.html\" target=\"_blank\">FGMap</a> " + this.fgmap.version + " - <a href=\"http://www.flightgear.org/\">FlightGear</a> network server traffic map<br>\
-Written by <a href=\"http://pigeond.net/\">Pigeon</a><br>\
-Powered by <a href=\"http://maps.google.com/\">Google Map</a><br>\
+Written by <a href=\"http://pigeond.net/\">Pigeon</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"https://github.com/pigeond/fgmap/issues\">FGMap bug tracker</a><br>\
+Powered by <a href=\"https://developers.google.com/maps/\">Google Map API</a> v3<br>\
 <a href=\"http://fgms.sf.net/\">FlightGear server</a> written by Oliver Schroeder<br>\
 <div style=\"padding-top: 6px; line-height: 100%;\">Disclaimer: All navigation info are for flight simulation use only</div>\
 ";
