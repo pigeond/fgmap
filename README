@@ -169,10 +169,8 @@ Additional notes
 
 - The CGI that talks to FG server, namely fg_server_xml.cgi, written in Perl,
   uses a function in a very tiny SimGear Perl binding. The binary for this
-  binding is included for convenience. However if you'd like to rebuild this
-  for whatever reasons (hosting FGMap on a platform other than x86), please
-  read the README in sg_perl/. If you are on x86, make sure the sg_perl/blib
-  symlink is pointing to the right one. It points to x86-32 by default.
+  binding is no longer in the repo. So you have to compile it yourself. Please
+  read the README in sg_perl/.
 
 
 Troubleshooting
@@ -214,9 +212,8 @@ Troubleshooting
     is somehow not configured to run the script as a CGI. You might want to
     have a look at the server configuration.
 
-  - Are you on 64-bit platform? The default sg_perl is symlinked to 32-bit.
-    Update the symlink and try again. Read sg_perl/README for more info, or
-    maybe you need to build your own sg_perl if you're not on x86 platform.
+  - Make sure you have compiled sg_perl. Read sg_perl/README for more info, or
+    contact me if you have trouble building it.
 
 
 FGMap on Google Earth
