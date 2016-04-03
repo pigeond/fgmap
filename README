@@ -91,10 +91,10 @@ Requirements
   file, and hence fg_server_map.html. See the description of fgmap.keys below
   too.
 
-- Also you probably want to install libwww-perl (under Debian) for the navaids
-  and metar lookup proxy. You may also need to rebuild a tiny Perl binding if
-  you are not hosting FGMap on x86 32 or 64. See the 'Additional notes' below
-  for details.
+- You probably want to install libwww-perl (under Debian) for the navaids
+  and metar lookup proxy.
+
+- You need to compile sg_perl perl bindings. See sg_perl/README for details.
 
 
 Files to tune/edit
