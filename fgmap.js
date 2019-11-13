@@ -3051,7 +3051,7 @@ FGAirport.prototype.metar_update = function() {
 
     url += "?" + this.code;
 
-    this.metar_request = GXmlHttp.create();
+    this.metar_request = new XMLHttpRequest();
     this.metar_request.open('GET', url, true);
     this.metar_request.onreadystatechange = this.metar_xml_cb.bind_event(this);
     this.metar_request.send(null);
