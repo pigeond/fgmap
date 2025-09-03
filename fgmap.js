@@ -140,7 +140,7 @@ var FGMAP_CRAFT_MODELS_HEAVYJET = [ "boeing733", "boeing747-400-jw", "a320-fb", 
 
 
 var FGMAP_CRAFT_ICON_GLIDER = "glider/glider";
-var FGMAP_CRAFT_MODELS_GLIDER = [ "hgldr-cs-model", "paraglider_model", "colditz-model", "sgs233", "ask21", "ask21-jsb", "ask21mi", "ka6" ];
+var FGMAP_CRAFT_MODELS_GLIDER = [ "hgldr-cs-model", "paraglider_model", "colditz-model", "sgs233", "ask21", "ask21-jsb", "ask21mi", "ka6", "ls4" ];
 
 var FGMAP_CRAFT_ICON_BLIMP = "blimp/blimp";
 var FGMAP_CRAFT_MODELS_BLIMP = [ "ZLT-NT", "ZF-balloon", "Submarine_Scout", "LZ-129", "Excelsior-model" ];
