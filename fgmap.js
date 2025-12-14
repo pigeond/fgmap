@@ -146,7 +146,7 @@ var FGMAP_CRAFT_ICON_BLIMP = "blimp/blimp";
 var FGMAP_CRAFT_MODELS_BLIMP = [ "ZLT-NT", "ZF-balloon", "Submarine_Scout", "LZ-129", "Excelsior-model" ];
 
 var FGMAP_CRAFT_ICON_CARRIER = "carrier/fg_carrier";
-var FGMAP_CRAFT_MODELS_CARRIER = [ "mp-nimitz", "mp-eisenhower", "mp-foch" ];
+var FGMAP_CRAFT_MODELS_CARRIER = [ "mp-nimitz", "mp-eisenhower", "mp-foch", "mp-clemenceau" ];
 
 var FGMAP_CRAFT_ICON_AUCAFLY = "aucafly/AUCAFLY";
 var FGMAP_CRAFT_MODELS_AUCAFLY = [ "aucaflyt1" ];
